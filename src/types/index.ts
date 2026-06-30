@@ -77,6 +77,7 @@ export interface Employee {
   id: string
   name: string
   phone: string
+  birthDate?: string
   status: EmploymentStatus
   hiredAt: string
   terminatedAt?: string

@@ -1,0 +1,508 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: calc(var(--nav-height) + 72px);
+}
+
+/* ── 헤더 ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.viewTabs {
+  display: flex;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.tab,
+.tabActive {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tab {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.tab:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.tabActive {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabBadge {
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 필터 ── */
+.filterRow {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chip,
+.chipActive {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.chip {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.chipActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+/* ── 직원 카드 그리드 ── */
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding: 32px 0;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+/* ── 직원 카드 ── */
+.empCard {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.empCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.badge_ACTIVE   { background: var(--color-primary-light); color: var(--color-primary); }
+.badge_INACTIVE { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.empName {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.empPhone {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.dowRow {
+  display: flex;
+  gap: 4px;
+}
+
+.dowDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dowDotOn {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.timeRange {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 16px);
+  right: 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(61, 99, 221, 0.35);
+  z-index: 10;
+  transition: box-shadow 0.15s;
+}
+
+.fab:hover {
+  box-shadow: 0 6px 20px rgba(61, 99, 221, 0.45);
+}
+
+@media (min-width: 768px) {
+  .fab { bottom: 24px; }
+}
+
+/* ── 가입 신청 ── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.requestCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.requestInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.requestName {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.requestMeta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.requestMsg {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.requestBtns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.btnReject {
+  padding: 7px 13px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+
+.btnReject:hover {
+  background: var(--color-bg);
+}
+
+.btnApprove {
+  padding: 7px 13px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── 초대 시트 ── */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: overlayIn 0.2s ease-out;
+}
+
+@keyframes overlayIn {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.35); }
+}
+
+.sheet {
+  background: var(--color-surface);
+  border-radius: 20px 20px 0 0;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  animation: sheetUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-primary-light);
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sheetTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sheetClose {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  transition: background 0.1s;
+}
+
+.sheetClose:hover {
+  background: var(--color-bg);
+}
+
+.sheetBody {
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 28px;
+}
+
+.inviteDesc {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.phoneInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-sizing: border-box;
+}
+
+.phoneInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 13px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.inviteSuccess {
+  padding: 28px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inviteSuccessTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.inviteSuccessDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .sheetOverlay {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sheet {
+    width: 420px;
+    border-radius: 16px;
+    animation: modalIn 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes modalIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .page {
+    padding-bottom: 24px;
+  }
+}

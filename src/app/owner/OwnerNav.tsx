@@ -12,6 +12,7 @@ const navItems = [
   { href: '/owner/checklists', label: '체크리스트', short: '체크' },
   { href: '/owner/requests', label: '요청함', short: '요청' },
   { href: '/owner/attendance', label: '출근현황', short: '출근' },
+  { href: '/owner/employees', label: '직원관리', short: '직원' },
 ]
 
 export default function OwnerNav() {

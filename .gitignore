@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# -------------------------
+# Dependencies
+# -------------------------
 /node_modules
 /.pnp
 .pnp.*
@@ -10,36 +12,82 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# -------------------------
+# Next.js
+# -------------------------
 /.next/
 /out/
 
-# production
+# -------------------------
+# React / Build Output
+# -------------------------
 /build
+/dist
 
-# misc
-.DS_Store
-*.pem
+# -------------------------
+# Testing
+# -------------------------
+/coverage
 
-# IDE
+# -------------------------
+# TypeScript
+# -------------------------
+*.tsbuildinfo
+next-env.d.ts
+
+# -------------------------
+# Environment Variables
+# -------------------------
+.env*
+
+# -------------------------
+# IDE - IntelliJ IDEA / WebStorm
+# -------------------------
 .idea/
-.vscode/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
 
-# debug
+# -------------------------
+# IDE - VS Code
+# -------------------------
+.vscode/
+!.vscode/extensions.json
+
+# -------------------------
+# OS - macOS
+# -------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# -------------------------
+# OS - Windows
+# -------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -------------------------
+# Debug
+# -------------------------
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
+# -------------------------
+# Misc
+# -------------------------
+*.pem
 .vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+.cache/
+.turbo/

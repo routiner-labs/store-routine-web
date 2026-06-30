@@ -159,14 +159,24 @@
    ══════════════════════════════════════ */
 .advPanel {
   background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  padding: 14px var(--page-x);
   display: flex;
   flex-direction: column;
   gap: 12px;
   position: sticky;
   top: var(--header-height);
   z-index: 9;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 var(--page-x);
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.advPanelOpen {
+  max-height: 600px;
+  opacity: 1;
+  padding: 14px var(--page-x);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .advRow {
@@ -256,15 +266,17 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 12px;
+  padding: 7px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.1s, color 0.1s;
 }
 

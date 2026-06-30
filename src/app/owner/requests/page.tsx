@@ -211,8 +211,7 @@ export default function OwnerRequests() {
         </div>
       </header>
 
-      {advOpen && (
-        <div className={styles.advPanel}>
+      <div className={`${styles.advPanel} ${advOpen ? styles.advPanelOpen : ''}`}>
           <div className={styles.advRow}>
             <span className={styles.advLabel}>내용</span>
             <div className={styles.advSearchWrap}>
@@ -341,8 +340,7 @@ export default function OwnerRequests() {
             </div>
           </div>
 
-        </div>
-      )}
+      </div>
 
       {authorPopupOpen && (
         <div className={styles.authorPickerOverlay} onClick={() => { setAuthorPopupOpen(false); setEmpSearchText('') }}>

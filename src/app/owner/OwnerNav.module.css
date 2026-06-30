@@ -1,5 +1,14 @@
-/* Mobile: 하단 탭바 */
+/* ════════════════════════════════════════
+   모바일: .nav 숨김 / .mobileBar 표시
+   ════════════════════════════════════════ */
+
+/* 태블릿 미만: 사이드바 숨김 */
 .nav {
+  display: none;
+}
+
+/* ── 모바일 3등분 하단 바 ── */
+.mobileBar {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -8,97 +17,442 @@
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
   display: flex;
-  flex-direction: row;
   align-items: stretch;
-  z-index: 100;
+  z-index: 201;
 }
 
-.brand {
-  display: none;
-}
-
-.storeTrigger {
-  display: none;
-}
-
-.storeShort,
-.storeFull,
-.storeChevron {
-  display: none;
-}
-
-.item {
+.mobileBtn {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
   color: var(--color-text-secondary);
+  padding: 0 8px;
   transition: color 0.15s;
 }
 
-.item.active {
-  color: var(--color-primary);
+.mobileBtn:hover {
+  color: var(--color-text);
 }
 
-.navIcon {
+.mobileBtnIcon {
   font-size: 22px;
   flex-shrink: 0;
 }
 
-.shortLabel {
-  display: block;
-  font-size: 10px;
+.mobileBtnLabel {
+  font-size: 11px;
   font-weight: 600;
 }
 
-.fullLabel {
-  display: none;
-  font-size: 11px;
+.mobileAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── 왼쪽 알림 버튼 ── */
+.mobileBellWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileBellBadge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 2px solid var(--color-surface);
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* ── 중앙 다이아몬드 메뉴 영역 ── */
+.mobileDiamondArea {
+  flex: 0 0 72px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 원형 메뉴 버튼 */
+.menuDiamond {
+  position: absolute;
+  top: -2px;
+  width: 56px;
+  height: 56px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 4px 16px rgba(61, 99, 221, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.menuDiamond:hover {
+  opacity: 0.9;
+}
+
+.menuDiamondIcon {
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── 모바일 알림 전체화면 ── */
+.notifScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--nav-height);
+  background: var(--color-bg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  animation: notifIn 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.notifHeader {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.notifClose {
+  font-size: 22px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+
+.notifClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.notifTitle {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.notifMarkAll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 0.1s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.notifMarkAll:hover {
+  background: var(--color-primary-light);
+}
+
+.notifList {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 16px;
+}
+
+.notifEmpty {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 48px 20px;
+  margin: 0;
+}
+
+.notifItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 16px var(--page-x);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  font-family: inherit;
+}
+
+.notifItem:hover {
+  background: var(--color-bg);
+}
+
+.notifItemUnread {
+  background: var(--color-primary-light);
+}
+
+.notifItemUnread:hover {
+  background: color-mix(in srgb, var(--color-primary-light) 70%, var(--color-bg));
+}
+
+.notifIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notifType_REQUEST    { background: var(--color-primary-light); color: var(--color-primary); }
+.notifType_ATTENDANCE { background: var(--color-warning-light); color: var(--color-warning); }
+.notifType_CHECKLIST  { background: var(--color-success-light); color: var(--color-success); }
+.notifType_SYSTEM     { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+.notifBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notifItemTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.notifItemDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notifItemTime {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.notifDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* 태블릿+에서 전체화면 알림 숨김 (데스크탑은 패널로 처리) */
+@media (min-width: 768px) {
+  .notifScreen {
+    display: none;
+  }
+}
+
+/* ── 모바일 메뉴 드로어 ── */
+.drawerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--nav-height);
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 150;
+  animation: overlayIn 0.2s ease-out;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border-radius: 20px 20px 0 0;
+  z-index: 151;
+  padding-bottom: calc(var(--nav-height) + 8px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  animation: drawerUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes drawerUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.drawerHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+  margin: 12px auto 0;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.drawerStoreName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.drawerClose {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.drawerClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.drawerItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: background 0.1s, color 0.1s;
+}
+
+.drawerItem:last-child {
+  border-bottom: none;
+}
+
+.drawerItem:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.drawerItemActive {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.drawerItemActive:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.drawerIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.drawerLabel {
+  font-size: 15px;
   font-weight: 500;
 }
 
-/* Mobile: 유저 섹션 — 벨 아이콘만 탭바에 표시 */
-.userSection {
-  flex: 0 0 52px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  border-left: 1px solid var(--color-border);
+.drawerItemActive .drawerLabel {
+  font-weight: 600;
 }
 
-.userAvatar {
-  display: none;
-}
-
-.userName {
-  display: none;
-}
-
-/* Tablet (768px~): 좌측 아이콘 사이드바 */
+/* ════════════════════════════════════════
+   태블릿 (768px~): 좌측 아이콘 사이드바
+   ════════════════════════════════════════ */
 @media (min-width: 768px) {
   .nav {
+    display: flex;
     position: sticky;
     order: -1;
     top: 0;
-    right: auto;
-    bottom: auto;
     width: var(--sidebar-sm);
     height: 100vh;
     flex-direction: column;
-    border-top: none;
-    border-right: 1px solid var(--color-border);
     align-items: center;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
     justify-content: flex-start;
     padding-top: 16px;
     gap: 2px;
     overflow: visible;
   }
 
-  .brand {
+  /* 모바일 전용 요소 숨김 */
+  .mobileBar {
     display: none;
   }
 
@@ -129,38 +483,42 @@
   }
 
   .item {
+    display: flex;
     flex: 0;
     width: 100%;
     padding: 12px 0;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 0;
-    border-radius: 0;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .item.active {
+    color: var(--color-primary);
   }
 
   .navIcon {
     font-size: 22px;
-  }
-
-  .shortLabel {
-    display: none;
+    flex-shrink: 0;
   }
 
   .fullLabel {
     display: none;
   }
 
-  /* 태블릿: 사이드바 하단에 벨 아이콘 */
+  /* 사이드바 하단: 벨 아이콘 */
   .userSection {
-    flex: 0;
+    display: flex;
     flex-direction: column;
-    border-left: none;
-    border-top: 1px solid var(--color-border);
+    align-items: center;
+    justify-content: center;
     margin-top: auto;
+    border-top: 1px solid var(--color-border);
     width: 100%;
     padding: 12px 0;
-    gap: 0;
-    justify-content: center;
-    align-items: center;
   }
 
   .userAvatar {
@@ -172,17 +530,15 @@
   }
 }
 
-/* Desktop (1024px~): 라벨 포함 사이드바 */
+/* ════════════════════════════════════════
+   데스크탑 (1024px~): 라벨 포함 사이드바
+   ════════════════════════════════════════ */
 @media (min-width: 1024px) {
   .nav {
     width: var(--sidebar-lg);
     align-items: stretch;
     padding-top: 0;
     gap: 2px;
-  }
-
-  .brand {
-    display: none;
   }
 
   .storeTrigger {
@@ -244,10 +600,6 @@
   .navIcon {
     font-size: 18px;
     flex-shrink: 0;
-  }
-
-  .shortLabel {
-    display: none;
   }
 
   .fullLabel {

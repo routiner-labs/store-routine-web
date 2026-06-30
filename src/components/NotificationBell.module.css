@@ -6,6 +6,31 @@
   flex-shrink: 0;
 }
 
+/* ── 다이아몬드 변형: 역회전으로 콘텐츠를 수직으로 복원 ── */
+.wrapDiamond {
+  transform: rotate(-45deg);
+}
+
+.wrapDiamond .bell {
+  color: #fff;
+  padding: 10px;
+}
+
+.wrapDiamond .bell:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.wrapDiamond .bellIcon {
+  font-size: 24px;
+}
+
+.wrapDiamond .badge {
+  top: 1px;
+  right: 1px;
+  border-color: var(--color-primary);
+}
+
 /* ── 벨 버튼 ── */
 .bell {
   position: relative;

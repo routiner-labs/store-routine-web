@@ -21,7 +21,7 @@ const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   SYSTEM:     <LiaInfoCircleSolid />,
 }
 
-export default function NotificationBell() {
+export default function NotificationBell({ diamond }: { diamond?: boolean }) {
   const [open, setOpen] = useState(false)
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotification()
   const router = useRouter()
@@ -33,7 +33,7 @@ export default function NotificationBell() {
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap} ${diamond ? styles.wrapDiamond : ''}`}>
       <button
         className={styles.bell}
         onClick={() => setOpen((v) => !v)}

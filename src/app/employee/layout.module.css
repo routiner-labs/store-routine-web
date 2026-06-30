@@ -1,0 +1,25 @@
+.layout {
+  min-height: 100dvh;
+}
+
+.main {
+  padding-bottom: var(--nav-height);
+}
+
+@media (min-width: 768px) {
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-sm) 1fr;
+    min-height: 100vh;
+  }
+
+  .main {
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: var(--sidebar-lg) 1fr;
+  }
+}

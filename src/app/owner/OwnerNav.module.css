@@ -1,0 +1,194 @@
+/* Mobile: 하단 탭바 */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  z-index: 100;
+}
+
+.brand {
+  display: none;
+}
+
+.storeTrigger {
+  display: none;
+}
+
+.storeShort,
+.storeFull,
+.storeChevron {
+  display: none;
+}
+
+.item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: color 0.15s;
+}
+
+.item.active {
+  color: var(--color-primary);
+}
+
+.shortLabel {
+  display: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fullLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Tablet (768px~): 좌측 아이콘 사이드바 */
+@media (min-width: 768px) {
+  .nav {
+    position: sticky;
+    order: -1;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    width: var(--sidebar-sm);
+    height: 100vh;
+    flex-direction: column;
+    border-top: none;
+    border-right: 1px solid var(--color-border);
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 16px;
+    gap: 2px;
+    overflow: hidden;
+  }
+
+  .brand {
+    display: none;
+  }
+
+  .storeTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 8px 0 14px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 8px;
+    color: var(--color-text-secondary);
+  }
+
+  .storeShort {
+    display: block;
+    font-size: 16px;
+  }
+
+  .storeFull,
+  .storeChevron {
+    display: none;
+  }
+
+  .item {
+    flex: 0;
+    width: 100%;
+    padding: 12px 0;
+    flex-direction: column;
+  }
+
+  .shortLabel {
+    display: block;
+  }
+
+  .fullLabel {
+    display: none;
+  }
+}
+
+/* Desktop (1024px~): 라벨 포함 사이드바 */
+@media (min-width: 1024px) {
+  .nav {
+    width: var(--sidebar-lg);
+    align-items: stretch;
+    padding-top: 0;
+    gap: 2px;
+  }
+
+  .brand {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+    padding: 24px 16px 0;
+  }
+
+  .storeTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 16px 16px;
+    gap: 6px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 12px;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .storeTrigger:hover {
+    color: var(--color-text);
+  }
+
+  .storeShort {
+    display: none;
+  }
+
+  .storeFull {
+    display: block;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .storeChevron {
+    display: block;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .item {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 11px 16px;
+    border-radius: var(--radius-md);
+    margin: 0 8px;
+    width: calc(100% - 16px);
+  }
+
+  .item.active {
+    background: var(--color-primary-light);
+  }
+
+  .shortLabel {
+    display: none;
+  }
+
+  .fullLabel {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}

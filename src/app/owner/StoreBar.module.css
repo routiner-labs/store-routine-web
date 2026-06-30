@@ -1,0 +1,29 @@
+.bar {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 10px 16px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text);
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chevron {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* 태블릿 이상에서는 사이드바에 매장 표시 */
+@media (min-width: 768px) {
+  .bar {
+    display: none;
+  }
+}

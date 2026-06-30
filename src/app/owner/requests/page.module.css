@@ -1,0 +1,120 @@
+.page {
+  padding-bottom: 16px;
+}
+
+.header {
+  padding: 20px 20px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.section {
+  padding: 16px 16px 0;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.typeTag {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.status_REQUESTED { color: var(--color-primary); background: var(--color-primary-light); }
+.status_CONFIRMED { color: var(--color-success); background: var(--color-success-light); }
+.status_IN_PROGRESS { color: var(--color-warning); background: var(--color-warning-light); }
+.status_DONE { color: var(--color-text-secondary); background: var(--color-border); }
+.status_REJECTED { color: var(--color-danger); background: var(--color-danger-light); }
+
+.content {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.photoBadge {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Responsive ─── */
+
+@media (min-width: 768px) {
+  .page {
+    padding: 24px;
+    max-width: var(--content-max);
+    margin: 0 auto;
+  }
+
+  .header {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+  }
+
+  .section {
+    padding: 0 0 16px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 32px;
+  }
+}

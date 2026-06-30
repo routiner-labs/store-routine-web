@@ -1,0 +1,179 @@
+.page {
+  padding-bottom: 16px;
+}
+
+.header {
+  padding: 20px 20px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.typeTag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.reviewBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 99px;
+}
+
+.progressText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  min-width: 36px;
+  text-align: right;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item_DONE { opacity: 0.6; }
+.item_NEEDS_REVIEW { background: var(--color-danger-light); }
+
+.completionIcon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.itemTitle {
+  flex: 1;
+  font-size: 14px;
+}
+
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.itemValue {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.itemStatus {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.itemStatus_DONE { color: var(--color-success); background: var(--color-success-light); }
+.itemStatus_PENDING { color: var(--color-text-secondary); background: var(--color-border); }
+.itemStatus_NEEDS_REVIEW { color: var(--color-danger); background: var(--color-danger-light); }
+.itemStatus_SKIPPED { color: var(--color-warning); background: var(--color-warning-light); }
+
+/* ─── Responsive ─── */
+
+@media (min-width: 768px) {
+  .page {
+    padding: 24px;
+    max-width: var(--content-max);
+    margin: 0 auto;
+  }
+
+  .header {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+  }
+
+  .list {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 32px;
+  }
+}

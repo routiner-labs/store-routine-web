@@ -1,66 +1,37 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link'
+import styles from './page.module.css'
 
-export default function Home() {
+export default function RolePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className={styles.container}>
+      <div className={styles.hero}>
+        <div className={styles.logoMark}>루틴</div>
+        <p className={styles.tagline}>
+          알바생은 오늘 할 일을 확인하고<br />
+          사장님은 문제 있는 것만 봅니다
+        </p>
+      </div>
+
+      <div className={styles.roles}>
+        <Link href="/owner" className={styles.roleBtn}>
+          <span className={styles.roleIcon}>사장</span>
+          <div className={styles.roleText}>
+            <strong>사장님으로 입장</strong>
+            <span>매장 현황과 이상 항목을 확인합니다</span>
+          </div>
+          <span className={styles.arrow}>›</span>
+        </Link>
+        <Link href="/employee" className={styles.roleBtn}>
+          <span className={styles.roleIcon}>알바</span>
+          <div className={styles.roleText}>
+            <strong>알바생으로 입장</strong>
+            <span>오늘 할 일과 체크리스트를 확인합니다</span>
+          </div>
+          <span className={styles.arrow}>›</span>
+        </Link>
+      </div>
+
+      <p className={styles.hint}>데모 버전 · 실제 로그인 없음</p>
     </div>
-  );
+  )
 }

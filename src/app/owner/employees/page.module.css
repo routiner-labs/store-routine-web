@@ -11,7 +11,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
@@ -25,58 +26,59 @@
   flex-shrink: 0;
 }
 
-.viewTabs {
-  display: flex;
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-  gap: 2px;
-  flex-shrink: 0;
+.headerSearch {
+  display: none;
 }
 
-.tab,
-.tabActive {
-  padding: 6px 14px;
-  font-size: 13px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.searchWrap {
+  position: relative;
+  flex: 1;
 }
 
-.tab {
-  background: transparent;
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
   color: var(--color-text-secondary);
+  pointer-events: none;
 }
 
-.tab:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+.searchInput {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-.tabActive {
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.searchBtn {
+  padding: 7px 14px;
   background: var(--color-primary);
   color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: opacity 0.12s;
 }
 
-.tabBadge {
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
-  background: var(--color-danger);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 0 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.searchBtn:hover {
+  opacity: 0.88;
 }
 
 /* ── 필터 ── */
@@ -88,26 +90,36 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.chip,
-.chipActive {
-  padding: 6px 14px;
-  border-radius: 20px;
+.chip {
+  padding: 5px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 
-.chip {
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+.chip:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .chipActive {
   background: var(--color-primary-light);
   color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.chipActive:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 /* ── 직원 카드 그리드 ── */
@@ -180,10 +192,10 @@
 }
 
 .statusBadge {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 3px 9px;
-  border-radius: 20px;
+  border-radius: 99px;
   flex-shrink: 0;
 }
 
@@ -245,6 +257,40 @@
   color: var(--color-text-secondary);
 }
 
+/* ── 가입 신청 배너 ── */
+.joinBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 16px 0;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: background 0.12s, box-shadow 0.12s;
+}
+
+.joinBanner:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.joinBannerText {
+  font-size: 14px;
+}
+
+.joinBannerText strong {
+  color: var(--color-primary);
+}
+
+.joinBannerArrow {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
 /* ── FAB ── */
 .fab {
   position: fixed;
@@ -268,93 +314,6 @@
 
 .fab:hover {
   box-shadow: 0 6px 20px rgba(61, 99, 221, 0.45);
-}
-
-@media (min-width: 768px) {
-  .fab { bottom: 24px; }
-}
-
-/* ── 가입 신청 ── */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-}
-
-.requestCard {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  justify-content: space-between;
-}
-
-.requestInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.requestName {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.requestMeta {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.requestMsg {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-.requestBtns {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-.btnReject {
-  padding: 7px 13px;
-  background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.1s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.btnReject:hover {
-  background: var(--color-bg);
-}
-
-.btnApprove {
-  padding: 7px 13px;
-  background: var(--color-primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 /* ── 초대 시트 ── */
@@ -495,6 +454,24 @@
 }
 
 @media (min-width: 768px) {
+  .fab { bottom: 24px; }
+
+  .filterRow {
+    background: transparent;
+    border-bottom: none;
+    padding: 16px var(--page-x) 0;
+  }
+
+  .headerSearch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
   .sheetOverlay {
     align-items: center;
     justify-content: center;
@@ -513,5 +490,9 @@
 
   .page {
     padding-bottom: 24px;
+  }
+
+  .joinBanner {
+    margin: 12px 24px 0;
   }
 }

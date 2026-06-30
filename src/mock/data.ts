@@ -1,4 +1,4 @@
-import type { Checklist, AttendanceRecord, SpecialInstruction, EmployeeRequest } from '@/types'
+import type { Checklist, AttendanceRecord, SpecialInstruction, EmployeeRequest, RequestReply, ActivityLog } from '@/types'
 
 export const mockAttendance: AttendanceRecord[] = [
   {
@@ -86,7 +86,8 @@ export const mockRequests: EmployeeRequest[] = [
     type: '재료부족',
     content: '우유가 2팩 남았습니다. 내일 오픈 전에 보충이 필요해요.',
     status: 'CONFIRMED',
-    createdAt: '14:32',
+    visibility: 'ALL',
+    createdAt: '2026-06-29 14:32',
     employeeName: '김민수',
     hasPhoto: true,
   },
@@ -95,7 +96,8 @@ export const mockRequests: EmployeeRequest[] = [
     type: '근무변경',
     content: '이번 주 금요일 개인 사정으로 2시간 일찍 퇴근이 가능한지 여쭤봅니다.',
     status: 'REQUESTED',
-    createdAt: '11:15',
+    visibility: 'OWNER_ONLY',
+    createdAt: '2026-06-30 11:15',
     employeeName: '이지은',
     hasPhoto: false,
   },
@@ -104,8 +106,41 @@ export const mockRequests: EmployeeRequest[] = [
     type: '장비고장',
     content: '커피머신 스팀 노즐에서 물이 계속 새고 있어요. 수건으로 막아두었습니다.',
     status: 'IN_PROGRESS',
-    createdAt: '09:44',
+    visibility: 'OWNER_ONLY',
+    createdAt: '2026-06-30 09:44',
     employeeName: '김민수',
     hasPhoto: true,
   },
+]
+
+export const mockReplies: RequestReply[] = [
+  {
+    id: 'r1',
+    requestId: '1',
+    content: '확인했습니다. 내일 오전 오픈 전 배송 예정입니다.',
+    authorName: '사장',
+    authorRole: 'OWNER',
+    createdAt: '2026-06-29 16:10',
+  },
+  {
+    id: 'r2',
+    requestId: '3',
+    content: 'A/S 업체에 연락했습니다. 내일 오후 방문 예정입니다.',
+    authorName: '사장',
+    authorRole: 'OWNER',
+    createdAt: '2026-06-30 10:20',
+  },
+]
+
+export const mockActivityLogs: ActivityLog[] = [
+  // 요청 1
+  { id: 'a1', requestId: '1', type: 'CREATED',        actorName: '김민수', actorRole: 'EMPLOYEE', createdAt: '2026-06-29 14:32' },
+  { id: 'a2', requestId: '1', type: 'STATUS_CHANGED', actorName: '사장',   actorRole: 'OWNER',    detail: '미확인 → 확인됨',    createdAt: '2026-06-29 15:44' },
+  { id: 'a3', requestId: '1', type: 'COMMENT_ADDED',  actorName: '사장',   actorRole: 'OWNER',    createdAt: '2026-06-29 16:10' },
+  // 요청 2
+  { id: 'a4', requestId: '2', type: 'CREATED',        actorName: '이지은', actorRole: 'EMPLOYEE', createdAt: '2026-06-30 11:15' },
+  // 요청 3
+  { id: 'a5', requestId: '3', type: 'CREATED',        actorName: '김민수', actorRole: 'EMPLOYEE', createdAt: '2026-06-30 09:44' },
+  { id: 'a6', requestId: '3', type: 'STATUS_CHANGED', actorName: '사장',   actorRole: 'OWNER',    detail: '미확인 → 처리 중',   createdAt: '2026-06-30 10:05' },
+  { id: 'a7', requestId: '3', type: 'COMMENT_ADDED',  actorName: '사장',   actorRole: 'OWNER',    createdAt: '2026-06-30 10:20' },
 ]

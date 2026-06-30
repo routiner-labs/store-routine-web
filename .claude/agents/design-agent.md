@@ -155,6 +155,179 @@ UI/UX 설계 및 화면 구조 정의를 담당하는 에이전트.
 
 ---
 
+---
+
+## 컴포넌트 스타일 가이드
+
+### 필터 칩 (Filter Chip)
+
+페이지 내 상태·유형 필터에 사용하는 pill 형태 버튼.
+
+#### 크기 / 타이포
+
+| 속성 | 값 |
+|---|---|
+| padding | `5px 13px` |
+| border-radius | `99px` |
+| font-size | `13px` |
+| font-weight | 기본 `500` / 활성 `600` |
+
+#### 상태별 색상
+
+| 상태 | background | color | border |
+|---|---|---|---|
+| 기본 (default) | `--color-bg` | `--color-text-secondary` | `1px solid --color-border` |
+| hover | `--color-primary-light` | `--color-primary` | `1px solid --color-primary` |
+| 활성 (active) | `--color-primary-light` | `--color-primary` | `1px solid --color-primary` |
+
+> 활성 칩은 solid 파랑(`--color-primary`) 배경을 사용하지 않는다. 필터는 CTA가 아니므로 연한 파랑(`--color-primary-light`)으로 강조한다.
+
+#### CSS 패턴
+
+```css
+.chip {
+  padding: 5px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.chip:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.chipActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+.chipActive:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+```
+
+#### TSX 패턴
+
+```tsx
+// chip + chipActive 를 합산 적용 (active 는 override만 담당)
+className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
+```
+
+#### 필터 바 (filter bar) 레이아웃
+
+```css
+.filterBar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px var(--page-x);          /* --page-x: 16/24/32px (반응형) */
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+@media (min-width: 768px) {
+  .filterBar {
+    background: transparent;
+    border-bottom: none;
+  }
+}
+```
+
+---
+
+### 뱃지 (Badge)
+
+뱃지는 용도에 따라 두 종류로만 구분한다. 새 뱃지를 만들 때 이 두 종류 안에서 해결한다.
+
+#### 1. 상태 뱃지 (Status Badge) — pill 형태
+
+재직/퇴직, 요청 상태(미확인/처리중/완료 등) 등 **상태값**에 사용.
+
+| 속성 | 값 |
+|---|---|
+| padding | `3px 9px` |
+| border-radius | `99px` |
+| font-size | `12px` |
+| font-weight | `600` |
+
+```css
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+```
+
+색상은 상태 의미에 따라 시맨틱 토큰 사용:
+
+| 상태 | background | color |
+|---|---|---|
+| 신규/미확인 | `--color-primary-light` | `--color-primary` |
+| 확인/처리중 | `--color-success-light` / `--color-warning-light` | 해당 색상 토큰 |
+| 완료 | `--color-border` | `--color-text-secondary` |
+| 반려/오류 | `--color-danger-light` | `--color-danger` |
+| 비활성 | `--color-bg` + `border: 1px solid --color-border` | `--color-text-secondary` |
+
+#### 2. 유형·속성 뱃지 (Category Badge) — 둥근 사각형
+
+요청 유형(재료부족, 장비고장 등), 공개범위(사장만, 전체공개), 부가정보(사진 있음) 등 **카테고리·메타정보**에 사용.
+
+| 속성 | 값 |
+|---|---|
+| padding | `3px 8px` |
+| border-radius | `6px` |
+| font-size | `11px` |
+| font-weight | 카테고리 `700` / 메타정보 `500` |
+
+```css
+.categoryBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+```
+
+> **금지**: `border-radius: 4px`, `border-radius: 20px` 같은 임의 값 사용. 뱃지는 반드시 `99px`(pill) 또는 `6px`(rect) 중 하나를 선택한다.
+
+---
+
+### 헤더 레이아웃
+
+모든 페이지 헤더는 아래 규칙을 따른다.
+
+```css
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);   /* 70px — globals.css */
+  padding: 0 var(--page-x);       /* 16/24/32px — globals.css */
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+```
+
+- `height: var(--header-height)` + `padding: 0 var(--page-x)` 조합으로 높이를 고정한다.
+- `padding: 16px` 처럼 상하 패딩으로 높이를 결정하는 방식은 사용하지 않는다.
+- 개별 페이지에서 미디어쿼리로 헤더 패딩을 오버라이드하지 않는다. `--page-x`가 반응형으로 처리한다.
+
+---
+
 ### 향후 확장 고려사항
 
 - **다크 모드**: blue-900(`#162577`)을 배경으로, blue-300(`#93A8FA`)을 프라이머리로 전환

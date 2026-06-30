@@ -2,25 +2,28 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LiaUserPlusSolid, LiaCheckSolid, LiaTimesSolid } from 'react-icons/lia'
+import Link from 'next/link'
+import { LiaUserPlusSolid, LiaAngleRightSolid, LiaSearchSolid } from 'react-icons/lia'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
 import type { EmploymentStatus } from '@/types'
 import styles from './page.module.css'
-
-type MainTab = 'employees' | 'requests'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
 
 export default function EmployeesPage() {
   const router = useRouter()
-  const [mainTab, setMainTab] = useState<MainTab>('employees')
   const [statusFilter, setStatusFilter] = useState<EmploymentStatus>('ACTIVE')
-  const [requests, setRequests] = useState(mockJoinRequests)
   const [inviteOpen, setInviteOpen] = useState(false)
   const [invitePhone, setInvitePhone] = useState('')
   const [inviteSent, setInviteSent] = useState(false)
+  const [searchText, setSearchText] = useState('')
+  const [appliedSearch, setAppliedSearch] = useState('')
 
-  const visibleEmployees = mockEmployees.filter((e) => e.status === statusFilter)
+  const q = appliedSearch.trim().toLowerCase()
+
+  const visibleEmployees = mockEmployees
+    .filter((e) => e.status === statusFilter)
+    .filter((e) => !q || e.name.toLowerCase().includes(q) || e.phone.includes(q))
 
   function closeInvite() {
     setInviteOpen(false)
@@ -37,118 +40,94 @@ export default function EmployeesPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.heading}>직원 관리</h1>
-        <div className={styles.viewTabs}>
+        <div className={styles.headerSearch}>
+          <div className={styles.searchWrap}>
+            <LiaSearchSolid className={styles.searchIcon} />
+            <input
+              className={styles.searchInput}
+              placeholder="이름 / 전화번호"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') setAppliedSearch(searchText) }}
+            />
+          </div>
           <button
-            className={mainTab === 'employees' ? styles.tabActive : styles.tab}
-            onClick={() => setMainTab('employees')}
+            className={styles.searchBtn}
+            onClick={() => setAppliedSearch(searchText)}
           >
-            직원
-          </button>
-          <button
-            className={mainTab === 'requests' ? styles.tabActive : styles.tab}
-            onClick={() => setMainTab('requests')}
-          >
-            가입 신청
-            {requests.length > 0 && <span className={styles.tabBadge}>{requests.length}</span>}
+            검색
           </button>
         </div>
       </header>
 
-      {mainTab === 'employees' && (
-        <>
-          <div className={styles.filterRow}>
-            {(['ACTIVE', 'INACTIVE'] as EmploymentStatus[]).map((s) => (
-              <button
-                key={s}
-                className={statusFilter === s ? styles.chipActive : styles.chip}
-                onClick={() => setStatusFilter(s)}
-              >
-                {s === 'ACTIVE' ? '재직중' : '퇴직'}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.cardGrid}>
-            {visibleEmployees.length === 0 ? (
-              <p className={styles.emptyText}>
-                {statusFilter === 'ACTIVE' ? '재직중인 직원이 없습니다.' : '퇴직한 직원이 없습니다.'}
-              </p>
-            ) : (
-              visibleEmployees.map((emp) => (
-                <button
-                  key={emp.id}
-                  className={styles.empCard}
-                  onClick={() => router.push(`/owner/employees/${emp.id}`)}
-                >
-                  <div className={styles.cardHeader}>
-                    <div className={styles.avatar}>{emp.name[0]}</div>
-                    <span className={`${styles.statusBadge} ${emp.status === 'ACTIVE' ? styles.badge_ACTIVE : styles.badge_INACTIVE}`}>
-                      {emp.status === 'ACTIVE' ? '재직중' : '퇴직'}
-                    </span>
-                  </div>
-                  <div className={styles.cardBody}>
-                    <span className={styles.empName}>{emp.name}</span>
-                    <span className={styles.empPhone}>{emp.phone}</span>
-                  </div>
-                  {emp.schedule && (
-                    <div className={styles.cardFooter}>
-                      <div className={styles.dowRow}>
-                        {DOW.map((d, i) => (
-                          <span
-                            key={i}
-                            className={`${styles.dowDot} ${emp.schedule!.days.includes(i) ? styles.dowDotOn : ''}`}
-                          >
-                            {d}
-                          </span>
-                        ))}
-                      </div>
-                      <span className={styles.timeRange}>
-                        {emp.schedule.startTime} ~ {emp.schedule.endTime}
-                      </span>
-                    </div>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-
-          <button className={styles.fab} onClick={() => setInviteOpen(true)}>
-            <LiaUserPlusSolid /> 직원 초대
+      <div className={styles.filterRow}>
+        {(['ACTIVE', 'INACTIVE'] as EmploymentStatus[]).map((s) => (
+          <button
+            key={s}
+            className={`${styles.chip} ${statusFilter === s ? styles.chipActive : ''}`}
+            onClick={() => setStatusFilter(s)}
+          >
+            {s === 'ACTIVE' ? '재직중' : '퇴직'}
           </button>
-        </>
+        ))}
+      </div>
+
+      {mockJoinRequests.length > 0 && (
+        <Link href="/owner/employees/join-requests" className={styles.joinBanner}>
+          <span className={styles.joinBannerText}>
+            가입 신청 <strong>{mockJoinRequests.length}건</strong> 대기 중
+          </span>
+          <LiaAngleRightSolid className={styles.joinBannerArrow} />
+        </Link>
       )}
 
-      {mainTab === 'requests' && (
-        <div className={styles.list}>
-          {requests.length === 0 ? (
-            <p className={styles.emptyText}>새로운 가입 신청이 없습니다.</p>
-          ) : (
-            requests.map((req) => (
-              <div key={req.id} className={styles.requestCard}>
-                <div className={styles.requestInfo}>
-                  <span className={styles.requestName}>{req.name}</span>
-                  <span className={styles.requestMeta}>{req.phone} · {req.requestedAt}</span>
-                  {req.message && <span className={styles.requestMsg}>"{req.message}"</span>}
-                </div>
-                <div className={styles.requestBtns}>
-                  <button
-                    className={styles.btnReject}
-                    onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
-                  >
-                    <LiaTimesSolid /> 거절
-                  </button>
-                  <button
-                    className={styles.btnApprove}
-                    onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
-                  >
-                    <LiaCheckSolid /> 수락
-                  </button>
-                </div>
+      <div className={styles.cardGrid}>
+        {visibleEmployees.length === 0 ? (
+          <p className={styles.emptyText}>
+            {statusFilter === 'ACTIVE' ? '재직중인 직원이 없습니다.' : '퇴직한 직원이 없습니다.'}
+          </p>
+        ) : (
+          visibleEmployees.map((emp) => (
+            <button
+              key={emp.id}
+              className={styles.empCard}
+              onClick={() => router.push(`/owner/employees/${emp.id}`)}
+            >
+              <div className={styles.cardHeader}>
+                <div className={styles.avatar}>{emp.name[0]}</div>
+                <span className={`${styles.statusBadge} ${emp.status === 'ACTIVE' ? styles.badge_ACTIVE : styles.badge_INACTIVE}`}>
+                  {emp.status === 'ACTIVE' ? '재직중' : '퇴직'}
+                </span>
               </div>
-            ))
-          )}
-        </div>
-      )}
+              <div className={styles.cardBody}>
+                <span className={styles.empName}>{emp.name}</span>
+                <span className={styles.empPhone}>{emp.phone}</span>
+              </div>
+              {emp.schedule && (
+                <div className={styles.cardFooter}>
+                  <div className={styles.dowRow}>
+                    {DOW.map((d, i) => (
+                      <span
+                        key={i}
+                        className={`${styles.dowDot} ${emp.schedule!.days.includes(i) ? styles.dowDotOn : ''}`}
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                  <span className={styles.timeRange}>
+                    {emp.schedule.startTime} ~ {emp.schedule.endTime}
+                  </span>
+                </div>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+
+      <button className={styles.fab} onClick={() => setInviteOpen(true)}>
+        <LiaUserPlusSolid /> 직원 초대
+      </button>
 
       {inviteOpen && (
         <div className={styles.sheetOverlay} onClick={closeInvite}>

@@ -18,10 +18,20 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
   --nav-height: 64px;
+  --header-height: 70px;
   --max-width: 480px;
   --sidebar-sm: 72px;
   --sidebar-lg: 220px;
   --content-max: 960px;
+  --page-x: 16px;
+}
+
+@media (min-width: 768px) {
+  :root { --page-x: 24px; }
+}
+
+@media (min-width: 1024px) {
+  :root { --page-x: 32px; }
 }
 
 * {

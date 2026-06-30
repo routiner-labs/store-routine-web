@@ -32,7 +32,6 @@ export default function OwnerNav() {
   return (
     <>
       <nav className={styles.nav}>
-        <div className={styles.brand}>루틴</div>
         <button className={styles.storeTrigger} onClick={() => setSwitcherOpen(true)}>
           <LiaAngleDownSolid className={styles.storeShort} />
           <span className={styles.storeFull}>{currentStore.name}</span>

@@ -142,22 +142,18 @@
   }
 
   .brand {
-    display: block;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--color-primary);
-    letter-spacing: -0.5px;
-    padding: 24px 16px 0;
+    display: none;
   }
 
   .storeTrigger {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 8px 16px 16px;
+    height: var(--header-height);
+    padding: 0 16px;
     gap: 6px;
     border-bottom: 1px solid var(--color-border);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     color: var(--color-text-secondary);
     font-size: 13px;
     width: 100%;

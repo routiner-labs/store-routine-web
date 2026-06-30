@@ -39,14 +39,38 @@ export interface SpecialInstruction {
   status: InstructionStatus
 }
 
+export type RequestVisibility = 'OWNER_ONLY' | 'ALL'
+
 export interface EmployeeRequest {
   id: string
   type: RequestType
   content: string
   status: RequestStatus
+  visibility: RequestVisibility
   createdAt: string
   employeeName: string
   hasPhoto: boolean
+}
+
+export interface RequestReply {
+  id: string
+  requestId: string
+  content: string
+  authorName: string
+  authorRole: 'OWNER' | 'EMPLOYEE'
+  createdAt: string
+}
+
+export type ActivityType = 'CREATED' | 'STATUS_CHANGED' | 'COMMENT_ADDED' | 'CONTENT_EDITED'
+
+export interface ActivityLog {
+  id: string
+  requestId: string
+  type: ActivityType
+  actorName: string
+  actorRole: 'OWNER' | 'EMPLOYEE'
+  detail?: string
+  createdAt: string
 }
 
 export interface Store {

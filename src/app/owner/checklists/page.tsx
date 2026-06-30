@@ -77,7 +77,7 @@ export default function OwnerChecklists() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.heading}>체크리스트</h1>
+        <h1 className={styles.heading}>업무리스트</h1>
       </header>
       <div className={styles.list}>
         {mockChecklists.map((checklist) => (

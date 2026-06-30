@@ -430,6 +430,15 @@
   font-weight: 600;
 }
 
+/* 드로어 대 카테고리 라벨 */
+.drawerGroupLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 14px 20px 4px;
+}
+
 /* ════════════════════════════════════════
    태블릿 (768px~): 좌측 아이콘 사이드바
    ════════════════════════════════════════ */
@@ -506,6 +515,21 @@
   }
 
   .fullLabel {
+    display: none;
+  }
+
+  /* 대 카테고리: 아이콘 레일에서는 라벨 숨기고 구분선만 */
+  .navGroup {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .navGroupLabel {
     display: none;
   }
 
@@ -606,6 +630,23 @@
     display: block;
     font-size: 14px;
     font-weight: 500;
+  }
+
+  /* 대 카테고리: 라벨 표시, 구분선 제거 */
+  .navGroup {
+    align-items: stretch;
+    margin-top: 4px;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .navGroupLabel {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    padding: 14px 16px 5px 24px;
+    letter-spacing: 0.02em;
   }
 
   /* 데스크탑: 아바타 + 이름 + 벨 */

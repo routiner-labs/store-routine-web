@@ -12,7 +12,7 @@ export default async function ChecklistPage({
   if (!checklist) {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-        체크리스트를 찾을 수 없습니다.
+        업무리스트를 찾을 수 없습니다.
       </div>
     )
   }

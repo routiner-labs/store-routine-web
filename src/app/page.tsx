@@ -25,7 +25,7 @@ export default function RolePage() {
           <span className={styles.roleIcon}>알바</span>
           <div className={styles.roleText}>
             <strong>알바생으로 입장</strong>
-            <span>오늘 할 일과 체크리스트를 확인합니다</span>
+            <span>오늘 할 일과 업무리스트를 확인합니다</span>
           </div>
           <span className={styles.arrow}>›</span>
         </Link>

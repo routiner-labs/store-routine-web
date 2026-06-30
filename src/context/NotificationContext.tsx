@@ -39,8 +39,8 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   },
   {
     id: 'n3', type: 'CHECKLIST', isRead: false,
-    title: '체크리스트 미완료',
-    body: '오픈 체크리스트 3개 항목이 완료되지 않았습니다',
+    title: '업무리스트 미완료',
+    body: '오픈 업무리스트 3개 항목이 완료되지 않았습니다',
     createdAt: '1시간 전',
   },
   {

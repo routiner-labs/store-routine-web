@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { LiaAngleDownSolid } from 'react-icons/lia'
 import { getAttendanceForDate } from '@/mock/calendar'
+import type { AttendanceStatus, CalendarRecord } from '@/types'
 import styles from './page.module.css'
 
 type ViewMode = 'day' | 'week' | 'month'
@@ -64,6 +65,183 @@ function shiftMonth(year: number, month: number, dir: number) {
   if (m === 0) { y--; m = 12 }
   if (m === 13) { y++; m = 1 }
   return { year: y, month: m }
+}
+
+function AttendanceTimeline({ records }: { records: CalendarRecord[] }) {
+  if (records.length === 0) {
+    return <p className={styles.emptyText}>근무 데이터가 없습니다</p>
+  }
+
+  const toMin = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+  const allMin = records.flatMap((r) => [
+    toMin(r.scheduledStart), toMin(r.scheduledEnd),
+    ...(r.clockedIn ? [toMin(r.clockedIn)] : []),
+    ...(r.clockedOut ? [toMin(r.clockedOut)] : []),
+  ])
+  const tlMin = Math.floor(Math.min(...allMin) / 60) * 60
+  const tlMax = Math.ceil(Math.max(...allMin) / 60) * 60
+  const span = tlMax - tlMin
+  const p = (m: number) => `${((m - tlMin) / span * 100).toFixed(1)}%`
+  const w = (s: number, e: number) => `${((e - s) / span * 100).toFixed(1)}%`
+  const hrs = Array.from(
+    { length: Math.floor(tlMax / 60) - Math.ceil(tlMin / 60) + 1 },
+    (_, i) => Math.ceil(tlMin / 60) + i
+  )
+
+  return (
+    <div className={styles.tlWrap}>
+      <div className={styles.tlAxisRow}>
+        <div className={styles.tlLabelCol} />
+        <div className={styles.tlTrackCol}>
+          {hrs.map((h) => (
+            <span key={h} className={styles.tlHourMark} style={{ left: p(h * 60) }}>
+              {h}
+            </span>
+          ))}
+        </div>
+      </div>
+      {records.map((r) => {
+        const ss = toMin(r.scheduledStart)
+        const se = toMin(r.scheduledEnd)
+        const ci = r.clockedIn ? toMin(r.clockedIn) : null
+        const co = r.clockedOut ? toMin(r.clockedOut) : null
+        const ongoing = r.status === 'CLOCKED_IN' || r.status === 'LATE'
+        return (
+          <div key={r.employeeId} className={styles.tlRow}>
+            <div className={styles.tlLabelCol}>
+              <span className={styles.tlEmpName}>{r.employeeName}</span>
+              <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
+                {STATUS_LABEL[r.status]}
+              </span>
+              <span className={styles.tlEmpTime}>
+                {r.clockedIn ?? r.scheduledStart}
+                {' ~ '}
+                {r.clockedOut ? r.clockedOut : ongoing ? '근무중' : r.scheduledEnd}
+              </span>
+            </div>
+            <div className={styles.tlTrackCol}>
+              {hrs.map((h) => (
+                <div key={h} className={styles.tlGridLine} style={{ left: p(h * 60) }} />
+              ))}
+              <div
+                className={`${styles.tlBarSched} ${r.status === 'ABSENT' ? styles.tlBarSchedAbsent : ''}`}
+                style={{ left: p(ss), width: w(ss, se) }}
+              />
+              {ci !== null && (
+                <div
+                  className={`${styles.tlBarActual} ${styles[`tlBarActual_${r.status}`]} ${ongoing ? styles.tlBarOngoing : ''}`}
+                  style={{ left: p(ci), width: w(ci, co ?? se) }}
+                />
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+type TimelineEvent = {
+  key: string
+  sortMin: number
+  time: string | null
+  type: AttendanceStatus
+  label: string
+}
+
+function buildDayEvents(records: CalendarRecord[]): TimelineEvent[] {
+  const toMin = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+  const events: TimelineEvent[] = []
+  for (const r of records) {
+    if (r.status === 'ABSENT') {
+      events.push({ key: `${r.employeeId}-absent`, sortMin: toMin(r.scheduledStart), time: null, type: 'ABSENT', label: `${r.employeeName} 결근` })
+      continue
+    }
+    if (r.status === 'SCHEDULED') {
+      events.push({ key: `${r.employeeId}-sched`, sortMin: toMin(r.scheduledStart), time: r.scheduledStart, type: 'SCHEDULED', label: `${r.employeeName} 출근 예정` })
+      continue
+    }
+    if (r.clockedIn) {
+      const late = r.status === 'LATE'
+      events.push({
+        key: `${r.employeeId}-in`,
+        sortMin: toMin(r.clockedIn),
+        time: r.clockedIn,
+        type: late ? 'LATE' : 'CLOCKED_IN',
+        label: `${r.employeeName} ${late ? '지각 출근' : '출근'}`,
+      })
+    }
+    if (r.clockedOut) {
+      events.push({ key: `${r.employeeId}-out`, sortMin: toMin(r.clockedOut), time: r.clockedOut, type: 'CLOCKED_OUT', label: `${r.employeeName} 퇴근` })
+    }
+  }
+  return events.sort((a, b) => a.sortMin - b.sortMin)
+}
+
+function WeeklyTimeline({
+  weekDays,
+  selectedDate,
+  onSelectDate,
+}: {
+  weekDays: Date[]
+  selectedDate: string | null
+  onSelectDate: (ds: string) => void
+}) {
+  const days = weekDays.map((date) => {
+    const d = date.getDate()
+    const ds = formatDate(date.getFullYear(), date.getMonth() + 1, d)
+    return { ds, d, dow: (date.getDay() + 6) % 7, events: buildDayEvents(getAttendanceForDate(ds)) }
+  })
+
+  return (
+    <div className={styles.gitWeek}>
+      {days.map((day) => (
+        <div key={day.ds} className={styles.gitCol}>
+          <button
+            className={[
+              styles.gitColHead,
+              day.ds === TODAY ? styles.gitColHeadToday : '',
+              day.ds === selectedDate ? styles.gitColHeadSel : '',
+            ].join(' ')}
+            onClick={() => onSelectDate(day.ds)}
+          >
+            <span
+              className={[
+                styles.gitColDow,
+                day.dow === 5 ? styles.calHeadSat : day.dow === 6 ? styles.calHeadSun : '',
+              ].join(' ')}
+            >
+              {WEEKDAY_LABELS[day.dow]}
+            </span>
+            <span className={styles.gitColDate}>{day.d}</span>
+          </button>
+          <div className={`${styles.gitColBody} ${day.events.length === 0 ? styles.gitColBodyEmpty : ''}`}>
+            {day.events.length === 0 ? (
+              <span className={styles.gitEmpty}>—</span>
+            ) : (
+              day.events.map((ev) => (
+                <div key={ev.key} className={styles.gitEvent}>
+                  <span className={styles.gitLane}>
+                    <span className={`${styles.gitDot} ${styles[`gitDot_${ev.type}`]}`} />
+                  </span>
+                  <span className={styles.gitEventBody}>
+                    <span className={styles.gitLabel}>{ev.label}</span>
+                    {ev.time && <span className={styles.gitTime}>{ev.time}</span>}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export default function AttendancePage() {
@@ -285,82 +463,18 @@ export default function AttendancePage() {
       {/* 주간 */}
       {viewMode === 'week' && (
         <div className={styles.weekWrap}>
-          <div className={styles.weekGrid}>
-            {WEEKDAY_LABELS.map((l, i) => (
-              <div
-                key={l}
-                className={[
-                  styles.calHead,
-                  i === 5 ? styles.calHeadSat : i === 6 ? styles.calHeadSun : '',
-                ].join(' ')}
-              >
-                {l}
-              </div>
-            ))}
-            {getWeekDays(baseYear, baseMonth, baseDay).map((date) => {
-              const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate()
-              const ds = formatDate(y, m, d)
-              const records = getAttendanceForDate(ds)
-              const hasAlert = records.some((r) => r.status === 'LATE' || r.status === 'ABSENT')
-              return (
-                <button
-                  key={ds}
-                  className={[
-                    styles.weekCell,
-                    ds === selectedDate ? styles.weekCellSelected : '',
-                    ds === TODAY ? styles.weekCellToday : '',
-                  ].join(' ')}
-                  onClick={() => setSelectedDate(ds === selectedDate ? null : ds)}
-                >
-                  <span className={styles.weekCellNum}>{d}</span>
-                  {records.length > 0 && (
-                    <span className={`${styles.calCount} ${hasAlert ? styles.calCountAlert : ''}`}>
-                      {records.length}명
-                    </span>
-                  )}
-                  {hasAlert && <span className={styles.calDot} />}
-                </button>
-              )
-            })}
-          </div>
+          <WeeklyTimeline
+            weekDays={getWeekDays(baseYear, baseMonth, baseDay)}
+            selectedDate={selectedDate}
+            onSelectDate={(ds) => setSelectedDate(ds === selectedDate ? null : ds)}
+          />
         </div>
       )}
 
       {/* 일간 */}
       {viewMode === 'day' && (
         <div className={styles.dayWrap}>
-          {dayRecords.length === 0 ? (
-            <p className={styles.emptyText}>근무 데이터가 없습니다</p>
-          ) : (
-            dayRecords.map((r) => (
-              <div key={r.employeeId} className={`${styles.empCard} ${styles[`empCard_${r.status}`]}`}>
-                <div className={styles.empTop}>
-                  <span className={styles.empName}>{r.employeeName}</span>
-                  <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
-                    {STATUS_LABEL[r.status]}
-                  </span>
-                </div>
-                <div className={styles.empTimes}>
-                  <div className={styles.timeRow}>
-                    <span className={styles.timeLabel}>예정</span>
-                    <span>{r.scheduledStart} ~ {r.scheduledEnd}</span>
-                  </div>
-                  {r.clockedIn && (
-                    <div className={styles.timeRow}>
-                      <span className={styles.timeLabel}>출근</span>
-                      <span className={r.status === 'LATE' ? styles.timeAlert : ''}>{r.clockedIn}</span>
-                    </div>
-                  )}
-                  {r.clockedOut && (
-                    <div className={styles.timeRow}>
-                      <span className={styles.timeLabel}>퇴근</span>
-                      <span>{r.clockedOut}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
+          <AttendanceTimeline records={dayRecords} />
         </div>
       )}
 
@@ -379,79 +493,7 @@ export default function AttendancePage() {
               <button className={styles.sheetClose} onClick={() => setSelectedDate(null)}>닫기</button>
             </div>
             <div className={styles.sheetBody}>
-              {selectedRecords.length === 0 ? (
-                <p className={styles.emptyText}>근무 데이터가 없습니다</p>
-              ) : (() => {
-                const toMin = (t: string) => {
-                  const [h, m] = t.split(':').map(Number)
-                  return h * 60 + m
-                }
-                const allMin = selectedRecords.flatMap(r => [
-                  toMin(r.scheduledStart), toMin(r.scheduledEnd),
-                  ...(r.clockedIn ? [toMin(r.clockedIn)] : []),
-                  ...(r.clockedOut ? [toMin(r.clockedOut)] : []),
-                ])
-                const tlMin = Math.floor(Math.min(...allMin) / 60) * 60
-                const tlMax = Math.ceil(Math.max(...allMin) / 60) * 60
-                const span = tlMax - tlMin
-                const p = (m: number) => `${((m - tlMin) / span * 100).toFixed(1)}%`
-                const w = (s: number, e: number) => `${((e - s) / span * 100).toFixed(1)}%`
-                const hrs = Array.from(
-                  { length: Math.floor(tlMax / 60) - Math.ceil(tlMin / 60) + 1 },
-                  (_, i) => Math.ceil(tlMin / 60) + i
-                )
-                return (
-                  <div className={styles.tlWrap}>
-                    <div className={styles.tlAxisRow}>
-                      <div className={styles.tlLabelCol} />
-                      <div className={styles.tlTrackCol}>
-                        {hrs.map(h => (
-                          <span key={h} className={styles.tlHourMark} style={{ left: p(h * 60) }}>
-                            {h}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    {selectedRecords.map(r => {
-                      const ss = toMin(r.scheduledStart)
-                      const se = toMin(r.scheduledEnd)
-                      const ci = r.clockedIn ? toMin(r.clockedIn) : null
-                      const co = r.clockedOut ? toMin(r.clockedOut) : null
-                      const ongoing = r.status === 'CLOCKED_IN' || r.status === 'LATE'
-                      return (
-                        <div key={r.employeeId} className={styles.tlRow}>
-                          <div className={styles.tlLabelCol}>
-                            <span className={styles.tlEmpName}>{r.employeeName}</span>
-                            <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
-                              {STATUS_LABEL[r.status]}
-                            </span>
-                            <span className={styles.tlEmpTime}>
-                              {r.clockedIn ?? r.scheduledStart}
-                              {' ~ '}
-                              {r.clockedOut ? r.clockedOut : ongoing ? '근무중' : r.scheduledEnd}
-                            </span>
-                          </div>
-                          <div className={styles.tlTrackCol}>
-                            {hrs.map(h => (
-                              <div key={h} className={styles.tlGridLine} style={{ left: p(h * 60) }} />
-                            ))}
-                            <div
-                              className={`${styles.tlBarSched} ${r.status === 'ABSENT' ? styles.tlBarSchedAbsent : ''}`}
-                              style={{ left: p(ss), width: w(ss, se) }}
-                            />
-                            {ci !== null && (
-                              <div
-                                className={`${styles.tlBarActual} ${styles[`tlBarActual_${r.status}`]} ${ongoing ? styles.tlBarOngoing : ''}`}
-                                style={{ left: p(ci), width: w(ci, co ?? se) }}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
+              <AttendanceTimeline records={selectedRecords} />
             </div>
           </div>
         </div>

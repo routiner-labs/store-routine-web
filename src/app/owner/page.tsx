@@ -94,7 +94,7 @@ export default function OwnerHome() {
           <h2 className={styles.sectionTitle}>업무 현황</h2>
           <div className={styles.card}>
             <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>오픈 체크리스트</span>
+              <span className={styles.taskLabel}>오픈 업무리스트</span>
               <div className={styles.taskRight}>
                 <div className={styles.progressBar}>
                   <div
@@ -118,7 +118,7 @@ export default function OwnerHome() {
               </div>
             </div>
             <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>마감 체크리스트</span>
+              <span className={styles.taskLabel}>마감 업무리스트</span>
               <span className={styles.waitingText}>대기 중</span>
             </div>
           </div>

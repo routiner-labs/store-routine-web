@@ -21,7 +21,7 @@ export const mockAttendance: AttendanceRecord[] = [
 export const mockChecklists: Checklist[] = [
   {
     id: '1',
-    title: '오픈 체크리스트',
+    title: '오픈 업무리스트',
     type: 'OPEN',
     items: [
       { id: '1-1', title: '매장 조명 켜기', description: '홀, 주방, 화장실, 창고 조명을 모두 켠다.', completionType: 'CHECK', status: 'DONE' },
@@ -38,7 +38,7 @@ export const mockChecklists: Checklist[] = [
   },
   {
     id: '2',
-    title: '마감 체크리스트',
+    title: '마감 업무리스트',
     type: 'CLOSE',
     items: [
       { id: '2-1', title: '포스 마감', description: '포스에서 일마감 메뉴를 실행하고 매출과 현금을 확인한다.', completionType: 'NUMBER', status: 'PENDING' },
@@ -52,7 +52,7 @@ export const mockChecklists: Checklist[] = [
   },
   {
     id: '3',
-    title: '청소 체크리스트',
+    title: '청소 업무리스트',
     type: 'CLEANING',
     items: [
       { id: '3-1', title: '홀 바닥 청소', description: '빗자루로 쓸고 걸레로 닦는다.', completionType: 'CHECK', status: 'DONE' },

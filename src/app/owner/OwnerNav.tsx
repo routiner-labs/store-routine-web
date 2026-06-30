@@ -26,12 +26,30 @@ import StoreSwitcher from './StoreSwitcher'
 import NotificationBell from '@/components/NotificationBell'
 import styles from './OwnerNav.module.css'
 
-const navItems: { href: string; label: string; icon: IconType }[] = [
-  { href: '/owner',            label: '홈',       icon: LiaHomeSolid },
-  { href: '/owner/checklists', label: '체크리스트', icon: LiaClipboardListSolid },
-  { href: '/owner/requests',   label: '요청함',    icon: LiaInboxSolid },
-  { href: '/owner/attendance', label: '출근현황',  icon: LiaCalendarSolid },
-  { href: '/owner/employees',  label: '직원관리',  icon: LiaUsersSolid },
+type NavItem = { href: string; label: string; icon: IconType }
+
+const homeItem: NavItem = { href: '/owner', label: '홈', icon: LiaHomeSolid }
+
+const navGroups: { category: string; items: NavItem[] }[] = [
+  {
+    category: '업무',
+    items: [
+      { href: '/owner/checklists', label: '업무리스트', icon: LiaClipboardListSolid },
+      { href: '/owner/requests',   label: '요청함',    icon: LiaInboxSolid },
+    ],
+  },
+  {
+    category: '스케줄',
+    items: [
+      { href: '/owner/attendance', label: '현황', icon: LiaCalendarSolid },
+    ],
+  },
+  {
+    category: '관리',
+    items: [
+      { href: '/owner/employees', label: '직원관리', icon: LiaUsersSolid },
+    ],
+  },
 ]
 
 const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
@@ -66,20 +84,33 @@ export default function OwnerNav() {
           <LiaAngleDownSolid className={styles.storeChevron} />
         </button>
 
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.item} ${isActive ? styles.active : ''}`}
-            >
-              <Icon className={styles.navIcon} />
-              <span className={styles.fullLabel}>{item.label}</span>
-            </Link>
-          )
-        })}
+        <Link
+          href={homeItem.href}
+          className={`${styles.item} ${pathname === homeItem.href ? styles.active : ''}`}
+        >
+          <homeItem.icon className={styles.navIcon} />
+          <span className={styles.fullLabel}>{homeItem.label}</span>
+        </Link>
+
+        {navGroups.map((group) => (
+          <div key={group.category} className={styles.navGroup}>
+            <span className={styles.navGroupLabel}>{group.category}</span>
+            {group.items.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.item} ${isActive ? styles.active : ''}`}
+                >
+                  <Icon className={styles.navIcon} />
+                  <span className={styles.fullLabel}>{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+        ))}
 
         <div className={styles.userSection}>
           <span className={styles.userAvatar}>사</span>
@@ -181,21 +212,35 @@ export default function OwnerNav() {
                 <LiaTimesSolid />
               </button>
             </div>
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`${styles.drawerItem} ${isActive ? styles.drawerItemActive : ''}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Icon className={styles.drawerIcon} />
-                  <span className={styles.drawerLabel}>{item.label}</span>
-                </Link>
-              )
-            })}
+            <Link
+              href={homeItem.href}
+              className={`${styles.drawerItem} ${pathname === homeItem.href ? styles.drawerItemActive : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <homeItem.icon className={styles.drawerIcon} />
+              <span className={styles.drawerLabel}>{homeItem.label}</span>
+            </Link>
+
+            {navGroups.map((group) => (
+              <div key={group.category}>
+                <span className={styles.drawerGroupLabel}>{group.category}</span>
+                {group.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`${styles.drawerItem} ${isActive ? styles.drawerItemActive : ''}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Icon className={styles.drawerIcon} />
+                      <span className={styles.drawerLabel}>{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            ))}
           </div>
         </>
       )}

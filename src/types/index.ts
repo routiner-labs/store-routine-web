@@ -64,3 +64,29 @@ export interface CalendarRecord {
   clockedIn?: string
   clockedOut?: string
 }
+
+export type EmploymentStatus = 'ACTIVE' | 'INACTIVE'
+
+export interface WeeklySchedule {
+  days: number[]   // 0=월 1=화 2=수 3=목 4=금 5=토 6=일
+  startTime: string
+  endTime: string
+}
+
+export interface Employee {
+  id: string
+  name: string
+  phone: string
+  status: EmploymentStatus
+  hiredAt: string
+  terminatedAt?: string
+  schedule?: WeeklySchedule
+}
+
+export interface JoinRequest {
+  id: string
+  name: string
+  phone: string
+  requestedAt: string
+  message?: string
+}

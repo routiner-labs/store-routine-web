@@ -101,37 +101,31 @@
 .calGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  border-top: 1px solid var(--color-primary-light);
-  border-left: 1px solid var(--color-primary-light);
+  gap: 1px;
+  background: rgba(61, 99, 221, 0.15);
   border-radius: 12px;
   overflow: hidden;
   margin: 16px;
-  box-shadow: 0 2px 16px rgba(61, 99, 221, 0.08);
+  box-shadow: 0 4px 20px rgba(61, 99, 221, 0.10);
 }
 
 .calHead {
-  border-right: 1px solid var(--color-primary-light);
-  border-bottom: 1px solid rgba(61, 99, 221, 0.2);
-  padding: 10px 0;
+  padding: 11px 0;
   text-align: center;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-light);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
 }
 
 .calEmpty {
-  border-right: 1px solid var(--color-primary-light);
-  border-bottom: 1px solid var(--color-primary-light);
   min-height: 72px;
   background: var(--color-bg);
 }
 
 .calCell {
-  border-right: 1px solid var(--color-primary-light);
-  border-bottom: 1px solid var(--color-primary-light);
   min-height: 72px;
-  padding: 7px 8px 6px;
+  padding: 8px 9px 7px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -175,9 +169,10 @@
 }
 
 .calCellSelected:not(.calCellToday) .calNum {
-  background: var(--color-primary-light);
+  background: #fff;
   color: var(--color-primary);
   font-weight: 700;
+  box-shadow: 0 1px 4px rgba(61, 99, 221, 0.2);
 }
 
 .calCount {

@@ -23,6 +23,7 @@ const statusLabel: Record<string, string> = {
 }
 
 const ALL_STATUSES: (RequestStatus | 'ALL')[] = ['ALL', 'REQUESTED', 'CONFIRMED', 'IN_PROGRESS', 'DONE', 'REJECTED']
+const KANBAN_STATUSES: RequestStatus[] = ['REQUESTED', 'CONFIRMED', 'IN_PROGRESS', 'DONE', 'REJECTED']
 
 const VISIBILITY_OPTIONS: Array<{ value: VisibilityFilter; label: string }> = [
   { value: 'FILTER_ALL', label: '전체' },
@@ -98,6 +99,35 @@ function ListItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
   )
 }
 
+function KanbanCard({ request, onClick, onDragStart, onDragEnd, dragging }: {
+  request: EmployeeRequest
+  onClick: () => void
+  onDragStart: () => void
+  onDragEnd: () => void
+  dragging: boolean
+}) {
+  const [date] = request.createdAt.split(' ')
+  return (
+    <div
+      className={`${styles.kanbanCard} ${dragging ? styles.kanbanCardDragging : ''}`}
+      draggable
+      onClick={onClick}
+      onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart() }}
+      onDragEnd={onDragEnd}
+    >
+      <div className={styles.kanbanCardTop}>
+        <span className={`${styles.typeTag} ${styles[`type_${request.type}`]}`}>{request.type}</span>
+        <VisibilityBadge visibility={request.visibility} />
+      </div>
+      <p className={styles.kanbanCardContent}>{request.content}</p>
+      <div className={styles.kanbanCardMeta}>
+        <span>{request.employeeName}</span>
+        <span>{date}</span>
+      </div>
+    </div>
+  )
+}
+
 export default function OwnerRequests() {
   const router = useRouter()
   const [view, setView] = useState<ViewMode>('list')
@@ -115,7 +145,11 @@ export default function OwnerRequests() {
   const [authorPopupOpen, setAuthorPopupOpen] = useState(false)
   const [empSearchText, setEmpSearchText] = useState('')
 
-  const availableTypes: RequestType[] = [...new Set(mockRequests.map((r) => r.type))]
+  const [requests, setRequests] = useState(mockRequests)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [dragOverStatus, setDragOverStatus] = useState<RequestStatus | null>(null)
+
+  const availableTypes: RequestType[] = [...new Set(requests.map((r) => r.type))]
 
   const advActiveCount =
     (filterType !== 'ALL' ? 1 : 0) +
@@ -124,7 +158,7 @@ export default function OwnerRequests() {
     (filterStatus !== 'ALL' ? 1 : 0) +
     (filterAuthor.trim() ? 1 : 0)
 
-  const filtered = mockRequests.filter((r) => {
+  const filtered = requests.filter((r) => {
     if (filterType !== 'ALL' && r.type !== filterType) return false
     if (filterStatus !== 'ALL' && r.status !== filterStatus) return false
     if (filterVisibility !== 'FILTER_ALL' && r.visibility !== filterVisibility) return false
@@ -137,6 +171,22 @@ export default function OwnerRequests() {
 
   const pending = filtered.filter((r) => r.status === 'REQUESTED')
   const others = filtered.filter((r) => r.status !== 'REQUESTED')
+
+  function handleDragStart(id: string) {
+    setDraggingId(id)
+  }
+
+  function handleDragEnd() {
+    setDraggingId(null)
+    setDragOverStatus(null)
+  }
+
+  function handleDrop(status: RequestStatus) {
+    if (!draggingId) return
+    setRequests((prev) => prev.map((r) => r.id === draggingId ? { ...r, status } : r))
+    setDraggingId(null)
+    setDragOverStatus(null)
+  }
 
   function resetAdv() {
     setFilterType('ALL')
@@ -405,6 +455,48 @@ export default function OwnerRequests() {
             )}
           </>
         )}
+      </div>
+
+      <div className={styles.kanban}>
+        {KANBAN_STATUSES.map((status) => {
+          const colItems = filtered.filter((r) => r.status === status)
+          const isOver = dragOverStatus === status && draggingId !== null
+          return (
+            <div
+              key={status}
+              className={`${styles.kanbanCol} ${isOver ? styles.kanbanColOver : ''}`}
+              onDragEnter={(e) => { e.preventDefault(); if (draggingId) setDragOverStatus(status) }}
+              onDragOver={(e) => e.preventDefault()}
+              onDragLeave={(e) => {
+                if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setDragOverStatus(null)
+                }
+              }}
+              onDrop={(e) => { e.preventDefault(); handleDrop(status) }}
+            >
+              <div className={styles.kanbanColHeader}>
+                <span className={styles.kanbanColTitle}>{statusLabel[status]}</span>
+                <span className={styles.kanbanColCount}>{colItems.length}</span>
+              </div>
+              <div className={styles.kanbanColBody}>
+                {colItems.length === 0 ? (
+                  <p className={styles.kanbanEmpty}>요청 없음</p>
+                ) : (
+                  colItems.map((r) => (
+                    <KanbanCard
+                      key={r.id}
+                      request={r}
+                      onClick={() => goToDetail(r.id)}
+                      onDragStart={() => handleDragStart(r.id)}
+                      onDragEnd={handleDragEnd}
+                      dragging={draggingId === r.id}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

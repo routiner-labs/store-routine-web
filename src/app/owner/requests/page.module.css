@@ -732,6 +732,122 @@
 }
 
 /* ══════════════════════════════════════
+   칸반 뷰 (웹 전용)
+   ══════════════════════════════════════ */
+.kanban {
+  display: none;
+}
+
+.kanbanCol {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  flex: 1;
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+.kanbanColOver {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.kanbanColHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kanbanColTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.kanbanColCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border-radius: 99px;
+  padding: 1px 8px;
+  border: 1px solid var(--color-border);
+}
+
+.kanbanColBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 10px 12px;
+  flex: 1;
+}
+
+.kanbanCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.15s, transform 0.1s, opacity 0.15s;
+  user-select: none;
+}
+
+.kanbanCard:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.kanbanCardDragging {
+  opacity: 0.4;
+  cursor: grabbing;
+  transform: rotate(1deg);
+}
+
+.kanbanCardTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.kanbanCardContent {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text);
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.kanbanCardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
+
+.kanbanEmpty {
+  text-align: center;
+  padding: 24px 12px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border);
+}
+
+/* ══════════════════════════════════════
    빈 결과
    ══════════════════════════════════════ */
 .emptyState {
@@ -747,6 +863,7 @@
 @media (min-width: 768px) {
   .page {
     padding-bottom: 0;
+    height: 100%;
   }
 
   .headerSearch {
@@ -763,27 +880,20 @@
   }
 
   .viewToggle {
-    margin-left: 0;
+    display: none;
   }
 
   .body {
-    max-width: 1280px;
-    margin: 0 auto;
-    width: 100%;
-    padding: 24px;
-    box-sizing: border-box;
+    display: none;
   }
 
-  .listGroup {
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .cardGrid {
-    padding: 0;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+  .kanban {
+    display: flex;
+    gap: 12px;
+    padding: 20px var(--page-x);
+    align-items: flex-start;
+    overflow-x: auto;
+    flex: 1;
   }
 }
 
@@ -791,17 +901,12 @@
    데스크탑 (1024px+)
    ══════════════════════════════════════ */
 @media (min-width: 1024px) {
-  .body {
-    padding: 28px 32px;
-  }
-
-  .cardGrid {
-    grid-template-columns: repeat(3, 1fr);
+  .kanban {
+    padding: 24px var(--page-x);
     gap: 16px;
   }
 
-  .listRow {
-    padding: 14px 24px;
-    column-gap: 16px;
+  .kanbanCol {
+    min-width: 220px;
   }
 }

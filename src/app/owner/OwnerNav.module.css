@@ -30,8 +30,10 @@
 .item {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   color: var(--color-text-secondary);
   transition: color 0.15s;
 }
@@ -40,9 +42,14 @@
   color: var(--color-primary);
 }
 
+.navIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
 .shortLabel {
   display: block;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -85,11 +92,16 @@
     border-bottom: 1px solid var(--color-border);
     margin-bottom: 8px;
     color: var(--color-text-secondary);
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    cursor: pointer;
   }
 
   .storeShort {
     display: block;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .storeFull,
@@ -102,10 +114,17 @@
     width: 100%;
     padding: 12px 0;
     flex-direction: column;
+    gap: 0;
+    border-radius: 0;
+  }
+
+  /* 태블릿: 아이콘만, 텍스트 숨김 */
+  .navIcon {
+    font-size: 22px;
   }
 
   .shortLabel {
-    display: block;
+    display: none;
   }
 
   .fullLabel {
@@ -143,6 +162,7 @@
     font-size: 13px;
     width: 100%;
     text-align: left;
+    transition: color 0.15s;
   }
 
   .storeTrigger:hover {
@@ -165,21 +185,30 @@
 
   .storeChevron {
     display: block;
-    font-size: 11px;
+    font-size: 14px;
     flex-shrink: 0;
+    opacity: 0.5;
   }
 
   .item {
+    flex: 0;
     flex-direction: row;
     justify-content: flex-start;
     padding: 11px 16px;
     border-radius: var(--radius-md);
     margin: 0 8px;
     width: calc(100% - 16px);
+    gap: 10px;
   }
 
   .item.active {
     background: var(--color-primary-light);
+  }
+
+  /* 데스크탑: 아이콘 + 라벨 */
+  .navIcon {
+    font-size: 18px;
+    flex-shrink: 0;
   }
 
   .shortLabel {

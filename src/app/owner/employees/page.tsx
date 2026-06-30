@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { LiaUserPlusSolid, LiaCheckSolid, LiaTimesSolid } from 'react-icons/lia'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
 import type { EmploymentStatus } from '@/types'
 import styles from './page.module.css'
@@ -112,7 +113,7 @@ export default function EmployeesPage() {
           </div>
 
           <button className={styles.fab} onClick={() => setInviteOpen(true)}>
-            + 직원 초대
+            <LiaUserPlusSolid /> 직원 초대
           </button>
         </>
       )}
@@ -134,13 +135,13 @@ export default function EmployeesPage() {
                     className={styles.btnReject}
                     onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
                   >
-                    거절
+                    <LiaTimesSolid /> 거절
                   </button>
                   <button
                     className={styles.btnApprove}
                     onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
                   >
-                    수락
+                    <LiaCheckSolid /> 수락
                   </button>
                 </div>
               </div>

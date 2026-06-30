@@ -261,6 +261,9 @@
   box-shadow: 0 4px 16px rgba(61, 99, 221, 0.35);
   z-index: 10;
   transition: box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .fab:hover {
@@ -330,6 +333,9 @@
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .btnReject:hover {
@@ -346,6 +352,9 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* ── 초대 시트 ── */

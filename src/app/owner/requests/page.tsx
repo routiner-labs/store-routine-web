@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   LiaThLargeSolid, LiaListSolid, LiaLockSolid, LiaUsersSolid,
-  LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid,
+  LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid, LiaInfoCircleSolid,
 } from 'react-icons/lia'
 import { mockRequests } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
@@ -24,6 +24,12 @@ const statusLabel: Record<string, string> = {
 
 const ALL_STATUSES: (RequestStatus | 'ALL')[] = ['ALL', 'REQUESTED', 'CONFIRMED', 'IN_PROGRESS', 'DONE', 'REJECTED']
 const KANBAN_STATUSES: RequestStatus[] = ['REQUESTED', 'CONFIRMED', 'IN_PROGRESS', 'DONE', 'REJECTED']
+
+const THIRTY_DAYS_AGO = (() => {
+  const d = new Date()
+  d.setDate(d.getDate() - 30)
+  return d.toISOString().split('T')[0]
+})()
 
 const VISIBILITY_OPTIONS: Array<{ value: VisibilityFilter; label: string }> = [
   { value: 'FILTER_ALL', label: '전체' },
@@ -459,7 +465,11 @@ export default function OwnerRequests() {
 
       <div className={styles.kanban}>
         {KANBAN_STATUSES.map((status) => {
-          const colItems = filtered.filter((r) => r.status === status)
+          const colItems = filtered.filter((r) => {
+            if (r.status !== status) return false
+            if ((status === 'DONE' || status === 'REJECTED') && r.createdAt.split(' ')[0] < THIRTY_DAYS_AGO) return false
+            return true
+          })
           const isOver = dragOverStatus === status && draggingId !== null
           return (
             <div
@@ -475,7 +485,14 @@ export default function OwnerRequests() {
               onDrop={(e) => { e.preventDefault(); handleDrop(status) }}
             >
               <div className={styles.kanbanColHeader}>
-                <span className={styles.kanbanColTitle}>{statusLabel[status]}</span>
+                {(status === 'DONE' || status === 'REJECTED') ? (
+                  <span className={styles.kanbanColTitleWrap} data-tooltip="최근 30일 데이터만 표시됩니다">
+                    <span className={styles.kanbanColTitle}>{statusLabel[status]}</span>
+                    <LiaInfoCircleSolid className={styles.kanbanColInfoIcon} />
+                  </span>
+                ) : (
+                  <span className={styles.kanbanColTitle}>{statusLabel[status]}</span>
+                )}
                 <span className={styles.kanbanColCount}>{colItems.length}</span>
               </div>
               <div className={styles.kanbanColBody}>

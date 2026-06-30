@@ -16,7 +16,7 @@
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
-  top: 0;
+  top: var(--appbar-height);
   z-index: 10;
 }
 

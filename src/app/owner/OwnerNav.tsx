@@ -14,6 +14,7 @@ import {
 import type { IconType } from 'react-icons'
 import { useStore } from '@/context/StoreContext'
 import StoreSwitcher from './StoreSwitcher'
+import NotificationBell from '@/components/NotificationBell'
 import styles from './OwnerNav.module.css'
 
 const navItems: { href: string; label: string; short: string; icon: IconType }[] = [
@@ -37,6 +38,7 @@ export default function OwnerNav() {
           <span className={styles.storeFull}>{currentStore.name}</span>
           <LiaAngleDownSolid className={styles.storeChevron} />
         </button>
+
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -52,6 +54,12 @@ export default function OwnerNav() {
             </Link>
           )
         })}
+
+        <div className={styles.userSection}>
+          <span className={styles.userAvatar}>사</span>
+          <span className={styles.userName}>사장님</span>
+          <NotificationBell />
+        </div>
       </nav>
       {switcherOpen && <StoreSwitcher onClose={() => setSwitcherOpen(false)} />}
     </>

@@ -19,6 +19,7 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
   --nav-height: 64px;
   --header-height: 70px;
+  --appbar-height: 0px;
   --max-width: 480px;
   --sidebar-sm: 72px;
   --sidebar-lg: 220px;

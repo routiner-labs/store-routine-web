@@ -1,6 +1,37 @@
 Behavioral guidelines to reduce common LLM coding mistakes.
 Merge with project-specific instructions as needed.
 
+## Agent System
+
+작업 성격에 따라 `.claude/agents/` 폴더의 해당 에이전트 속성을 참고하여 작업한다.
+
+| 에이전트 | 파일 | 담당 |
+|---|---|---|
+| Planning Agent | `agents/planning-agent.md` | 기능 범위 정의, 우선순위, 구현 순서 |
+| Design Agent | `agents/design-agent.md` | UI/UX 설계, 화면 구조, 컴포넌트 계층 |
+| Coding Agent | `agents/coding-agent.md` | 실제 코드 구현 |
+| API Agent | `agents/api-agent.md` | 백엔드 API 계약 정의, 요청/응답 타입 |
+| Security Agent | `agents/security-agent.md` | 인증, 권한 분리, 보안 취약점 검토 |
+| Test Agent | `agents/test-agent.md` | 테스트 케이스 정의 및 작성 |
+| Validation Agent | `agents/validation-agent.md` | 구현 결과 검증, 규칙 준수 확인 |
+| Refactoring Agent | `agents/refactoring-agent.md` | 코드 품질 개선, 중복 제거, 구조 정리 |
+| Performance Agent | `agents/performance-agent.md` | PWA 성능 최적화, 캐싱 전략 |
+| SEO Agent | `agents/seo-agent.md` | 메타데이터, 시맨틱 HTML, PWA manifest |
+| Documentation Agent | `agents/documentation-agent.md` | 컴포넌트 문서, API 문서, 온보딩 자료 |
+
+### 작업 흐름
+
+```
+기능 요청
+  → Planning Agent: 범위 및 순서 확인
+  → Design Agent: UI/UX 설계
+  → Coding Agent: 구현
+  → Test Agent: 테스트
+  → Validation Agent: 최종 검증
+```
+
+단순 버그 수정이나 소규모 변경은 Coding Agent → Validation Agent만 적용한다.
+
 Tradeoff: These guidelines bias toward caution over speed.
 For trivial tasks, use judgment.
 

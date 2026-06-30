@@ -113,6 +113,7 @@ export default function OwnerRequests() {
   const [filterDateTo, setFilterDateTo] = useState('')
   const [filterAuthor, setFilterAuthor] = useState('')
   const [authorPopupOpen, setAuthorPopupOpen] = useState(false)
+  const [empSearchText, setEmpSearchText] = useState('')
 
   const availableTypes: RequestType[] = [...new Set(mockRequests.map((r) => r.type))]
 
@@ -262,26 +263,6 @@ export default function OwnerRequests() {
               >
                 <LiaUsersSolid />
               </button>
-              {authorPopupOpen && (
-                <>
-                  <div className={styles.authorPickerOverlay} onClick={() => setAuthorPopupOpen(false)} />
-                  <div className={styles.authorPickerPopup}>
-                    {mockEmployees.map((emp) => (
-                      <button
-                        key={emp.id}
-                        className={styles.authorPickerItem}
-                        onClick={() => {
-                          setFilterAuthor(emp.name)
-                          setAuthorPopupOpen(false)
-                        }}
-                      >
-                        <span className={styles.authorPickerName}>{emp.name}</span>
-                        <span className={styles.authorPickerPhone}>{emp.phone}</span>
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
           </div>
 
@@ -360,6 +341,50 @@ export default function OwnerRequests() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {authorPopupOpen && (
+        <div className={styles.authorPickerOverlay} onClick={() => { setAuthorPopupOpen(false); setEmpSearchText('') }}>
+          <div className={styles.authorPickerModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.authorPickerHeader}>
+              <span className={styles.authorPickerTitle}>직원 선택</span>
+              <button className={styles.authorPickerClose} onClick={() => { setAuthorPopupOpen(false); setEmpSearchText('') }}>
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.authorPickerSearch}>
+              <LiaSearchSolid className={styles.authorPickerSearchIcon} />
+              <input
+                className={styles.authorPickerSearchInput}
+                placeholder="이름 검색"
+                value={empSearchText}
+                onChange={(e) => setEmpSearchText(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className={styles.authorPickerList}>
+              {mockEmployees
+                .filter((emp) => !empSearchText.trim() || emp.name.includes(empSearchText.trim()))
+                .map((emp) => (
+                  <button
+                    key={emp.id}
+                    className={styles.authorPickerItem}
+                    onClick={() => {
+                      setFilterAuthor(emp.name)
+                      setAuthorPopupOpen(false)
+                      setEmpSearchText('')
+                    }}
+                  >
+                    <span className={styles.authorPickerName}>{emp.name}</span>
+                    <span className={styles.authorPickerPhone}>{emp.phone}</span>
+                  </button>
+                ))}
+              {mockEmployees.filter((emp) => !empSearchText.trim() || emp.name.includes(empSearchText.trim())).length === 0 && (
+                <p className={styles.authorPickerEmpty}>검색 결과가 없습니다.</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

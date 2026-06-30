@@ -127,7 +127,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 7px 12px;
+  padding: 7px 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
@@ -152,6 +152,10 @@
   color: var(--color-primary);
   border-color: var(--color-primary);
   font-weight: 600;
+}
+
+.advBtnLabel {
+  display: none;
 }
 
 /* ══════════════════════════════════════
@@ -752,7 +756,10 @@
     flex: 1;
     max-width: 520px;
     margin-left: auto;
-    margin-right: 8px;
+  }
+
+  .advBtnLabel {
+    display: inline;
   }
 
   .viewToggle {

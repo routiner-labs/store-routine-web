@@ -187,14 +187,14 @@ export default function OwnerRequests() {
           >
             검색
           </button>
-          <button
-            className={`${styles.advBtn} ${advOpen || advActiveCount > 0 ? styles.advBtnActive : ''}`}
-            onClick={() => setAdvOpen((v) => !v)}
-          >
-            <LiaSlidersHSolid />
-            세부 검색
-          </button>
         </div>
+        <button
+          className={`${styles.advBtn} ${advOpen || advActiveCount > 0 ? styles.advBtnActive : ''}`}
+          onClick={() => setAdvOpen((v) => !v)}
+        >
+          <LiaSlidersHSolid />
+          <span className={styles.advBtnLabel}>세부 검색</span>
+        </button>
         <div className={styles.viewToggle}>
           <button
             className={`${styles.viewBtn} ${view === 'card' ? styles.viewBtnActive : ''}`}

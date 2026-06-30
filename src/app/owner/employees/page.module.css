@@ -81,6 +81,117 @@
   opacity: 0.88;
 }
 
+/* ── 세부 검색 버튼 ── */
+.advBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.advBtn:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.advBtnActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.advBtnLabel {
+  display: none;
+}
+
+/* ── 세부 검색 패널 ── */
+.advPanel {
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: var(--header-height);
+  z-index: 9;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 var(--page-x);
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.advPanelOpen {
+  max-height: 400px;
+  opacity: 1;
+  padding: 14px var(--page-x);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.advRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.advLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-width: 52px;
+  padding-top: 6px;
+  flex-shrink: 0;
+}
+
+.advSearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.advChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.advResetBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.advResetBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
 /* ── 필터 ── */
 .filterRow {
   display: flex;
@@ -456,12 +567,6 @@
 @media (min-width: 768px) {
   .fab { bottom: 24px; }
 
-  .filterRow {
-    background: transparent;
-    border-bottom: none;
-    padding: 16px var(--page-x) 0;
-  }
-
   .headerSearch {
     display: flex;
     align-items: center;
@@ -469,7 +574,10 @@
     flex: 1;
     max-width: 400px;
     margin-left: auto;
-    margin-right: 8px;
+  }
+
+  .advBtnLabel {
+    display: inline;
   }
 
   .sheetOverlay {

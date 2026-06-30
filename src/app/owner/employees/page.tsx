@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { LiaUserPlusSolid, LiaAngleRightSolid, LiaSearchSolid } from 'react-icons/lia'
+import { LiaUserPlusSolid, LiaAngleRightSolid, LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid } from 'react-icons/lia'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
 import type { EmploymentStatus } from '@/types'
 import styles from './page.module.css'
@@ -12,18 +12,37 @@ const DOW = ['월', '화', '수', '목', '금', '토', '일']
 
 export default function EmployeesPage() {
   const router = useRouter()
-  const [statusFilter, setStatusFilter] = useState<EmploymentStatus>('ACTIVE')
+  const [filterStatus, setFilterStatus] = useState<EmploymentStatus | 'ALL'>('ALL')
+  const [filterDays, setFilterDays] = useState<number[]>([])
+  const [advOpen, setAdvOpen] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
   const [invitePhone, setInvitePhone] = useState('')
   const [inviteSent, setInviteSent] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
 
+  const advActiveCount =
+    (filterStatus !== 'ALL' ? 1 : 0) +
+    (filterDays.length > 0 ? 1 : 0) +
+    (appliedSearch.trim() ? 1 : 0)
+
+  function resetAdv() {
+    setFilterStatus('ALL')
+    setFilterDays([])
+    setAppliedSearch('')
+    setSearchText('')
+  }
+
+  function toggleDay(i: number) {
+    setFilterDays((prev) => prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i])
+  }
+
   const q = appliedSearch.trim().toLowerCase()
 
   const visibleEmployees = mockEmployees
-    .filter((e) => e.status === statusFilter)
+    .filter((e) => filterStatus === 'ALL' || e.status === filterStatus)
     .filter((e) => !q || e.name.toLowerCase().includes(q) || e.phone.includes(q))
+    .filter((e) => filterDays.length === 0 || (e.schedule && filterDays.some((d) => e.schedule!.days.includes(d))))
 
   function closeInvite() {
     setInviteOpen(false)
@@ -58,18 +77,65 @@ export default function EmployeesPage() {
             검색
           </button>
         </div>
+        <button
+          className={`${styles.advBtn} ${advOpen || advActiveCount > 0 ? styles.advBtnActive : ''}`}
+          onClick={() => setAdvOpen((v) => !v)}
+        >
+          <LiaSlidersHSolid />
+          <span className={styles.advBtnLabel}>세부 검색</span>
+        </button>
       </header>
 
-      <div className={styles.filterRow}>
-        {(['ACTIVE', 'INACTIVE'] as EmploymentStatus[]).map((s) => (
-          <button
-            key={s}
-            className={`${styles.chip} ${statusFilter === s ? styles.chipActive : ''}`}
-            onClick={() => setStatusFilter(s)}
-          >
-            {s === 'ACTIVE' ? '재직중' : '퇴직'}
-          </button>
-        ))}
+      <div className={`${styles.advPanel} ${advOpen ? styles.advPanelOpen : ''}`}>
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>이름/전화</span>
+          <div className={styles.advSearchWrap}>
+            <div className={styles.searchWrap}>
+              <LiaSearchSolid className={styles.searchIcon} />
+              <input
+                className={styles.searchInput}
+                placeholder="이름 / 전화번호"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') setAppliedSearch(searchText) }}
+              />
+            </div>
+            <button className={styles.searchBtn} onClick={() => setAppliedSearch(searchText)}>검색</button>
+            <button className={styles.advResetBtn} onClick={resetAdv}>
+              <LiaTimesSolid /> 필터 초기화
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>상태</span>
+          <div className={styles.advChips}>
+            {(['ALL', 'ACTIVE', 'INACTIVE'] as const).map((s) => (
+              <button
+                key={s}
+                className={`${styles.chip} ${filterStatus === s ? styles.chipActive : ''}`}
+                onClick={() => setFilterStatus(s)}
+              >
+                {s === 'ALL' ? '전체' : s === 'ACTIVE' ? '재직중' : '퇴직'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>근무요일</span>
+          <div className={styles.advChips}>
+            {DOW.map((d, i) => (
+              <button
+                key={i}
+                className={`${styles.chip} ${filterDays.includes(i) ? styles.chipActive : ''}`}
+                onClick={() => toggleDay(i)}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {mockJoinRequests.length > 0 && (
@@ -84,7 +150,7 @@ export default function EmployeesPage() {
       <div className={styles.cardGrid}>
         {visibleEmployees.length === 0 ? (
           <p className={styles.emptyText}>
-            {statusFilter === 'ACTIVE' ? '재직중인 직원이 없습니다.' : '퇴직한 직원이 없습니다.'}
+            {filterStatus === 'INACTIVE' ? '퇴직한 직원이 없습니다.' : '재직중인 직원이 없습니다.'}
           </p>
         ) : (
           visibleEmployees.map((emp) => (

@@ -12,9 +12,9 @@ export default function StoreBar() {
   return (
     <>
       <div className={styles.bar}>
-        <button className={styles.btn} onClick={() => setOpen(true)}>
-          <span className={styles.name}>{currentStore.name}</span>
-          <span className={styles.chevron}>▾</span>
+        <button className={styles.storeBtn} onClick={() => setOpen(true)}>
+          <span className={styles.storeName}>{currentStore.name}</span>
+          <span className={styles.storeChevron}>▾</span>
         </button>
       </div>
       {open && <StoreSwitcher onClose={() => setOpen(false)} />}

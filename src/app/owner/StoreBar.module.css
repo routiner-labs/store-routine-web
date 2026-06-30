@@ -1,27 +1,40 @@
 .bar {
-  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
   background: var(--color-surface);
-  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--page-x);
 }
 
-.btn {
+.storeBtn {
   display: flex;
   align-items: center;
   gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  min-width: 0;
+}
+
+.storeName {
+  font-size: 16px;
+  font-weight: 700;
   color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.name {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.chevron {
+.storeChevron {
   font-size: 12px;
   color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
-/* 태블릿 이상에서는 사이드바에 매장 표시 */
+/* 태블릿+: 사이드바에 매장명 있으므로 전체 바 숨김 */
 @media (min-width: 768px) {
   .bar {
     display: none;

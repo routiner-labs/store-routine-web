@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { LiaAngleDownSolid } from 'react-icons/lia'
 import { getAttendanceForDate } from '@/mock/calendar'
 import styles from './page.module.css'
 
@@ -71,6 +72,15 @@ export default function AttendancePage() {
   const [baseMonth, setBaseMonth] = useState(6)
   const [baseDay, setBaseDay] = useState(30)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerNavYear, setPickerNavYear] = useState(2026)
+  const [pickerNavMonth, setPickerNavMonth] = useState(6)
+
+  function openPicker() {
+    setPickerNavYear(baseYear)
+    setPickerNavMonth(baseMonth)
+    setPickerOpen(true)
+  }
 
   function navigate(dir: 1 | -1) {
     setSelectedDate(null)
@@ -100,6 +110,13 @@ export default function AttendancePage() {
     return `${f.getFullYear()}년 ${f.getMonth() + 1}월 ${f.getDate()}일 ~ ${lm}${l.getDate()}일`
   })()
 
+  const selectedWeekSet = viewMode === 'week'
+    ? new Set(
+        getWeekDays(baseYear, baseMonth, baseDay)
+          .map(d => formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate()))
+      )
+    : null
+
   const selectedRecords = selectedDate ? getAttendanceForDate(selectedDate) : []
   const dayRecords = getAttendanceForDate(formatDate(baseYear, baseMonth, baseDay))
 
@@ -122,18 +139,119 @@ export default function AttendancePage() {
       </header>
 
       {/* 기간 네비게이션 */}
-      <div className={styles.periodNav}>
-        <button className={styles.navBtn} onClick={() => navigate(-1)}>‹</button>
-        <span className={styles.periodLabel}>{periodLabel}</span>
-        <button className={styles.navBtn} onClick={() => navigate(1)}>›</button>
+      <div className={styles.periodNavWrap}>
+        <div className={styles.periodNav}>
+          <button className={styles.navBtn} onClick={() => navigate(-1)}>‹</button>
+          <button className={styles.periodLabelBtn} onClick={openPicker}>
+            {periodLabel}
+            <LiaAngleDownSolid className={`${styles.periodLabelIcon} ${pickerOpen ? styles.periodLabelIconOpen : ''}`} />
+          </button>
+          <button className={styles.navBtn} onClick={() => navigate(1)}>›</button>
+        </div>
+
+        {pickerOpen && (
+          <>
+            <div className={styles.pickerOverlay} onClick={() => setPickerOpen(false)} />
+            <div className={styles.picker}>
+              {viewMode === 'month' ? (
+                /* 월 선택 */
+                <>
+                  <div className={styles.pickerHead}>
+                    <button className={styles.pickerNavBtn} onClick={() => setPickerNavYear(y => y - 1)}>‹</button>
+                    <span className={styles.pickerTitle}>{pickerNavYear}년</span>
+                    <button className={styles.pickerNavBtn} onClick={() => setPickerNavYear(y => y + 1)}>›</button>
+                  </div>
+                  <div className={styles.pickerMonthGrid}>
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                      <button
+                        key={m}
+                        className={[
+                          styles.pickerMonth,
+                          m === baseMonth && pickerNavYear === baseYear ? styles.pickerMonthSelected : '',
+                        ].join(' ')}
+                        onClick={() => { setBaseYear(pickerNavYear); setBaseMonth(m); setPickerOpen(false) }}
+                      >
+                        {m}월
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                /* 날짜 선택 (일간/주간) */
+                <>
+                  <div className={styles.pickerHead}>
+                    <button className={styles.pickerNavBtn} onClick={() => {
+                      const n = shiftMonth(pickerNavYear, pickerNavMonth, -1)
+                      setPickerNavYear(n.year); setPickerNavMonth(n.month)
+                    }}>‹</button>
+                    <span className={styles.pickerTitle}>{pickerNavYear}년 {pickerNavMonth}월</span>
+                    <button className={styles.pickerNavBtn} onClick={() => {
+                      const n = shiftMonth(pickerNavYear, pickerNavMonth, 1)
+                      setPickerNavYear(n.year); setPickerNavMonth(n.month)
+                    }}>›</button>
+                  </div>
+                  <div className={styles.pickerDayGrid}>
+                    {WEEKDAY_LABELS.map((l, i) => (
+                      <div
+                        key={l}
+                        className={[
+                          styles.pickerDow,
+                          i === 5 ? styles.pickerDowSat : i === 6 ? styles.pickerDowSun : '',
+                        ].join(' ')}
+                      >
+                        {l}
+                      </div>
+                    ))}
+                    {getMonthGrid(pickerNavYear, pickerNavMonth).map((d, i) => {
+                      if (!d) return <div key={`e-${i}`} />
+                      const ds = formatDate(pickerNavYear, pickerNavMonth, d)
+                      const isToday = ds === TODAY
+                      const isSelected = viewMode === 'day'
+                        ? ds === formatDate(baseYear, baseMonth, baseDay)
+                        : (selectedWeekSet?.has(ds) ?? false)
+                      const dow = (new Date(pickerNavYear, pickerNavMonth - 1, d).getDay() + 6) % 7
+                      return (
+                        <button
+                          key={d}
+                          className={[
+                            styles.pickerDay,
+                            isToday ? styles.pickerDayToday : '',
+                            isSelected ? styles.pickerDaySelected : '',
+                            dow === 5 ? styles.pickerDaySat : dow === 6 ? styles.pickerDaySun : '',
+                          ].join(' ')}
+                          onClick={() => {
+                            const { year, month, day } = parseDateStr(ds)
+                            setBaseYear(year); setBaseMonth(month); setBaseDay(day)
+                            setPickerOpen(false)
+                            setSelectedDate(null)
+                          }}
+                        >
+                          {d}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 월간 */}
       {viewMode === 'month' && (
         <div className={styles.monthWrap}>
           <div className={styles.calGrid}>
-            {WEEKDAY_LABELS.map((l) => (
-              <div key={l} className={styles.calHead}>{l}</div>
+            {WEEKDAY_LABELS.map((l, i) => (
+              <div
+                key={l}
+                className={[
+                  styles.calHead,
+                  i === 5 ? styles.calHeadSat : i === 6 ? styles.calHeadSun : '',
+                ].join(' ')}
+              >
+                {l}
+              </div>
             ))}
             {getMonthGrid(baseYear, baseMonth).map((d, i) => {
               if (!d) return <div key={`e-${i}`} className={styles.calEmpty} />
@@ -167,50 +285,44 @@ export default function AttendancePage() {
       {/* 주간 */}
       {viewMode === 'week' && (
         <div className={styles.weekWrap}>
-          {getWeekDays(baseYear, baseMonth, baseDay).map((date) => {
-            const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate()
-            const ds = formatDate(y, m, d)
-            const records = getAttendanceForDate(ds)
-            const hasAlert = records.some((r) => r.status === 'LATE' || r.status === 'ABSENT')
-            const dowLabel = WEEKDAY_LABELS[(date.getDay() + 6) % 7]
-            return (
-              <button
-                key={ds}
+          <div className={styles.weekGrid}>
+            {WEEKDAY_LABELS.map((l, i) => (
+              <div
+                key={l}
                 className={[
-                  styles.weekRow,
-                  ds === selectedDate ? styles.weekRowSelected : '',
+                  styles.calHead,
+                  i === 5 ? styles.calHeadSat : i === 6 ? styles.calHeadSun : '',
                 ].join(' ')}
-                onClick={() => setSelectedDate(ds === selectedDate ? null : ds)}
               >
-                <div className={`${styles.weekDay} ${ds === TODAY ? styles.weekDayToday : ''}`}>
-                  <span className={styles.weekDow}>{dowLabel}</span>
-                  <span className={styles.weekDate}>{m}/{d}</span>
-                </div>
-                <div className={styles.weekNames}>
-                  {records.length === 0 ? (
-                    <span className={styles.weekNone}>-</span>
-                  ) : (
-                    records.map((r) => (
-                      <span
-                        key={r.employeeId}
-                        className={[
-                          styles.weekName,
-                          r.status === 'LATE' ? styles.weekNameLate : '',
-                          r.status === 'ABSENT' ? styles.weekNameAbsent : '',
-                        ].join(' ')}
-                      >
-                        {r.employeeName}
-                      </span>
-                    ))
+                {l}
+              </div>
+            ))}
+            {getWeekDays(baseYear, baseMonth, baseDay).map((date) => {
+              const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate()
+              const ds = formatDate(y, m, d)
+              const records = getAttendanceForDate(ds)
+              const hasAlert = records.some((r) => r.status === 'LATE' || r.status === 'ABSENT')
+              return (
+                <button
+                  key={ds}
+                  className={[
+                    styles.weekCell,
+                    ds === selectedDate ? styles.weekCellSelected : '',
+                    ds === TODAY ? styles.weekCellToday : '',
+                  ].join(' ')}
+                  onClick={() => setSelectedDate(ds === selectedDate ? null : ds)}
+                >
+                  <span className={styles.weekCellNum}>{d}</span>
+                  {records.length > 0 && (
+                    <span className={`${styles.calCount} ${hasAlert ? styles.calCountAlert : ''}`}>
+                      {records.length}명
+                    </span>
                   )}
-                </div>
-                <div className={styles.weekMeta}>
-                  {hasAlert && <span className={styles.alertPip} />}
-                  <span className={styles.weekCount}>{records.length > 0 ? `${records.length}명` : ''}</span>
-                </div>
-              </button>
-            )
-          })}
+                  {hasAlert && <span className={styles.calDot} />}
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
 
@@ -269,23 +381,77 @@ export default function AttendancePage() {
             <div className={styles.sheetBody}>
               {selectedRecords.length === 0 ? (
                 <p className={styles.emptyText}>근무 데이터가 없습니다</p>
-              ) : (
-                selectedRecords.map((r) => (
-                  <div key={r.employeeId} className={`${styles.record} ${styles[`record_${r.status}`]}`}>
-                    <div>
-                      <span className={styles.recordName}>{r.employeeName}</span>
-                      <span className={styles.recordTime}>
-                        {r.scheduledStart} ~ {r.scheduledEnd}
-                        {r.clockedIn && ` · 출근 ${r.clockedIn}`}
-                        {r.clockedOut && ` · 퇴근 ${r.clockedOut}`}
-                      </span>
+              ) : (() => {
+                const toMin = (t: string) => {
+                  const [h, m] = t.split(':').map(Number)
+                  return h * 60 + m
+                }
+                const allMin = selectedRecords.flatMap(r => [
+                  toMin(r.scheduledStart), toMin(r.scheduledEnd),
+                  ...(r.clockedIn ? [toMin(r.clockedIn)] : []),
+                  ...(r.clockedOut ? [toMin(r.clockedOut)] : []),
+                ])
+                const tlMin = Math.floor(Math.min(...allMin) / 60) * 60
+                const tlMax = Math.ceil(Math.max(...allMin) / 60) * 60
+                const span = tlMax - tlMin
+                const p = (m: number) => `${((m - tlMin) / span * 100).toFixed(1)}%`
+                const w = (s: number, e: number) => `${((e - s) / span * 100).toFixed(1)}%`
+                const hrs = Array.from(
+                  { length: Math.floor(tlMax / 60) - Math.ceil(tlMin / 60) + 1 },
+                  (_, i) => Math.ceil(tlMin / 60) + i
+                )
+                return (
+                  <div className={styles.tlWrap}>
+                    <div className={styles.tlAxisRow}>
+                      <div className={styles.tlLabelCol} />
+                      <div className={styles.tlTrackCol}>
+                        {hrs.map(h => (
+                          <span key={h} className={styles.tlHourMark} style={{ left: p(h * 60) }}>
+                            {h}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
-                      {STATUS_LABEL[r.status]}
-                    </span>
+                    {selectedRecords.map(r => {
+                      const ss = toMin(r.scheduledStart)
+                      const se = toMin(r.scheduledEnd)
+                      const ci = r.clockedIn ? toMin(r.clockedIn) : null
+                      const co = r.clockedOut ? toMin(r.clockedOut) : null
+                      const ongoing = r.status === 'CLOCKED_IN' || r.status === 'LATE'
+                      return (
+                        <div key={r.employeeId} className={styles.tlRow}>
+                          <div className={styles.tlLabelCol}>
+                            <span className={styles.tlEmpName}>{r.employeeName}</span>
+                            <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
+                              {STATUS_LABEL[r.status]}
+                            </span>
+                            <span className={styles.tlEmpTime}>
+                              {r.clockedIn ?? r.scheduledStart}
+                              {' ~ '}
+                              {r.clockedOut ? r.clockedOut : ongoing ? '근무중' : r.scheduledEnd}
+                            </span>
+                          </div>
+                          <div className={styles.tlTrackCol}>
+                            {hrs.map(h => (
+                              <div key={h} className={styles.tlGridLine} style={{ left: p(h * 60) }} />
+                            ))}
+                            <div
+                              className={`${styles.tlBarSched} ${r.status === 'ABSENT' ? styles.tlBarSchedAbsent : ''}`}
+                              style={{ left: p(ss), width: w(ss, se) }}
+                            />
+                            {ci !== null && (
+                              <div
+                                className={`${styles.tlBarActual} ${styles[`tlBarActual_${r.status}`]} ${ongoing ? styles.tlBarOngoing : ''}`}
+                                style={{ left: p(ci), width: w(ci, co ?? se) }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
-                ))
-              )}
+                )
+              })()}
             </div>
           </div>
         </div>

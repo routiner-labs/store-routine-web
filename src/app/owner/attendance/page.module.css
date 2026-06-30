@@ -94,6 +94,186 @@
   color: var(--color-primary);
 }
 
+/* ── 기간 레이블 버튼 & 픽커 ── */
+.periodNavWrap {
+  position: relative;
+}
+
+.periodLabelBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+  font-family: inherit;
+}
+
+.periodLabelBtn:hover {
+  background: var(--color-primary-light);
+}
+
+.periodLabelIcon {
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.periodLabelIconOpen {
+  transform: rotate(180deg);
+}
+
+.pickerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  min-width: 272px;
+  max-width: calc(100vw - 32px);
+  animation: pickerIn 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes pickerIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.pickerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pickerNavBtn {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: background 0.1s, color 0.1s;
+}
+
+.pickerNavBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.pickerTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 날짜 그리드 (일간 / 주간) */
+.pickerDayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.pickerDow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 4px 0 6px;
+}
+
+.pickerDowSat { color: var(--color-primary); }
+.pickerDowSun { color: var(--color-danger); }
+
+.pickerDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+
+.pickerDay:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.pickerDayToday {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.pickerDaySelected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.pickerDaySat { color: var(--color-primary); }
+.pickerDaySun { color: var(--color-danger); }
+
+/* 월 그리드 (월간) */
+.pickerMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pickerMonth {
+  padding: 10px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  text-align: center;
+  font-family: inherit;
+}
+
+.pickerMonth:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.pickerMonthSelected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
 /* ── 월간 달력 ── */
 .monthWrap {
   flex: 1;
@@ -118,6 +298,9 @@
   color: var(--color-text-secondary);
   background: var(--color-surface);
 }
+
+.calHeadSat { color: var(--color-primary); }
+.calHeadSun { color: var(--color-danger); }
 
 .calEmpty {
   min-height: 72px;
@@ -208,121 +391,79 @@
 
 /* ── 주간 뷰 ── */
 .weekWrap {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
 }
 
-.weekRow {
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(61, 99, 221, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px;
+  box-shadow: 0 4px 20px rgba(61, 99, 221, 0.10);
+}
+
+.weekCell {
+  min-height: 140px;
+  padding: 8px 6px 7px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--color-border);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   background: var(--color-surface);
-  width: 100%;
-  text-align: left;
   cursor: pointer;
+  text-align: left;
   transition: background 0.12s;
 }
 
-.weekRow:hover {
+.weekCell:hover {
   background: var(--color-primary-light);
 }
 
-.weekRowSelected {
+.weekCellSelected {
   background: var(--color-primary-light);
 }
 
-.weekDay {
-  width: 44px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+.weekCellToday {
+  background: rgba(61, 99, 221, 0.04);
 }
 
-.weekDow {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.weekDate {
+.weekCellNum {
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.weekDayToday {
-  background: var(--color-primary-light);
-  border-radius: 8px;
-}
-
-.weekDayToday .weekDow,
-.weekDayToday .weekDate {
-  color: var(--color-primary);
-}
-
-.weekNames {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
-  min-width: 0;
-}
-
-.weekName {
-  font-size: 12px;
-  padding: 3px 9px;
-  border-radius: 20px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.weekNameLate {
-  color: var(--color-warning);
-  border-color: currentColor;
-  background: var(--color-warning-light);
-}
-
-.weekNameAbsent {
-  color: var(--color-danger);
-  border-color: currentColor;
-  background: var(--color-danger-light);
-  text-decoration: line-through;
-}
-
-.weekNone {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
-.weekMeta {
+  font-weight: 500;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.alertPip {
-  width: 7px;
-  height: 7px;
+  justify-content: center;
   border-radius: 50%;
-  background: var(--color-danger);
   flex-shrink: 0;
+  line-height: 1;
+  color: var(--color-text);
 }
 
-.weekCount {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  min-width: 28px;
-  text-align: right;
+.weekCellToday .weekCellNum {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.weekCellSelected:not(.weekCellToday) .weekCellNum {
+  background: #fff;
+  color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(61, 99, 221, 0.2);
+}
+
+@media (min-width: 768px) {
+  .weekCell { min-height: 200px; }
+  .weekCellNum { font-size: 14px; width: 26px; height: 26px; }
+}
+
+@media (min-width: 1024px) {
+  .weekCell { min-height: 240px; }
 }
 
 /* ── 일간 뷰 ── */
@@ -520,7 +661,7 @@
   }
 
   .sheet {
-    width: 460px;
+    width: 560px;
     border-radius: 16px;
     max-height: 70vh;
     animation: modalIn 0.2s cubic-bezier(0.32, 0.72, 0, 1);
@@ -534,4 +675,143 @@
   .sheetBody {
     padding-bottom: 20px;
   }
+}
+
+/* ── 날짜 상세 — Gantt 타임라인 ── */
+.tlWrap {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tlAxisRow {
+  display: flex;
+  align-items: flex-end;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.tlLabelCol {
+  width: 76px;
+  flex-shrink: 0;
+  padding-right: 10px;
+  position: sticky;
+  left: 0;
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+.tlRow {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.tlRow .tlLabelCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tlEmpName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tlEmpTime {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tlTrackCol {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.tlAxisRow .tlTrackCol {
+  height: 100%;
+}
+
+.tlRow .tlTrackCol {
+  height: 32px;
+}
+
+.tlHourMark {
+  position: absolute;
+  bottom: 0;
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.tlGridLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* 예정 시간 바 (background) */
+.tlBarSched {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.tlBarSchedAbsent {
+  opacity: 0.4;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-bg),
+    var(--color-bg) 3px,
+    var(--color-border) 3px,
+    var(--color-border) 6px
+  );
+}
+
+/* 실제 근무 바 (foreground) */
+.tlBarActual {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  border-radius: 4px;
+}
+
+.tlBarActual_CLOCKED_OUT { background: var(--color-success); }
+.tlBarActual_CLOCKED_IN  { background: var(--color-primary); }
+.tlBarActual_LATE        { background: var(--color-warning); }
+
+/* 근무 중 (퇴근 시간 미확정) — 오른쪽 끝 페이드 */
+.tlBarOngoing::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, transparent, var(--color-surface));
+  border-radius: 0 4px 4px 0;
+}
+
+@media (min-width: 768px) {
+  .tlLabelCol { width: 90px; }
+  .tlEmpName  { font-size: 14px; }
+  .tlHourMark { font-size: 11px; }
 }

@@ -534,6 +534,14 @@ export default function OwnerChecklists() {
     }))
   }
 
+  function createTaskFromSearch(name: string) {
+    const title = name.trim()
+    if (!title) return
+    openManageNew()
+    setNewTitle(title)
+    setCatalogQuery('')
+  }
+
   function addTaskToList(kind: TaskKind, catalogId: string) {
     setTasksByDate((prev) => {
       const list = prev[selectedDate] ?? []
@@ -572,7 +580,7 @@ export default function OwnerChecklists() {
     setNewActive(true)
     setNewCategory('ETC')
     setNewTiming(DEFAULT_TIMING)
-    setNewRecurrence('RECURRING')
+    setNewRecurrence('ONCE')
     setNewRule(DEFAULT_RECURRENCE_RULE)
     setNewRecurStart('')
     setNewRecurEnd('')
@@ -1177,7 +1185,19 @@ export default function OwnerChecklists() {
           </div>
           <div className={styles.catalogList}>
             {filteredCatalog.length === 0 ? (
-              <p className={styles.panelEmpty}>검색 결과가 없습니다</p>
+              query ? (
+                <button
+                  className={styles.catalogCreate}
+                  onClick={() => createTaskFromSearch(catalogQuery)}
+                >
+                  <LiaPlusSolid />
+                  <span>
+                    ‘{catalogQuery.trim()}’ 테스크 만들기
+                  </span>
+                </button>
+              ) : (
+                <p className={styles.panelEmpty}>테스크가 없습니다</p>
+              )
             ) : (
               filteredCatalog.map((tpl) => (
                 <div
@@ -1347,32 +1367,34 @@ export default function OwnerChecklists() {
                   )}
                 </div>
                 <div className={styles.manageListScroll}>
+                  {manageQ && manageFiltered.length === 0 && (
+                    <p className={styles.manageEmpty}>검색 결과가 없습니다</p>
+                  )}
+                  {manageFiltered.map((tpl) => {
+                    const inactive = tpl.active === false
+                    return (
+                      <button
+                        key={tpl.id}
+                        className={`${styles.manageListItem} ${
+                          editingId === tpl.id ? styles.manageListItemActive : ''
+                        } ${inactive ? styles.manageListItemOff : ''}`}
+                        onClick={() => selectTask(tpl)}
+                      >
+                        <span className={styles.catBadge}>
+                          {categoryName(tpl.category ?? 'ETC')}
+                        </span>
+                        <span className={styles.manageListName}>{tpl.title}</span>
+                        {inactive && <span className={styles.offBadge}>비활성</span>}
+                      </button>
+                    )
+                  })}
                   {editingId === null && (
                     <div className={`${styles.manageListItem} ${styles.manageListItemActive}`}>
-                      <span className={styles.manageListName}>새 테스크…</span>
+                      <span className={styles.catBadge}>{categoryName(newCategory)}</span>
+                      <span className={styles.manageListName}>
+                        {newTitle.trim() || '새 테스크'}
+                      </span>
                     </div>
-                  )}
-                  {manageFiltered.length === 0 ? (
-                    <p className={styles.manageEmpty}>검색 결과가 없습니다</p>
-                  ) : (
-                    manageFiltered.map((tpl) => {
-                      const inactive = tpl.active === false
-                      return (
-                        <button
-                          key={tpl.id}
-                          className={`${styles.manageListItem} ${
-                            editingId === tpl.id ? styles.manageListItemActive : ''
-                          } ${inactive ? styles.manageListItemOff : ''}`}
-                          onClick={() => selectTask(tpl)}
-                        >
-                          <span className={styles.catBadge}>
-                            {categoryName(tpl.category ?? 'ETC')}
-                          </span>
-                          <span className={styles.manageListName}>{tpl.title}</span>
-                          {inactive && <span className={styles.offBadge}>비활성</span>}
-                        </button>
-                      )
-                    })
                   )}
                 </div>
                 <button className={styles.manageNewBtn} onClick={selectNew}>

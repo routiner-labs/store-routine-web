@@ -310,6 +310,40 @@
   padding: 8px 2px;
 }
 
+.catalogCreate {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.1s;
+}
+
+.catalogCreate:hover {
+  opacity: 0.88;
+}
+
+.catalogCreate svg {
+  flex-shrink: 0;
+}
+
+.catalogCreate span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .catalogList {
   display: flex;
   gap: 8px;

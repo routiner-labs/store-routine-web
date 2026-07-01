@@ -94,3 +94,33 @@
 .toastClose:hover {
   opacity: 1;
 }
+
+/* 웹: 왼쪽 하단에서 나와 스택으로 쌓이고, 오래된 것부터 아래로 사라짐 */
+@keyframes slideInLeft {
+  from { transform: translateX(-120%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes slideDownOut {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(24px); opacity: 0; }
+}
+
+@media (min-width: 768px) {
+  .container {
+    top: auto;
+    bottom: 24px;
+    left: 24px;
+    transform: none;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .toast {
+    animation: slideInLeft 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  .toastExiting {
+    animation: slideDownOut 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+}

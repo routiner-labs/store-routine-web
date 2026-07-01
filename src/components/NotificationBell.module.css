@@ -76,48 +76,27 @@
   pointer-events: none;
 }
 
-/* ── 바깥 클릭 오버레이 ── */
+/* ── 바깥 클릭 오버레이 (body로 포탈) ── */
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 99;
+  z-index: 1199;
 }
 
-/* ── 알림 패널 ── */
-/* Mobile: 하단 탭바 벨 → 탭바 위에 패널 */
+/* ── 알림 패널 (body로 포탈, 벨 옆에 붙여 표시 · left/bottom 은 인라인 지정) ── */
 .panel {
   position: fixed;
-  bottom: calc(var(--nav-height) + 8px);
-  right: 4px;
-  width: min(360px, calc(100vw - 8px));
+  width: min(360px, calc(100vw - 24px));
   max-height: 480px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  z-index: 200;
+  z-index: 1200;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: panelIn 0.18s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-/* Tablet: 사이드바 우측에 패널 */
-@media (min-width: 768px) {
-  .panel {
-    bottom: 72px;
-    left: calc(var(--sidebar-sm) + 8px);
-    right: auto;
-    width: min(360px, calc(100vw - var(--sidebar-sm) - 24px));
-  }
-}
-
-/* Desktop: 더 넓은 사이드바 우측 */
-@media (min-width: 1024px) {
-  .panel {
-    left: calc(var(--sidebar-lg) + 8px);
-    width: min(360px, calc(100vw - var(--sidebar-lg) - 24px));
-  }
 }
 
 @keyframes panelIn {

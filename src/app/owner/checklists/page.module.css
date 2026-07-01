@@ -72,8 +72,25 @@
   min-width: 62px;
   padding: 8px 16px;
   background: var(--color-bg);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   flex-shrink: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.summaryItem:hover {
+  border-color: var(--color-border);
+}
+
+.summaryItemActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.summaryItemActive:hover {
+  border-color: var(--color-primary);
 }
 
 .summaryNum {

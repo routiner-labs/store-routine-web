@@ -352,6 +352,7 @@ const ATT_LABEL: Record<string, string> = {
 }
 
 type DragItem = { type: 'EMP' | 'CATALOG'; id: string }
+type SummaryFilter = 'ALL' | 'ASSIGNED' | 'UNASSIGNED' | 'DONE' | 'PENDING'
 
 function hasMethodContent(html: string) {
   if (/<img/i.test(html)) return true
@@ -391,6 +392,7 @@ export default function OwnerChecklists() {
   const [tasksByDate, setTasksByDate] = useState<Record<string, StoreTask[]>>(() => ({
     [TODAY]: createTasksForDate(TODAY),
   }))
+  const [summaryFilter, setSummaryFilter] = useState<SummaryFilter>('ALL')
   const [dragItem, setDragItem] = useState<DragItem | null>(null)
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null)
   const [dragOverSection, setDragOverSection] = useState<TaskKind | null>(null)
@@ -494,13 +496,21 @@ export default function OwnerChecklists() {
   const totalCount = tasks.length
   const assignedCount = tasks.filter((t) => t.assigneeIds.length > 0).length
   const doneCount = tasks.filter((t) => t.done).length
-  const summary = [
-    { label: '전체', value: totalCount, cls: '' },
-    { label: '할당', value: assignedCount, cls: styles.sumAssigned },
-    { label: '미할당', value: totalCount - assignedCount, cls: styles.sumUnassigned },
-    { label: '완료', value: doneCount, cls: styles.sumDone },
-    { label: '미완료', value: totalCount - doneCount, cls: styles.sumPending },
+  const summary: { key: SummaryFilter; label: string; value: number; cls: string }[] = [
+    { key: 'ALL', label: '전체', value: totalCount, cls: '' },
+    { key: 'ASSIGNED', label: '할당', value: assignedCount, cls: styles.sumAssigned },
+    { key: 'UNASSIGNED', label: '미할당', value: totalCount - assignedCount, cls: styles.sumUnassigned },
+    { key: 'DONE', label: '완료', value: doneCount, cls: styles.sumDone },
+    { key: 'PENDING', label: '미완료', value: totalCount - doneCount, cls: styles.sumPending },
   ]
+
+  function matchesSummary(t: StoreTask): boolean {
+    if (summaryFilter === 'ASSIGNED') return t.assigneeIds.length > 0
+    if (summaryFilter === 'UNASSIGNED') return t.assigneeIds.length === 0
+    if (summaryFilter === 'DONE') return t.done
+    if (summaryFilter === 'PENDING') return !t.done
+    return true
+  }
 
   function clearDrag() {
     setDragItem(null)
@@ -1009,13 +1019,14 @@ export default function OwnerChecklists() {
 
   function renderSection(kind: TaskKind, title: string, desc: string, list: StoreTask[]) {
     const q = taskQuery[kind].trim().toLowerCase()
-    const filtered = q
-      ? list.filter(
-          (t) =>
-            t.title.toLowerCase().includes(q) ||
-            t.assigneeIds.some((id) => empById[id]?.name.toLowerCase().includes(q)),
-        )
-      : list
+    const filtered = list.filter((t) => {
+      if (!matchesSummary(t)) return false
+      if (!q) return true
+      return (
+        t.title.toLowerCase().includes(q) ||
+        t.assigneeIds.some((id) => empById[id]?.name.toLowerCase().includes(q))
+      )
+    })
     return (
       <section
         className={`${styles.taskSection} ${dragOverSection === kind ? styles.taskSectionDragOver : ''}`}
@@ -1059,7 +1070,11 @@ export default function OwnerChecklists() {
         <div className={styles.taskList}>
           {filtered.length === 0 ? (
             <p className={styles.emptyText}>
-              {q ? '검색 결과가 없습니다' : '테스크를 여기로 끌어다 놓으세요'}
+              {q
+                ? '검색 결과가 없습니다'
+                : summaryFilter !== 'ALL'
+                  ? '해당하는 업무가 없습니다'
+                  : '테스크를 여기로 끌어다 놓으세요'}
             </p>
           ) : (
             filtered.map(renderTask)
@@ -1086,10 +1101,14 @@ export default function OwnerChecklists() {
 
       <div className={styles.summary}>
         {summary.map((s) => (
-          <div key={s.label} className={styles.summaryItem}>
+          <button
+            key={s.key}
+            className={`${styles.summaryItem} ${summaryFilter === s.key ? styles.summaryItemActive : ''}`}
+            onClick={() => setSummaryFilter(summaryFilter === s.key ? 'ALL' : s.key)}
+          >
             <span className={`${styles.summaryNum} ${s.cls}`}>{s.value}</span>
             <span className={styles.summaryLabel}>{s.label}</span>
-          </div>
+          </button>
         ))}
       </div>
 

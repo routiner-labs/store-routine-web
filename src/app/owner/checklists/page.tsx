@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   LiaAngleLeftSolid,
   LiaAngleRightSolid,
@@ -10,11 +10,19 @@ import {
   LiaSearchSolid,
   LiaInfoCircleSolid,
   LiaCheckSolid,
+  LiaClipboardListSolid,
+  LiaCogSolid,
+  LiaPenSolid,
+  LiaTrashAltSolid,
+  LiaAngleDownSolid,
+  LiaBookSolid,
+  LiaImageSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { getAttendanceForDate } from '@/mock/calendar'
 import { createTasksForDate, TASK_CATALOG } from '@/mock/tasks'
-import type { StoreTask, TaskKind } from '@/mock/tasks'
+import type { StoreTask, TaskKind, TaskTemplate } from '@/mock/tasks'
+import type { CompletionType } from '@/types'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -29,6 +37,15 @@ const COMPLETION_LABEL: Record<string, string> = {
   OWNER_CONFIRM: '사장확인',
 }
 
+const COMPLETION_OPTIONS: CompletionType[] = [
+  'CHECK',
+  'PHOTO',
+  'NUMBER',
+  'MEMO',
+  'SELECT',
+  'OWNER_CONFIRM',
+]
+
 const ATT_LABEL: Record<string, string> = {
   CLOCKED_IN: '출근',
   LATE: '지각',
@@ -38,6 +55,11 @@ const ATT_LABEL: Record<string, string> = {
 }
 
 type DragItem = { type: 'EMP' | 'CATALOG'; id: string }
+
+function hasMethodContent(html: string) {
+  if (/<img/i.test(html)) return true
+  return html.replace(/<[^>]*>/g, '').trim().length > 0
+}
 
 function InfoTip({ text, align = 'left' }: { text: string; align?: 'left' | 'right' }) {
   return (
@@ -76,6 +98,38 @@ export default function OwnerChecklists() {
   const [catalogQuery, setCatalogQuery] = useState('')
   const [taskQuery, setTaskQuery] = useState<Record<TaskKind, string>>({ COMMON: '', EXTRA: '' })
   const [empQuery, setEmpQuery] = useState('')
+  const [catalog, setCatalog] = useState<TaskTemplate[]>(TASK_CATALOG)
+  const [fabOpen, setFabOpen] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [manageOpen, setManageOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [newTitle, setNewTitle] = useState('')
+  const [newType, setNewType] = useState<CompletionType>('CHECK')
+  const [newMethod, setNewMethod] = useState('')
+  const [menuTaskId, setMenuTaskId] = useState<string | null>(null)
+  const [methodTask, setMethodTask] = useState<StoreTask | null>(null)
+  const seqRef = useRef(0)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<HTMLDivElement>(null)
+
+  // 에디터가 열릴 때 초기 내용 주입 (uncontrolled)
+  useEffect(() => {
+    if (createOpen && editorRef.current) {
+      editorRef.current.innerHTML = newMethod
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createOpen])
+
+  function insertPhotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    editorRef.current?.focus()
+    Array.from(files).forEach((f) => {
+      const url = URL.createObjectURL(f)
+      document.execCommand('insertHTML', false, `<img src="${url}" alt="수행 사진" />`)
+    })
+    e.target.value = ''
+  }
 
   const tasks = tasksByDate[selectedDate] ?? []
   const commonTasks = tasks.filter((t) => t.kind === 'COMMON')
@@ -91,8 +145,8 @@ export default function OwnerChecklists() {
 
   const query = catalogQuery.trim().toLowerCase()
   const filteredCatalog = query
-    ? TASK_CATALOG.filter((t) => t.title.toLowerCase().includes(query))
-    : TASK_CATALOG
+    ? catalog.filter((t) => t.title.toLowerCase().includes(query))
+    : catalog
 
   const empQ = empQuery.trim().toLowerCase()
   const filteredEmployees = empQ
@@ -153,13 +207,14 @@ export default function OwnerChecklists() {
     setTasksByDate((prev) => {
       const list = prev[selectedDate] ?? []
       if (list.some((t) => t.kind === kind && t.catalogId === catalogId)) return prev
-      const tpl = TASK_CATALOG.find((t) => t.id === catalogId)
+      const tpl = catalog.find((t) => t.id === catalogId)
       if (!tpl) return prev
       const newTask: StoreTask = {
         id: `${kind}-${catalogId}`,
         catalogId,
         title: tpl.title,
         completionType: tpl.completionType,
+        method: tpl.method,
         kind,
         assigneeIds: [],
         done: false,
@@ -175,6 +230,66 @@ export default function OwnerChecklists() {
         t.id === taskId ? { ...t, done: !t.done } : t,
       ),
     }))
+  }
+
+  function openCreateTask() {
+    setFabOpen(false)
+    setEditingId(null)
+    setNewTitle('')
+    setNewType('CHECK')
+    setNewMethod('')
+    setCreateOpen(true)
+  }
+
+  function openManage() {
+    setFabOpen(false)
+    setManageOpen(true)
+  }
+
+  function closeCreate() {
+    setCreateOpen(false)
+    setEditingId(null)
+  }
+
+  function startEdit(tpl: TaskTemplate) {
+    setEditingId(tpl.id)
+    setNewTitle(tpl.title)
+    setNewType(tpl.completionType)
+    setNewMethod(tpl.method)
+    setManageOpen(false)
+    setCreateOpen(true)
+  }
+
+  function deleteTask(id: string) {
+    setCatalog((prev) => prev.filter((t) => t.id !== id))
+  }
+
+  function createTask() {
+    const title = newTitle.trim()
+    if (!title) return
+    const method = editorRef.current?.innerHTML ?? ''
+    if (editingId) {
+      setCatalog((prev) =>
+        prev.map((t) =>
+          t.id === editingId ? { ...t, title, completionType: newType, method } : t,
+        ),
+      )
+      setTasksByDate((prev) => {
+        const next: Record<string, StoreTask[]> = {}
+        for (const date of Object.keys(prev)) {
+          next[date] = prev[date].map((t) =>
+            t.catalogId === editingId ? { ...t, title, completionType: newType, method } : t,
+          )
+        }
+        return next
+      })
+    } else {
+      seqRef.current += 1
+      const id = `custom-${seqRef.current}`
+      setCatalog((prev) => [...prev, { id, title, completionType: newType, method }])
+    }
+    setCreateOpen(false)
+    setEditingId(null)
   }
 
   function removeTask(taskId: string) {
@@ -212,7 +327,29 @@ export default function OwnerChecklists() {
           {task.done && <LiaCheckSolid />}
         </button>
         <span className={styles.taskCompletion}>{COMPLETION_LABEL[task.completionType]}</span>
-        <span className={styles.taskTitle}>{task.title}</span>
+        <div className={styles.taskMain}>
+          <button
+            className={styles.taskTitleBtn}
+            onClick={() => setMenuTaskId((cur) => (cur === task.id ? null : task.id))}
+          >
+            <span className={styles.taskTitle}>{task.title}</span>
+            <LiaAngleDownSolid className={styles.taskTitleChevron} />
+          </button>
+          {menuTaskId === task.id && (
+            <div className={styles.taskMenu}>
+              <button
+                className={styles.taskMenuItem}
+                onClick={() => {
+                  setMethodTask(task)
+                  setMenuTaskId(null)
+                }}
+              >
+                <LiaBookSolid className={styles.taskMenuIcon} />
+                수행 방법
+              </button>
+            </div>
+          )}
+        </div>
         <div className={styles.assignees}>
           {task.assigneeIds.length === 0 && (
             <span className={styles.assignHint}>
@@ -479,6 +616,200 @@ export default function OwnerChecklists() {
           </div>
         </aside>
       </div>
+
+      {/* 업무 드롭다운 메뉴 바깥 클릭 닫기 */}
+      {menuTaskId && <div className={styles.menuOverlay} onClick={() => setMenuTaskId(null)} />}
+
+      {/* 우측 하단 FAB + 메뉴 */}
+      {fabOpen && <div className={styles.fabOverlay} onClick={() => setFabOpen(false)} />}
+      <div className={styles.fabWrap}>
+        {fabOpen && (
+          <div className={styles.fabMenu}>
+            <button className={styles.fabMenuItem} onClick={openManage}>
+              <LiaCogSolid className={styles.fabMenuIcon} />
+              테스크 관리
+            </button>
+            <button className={styles.fabMenuItem} onClick={openCreateTask}>
+              <LiaClipboardListSolid className={styles.fabMenuIcon} />
+              테스크 만들기
+            </button>
+          </div>
+        )}
+        <button
+          className={`${styles.fab} ${fabOpen ? styles.fabActive : ''}`}
+          onClick={() => setFabOpen((o) => !o)}
+          aria-label="추가 메뉴"
+        >
+          <LiaPlusSolid />
+        </button>
+      </div>
+
+      {/* 테스크 만들기 / 수정 팝업 */}
+      {createOpen && (
+        <div className={styles.modalOverlay} onClick={closeCreate}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <h2 className={styles.modalTitle}>{editingId ? '테스크 수정' : '테스크 만들기'}</h2>
+              <button className={styles.modalClose} onClick={closeCreate} aria-label="닫기">
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <label className={styles.field}>
+                <span className={styles.fieldLabel}>테스크 이름</span>
+                <input
+                  className={styles.fieldInput}
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') createTask()
+                  }}
+                  placeholder="예: 매장 조명 켜기"
+                  autoFocus
+                />
+              </label>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>완료 방식</span>
+                <div className={styles.typeChips}>
+                  {COMPLETION_OPTIONS.map((ct) => (
+                    <button
+                      key={ct}
+                      className={`${styles.typeChip} ${newType === ct ? styles.typeChipActive : ''}`}
+                      onClick={() => setNewType(ct)}
+                    >
+                      {COMPLETION_LABEL[ct]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>수행 방법</span>
+                <div className={styles.editorToolbar}>
+                  <button className={styles.editorTool} onClick={() => fileRef.current?.click()}>
+                    <LiaImageSolid />
+                    사진
+                  </button>
+                </div>
+                <div
+                  ref={editorRef}
+                  className={styles.editor}
+                  contentEditable
+                  suppressContentEditableWarning
+                  data-placeholder="이 업무의 수행 방법을 작성하세요. 사진도 넣을 수 있어요."
+                />
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={insertPhotos}
+                  style={{ display: 'none' }}
+                />
+              </div>
+            </div>
+            <div className={styles.modalFoot}>
+              <button className={styles.btnCancel} onClick={closeCreate}>
+                취소
+              </button>
+              <button className={styles.btnCreate} onClick={createTask} disabled={!newTitle.trim()}>
+                {editingId ? '저장' : '만들기'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 테스크 관리 팝업 */}
+      {manageOpen && (
+        <div className={styles.modalOverlay} onClick={() => setManageOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <h2 className={styles.modalTitle}>테스크 관리</h2>
+              <button
+                className={styles.modalClose}
+                onClick={() => setManageOpen(false)}
+                aria-label="닫기"
+              >
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.manageBody}>
+              {catalog.length === 0 ? (
+                <p className={styles.panelEmpty}>등록된 테스크가 없습니다</p>
+              ) : (
+                catalog.map((tpl) => (
+                  <div key={tpl.id} className={styles.manageRow}>
+                    <span className={styles.manageType}>
+                      {COMPLETION_LABEL[tpl.completionType]}
+                    </span>
+                    <span className={styles.manageName}>{tpl.title}</span>
+                    <button
+                      className={styles.manageEdit}
+                      onClick={() => startEdit(tpl)}
+                      aria-label={`${tpl.title} 수정`}
+                    >
+                      <LiaPenSolid />
+                    </button>
+                    <button
+                      className={styles.manageDelete}
+                      onClick={() => deleteTask(tpl.id)}
+                      aria-label={`${tpl.title} 삭제`}
+                    >
+                      <LiaTrashAltSolid />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className={styles.modalFoot}>
+              <button
+                className={styles.btnCreate}
+                onClick={() => {
+                  setManageOpen(false)
+                  openCreateTask()
+                }}
+              >
+                <LiaPlusSolid />새 테스크
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 수행 방법 팝업 */}
+      {methodTask && (
+        <div className={styles.modalOverlay} onClick={() => setMethodTask(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <h2 className={styles.modalTitle}>수행 방법</h2>
+              <button
+                className={styles.modalClose}
+                onClick={() => setMethodTask(null)}
+                aria-label="닫기"
+              >
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.methodBody}>
+              <div className={styles.methodTaskName}>
+                <span className={styles.taskCompletion}>
+                  {COMPLETION_LABEL[methodTask.completionType]}
+                </span>
+                {methodTask.title}
+              </div>
+              {hasMethodContent(methodTask.method) ? (
+                <div
+                  className={styles.methodContent}
+                  dangerouslySetInnerHTML={{ __html: methodTask.method }}
+                />
+              ) : (
+                <p className={styles.methodEmpty}>등록된 수행 방법이 없습니다</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

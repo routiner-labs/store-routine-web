@@ -519,10 +519,84 @@
   flex-shrink: 0;
 }
 
-.taskTitle {
+.taskMain {
   flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.taskTitleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 3px 6px;
+  margin-left: -6px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.taskTitleBtn:hover {
+  background: var(--color-bg);
+}
+
+.taskTitle {
   font-size: 14px;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskTitleChevron {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.taskMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 46;
+  min-width: 160px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 5px;
+  animation: fabMenuIn 0.12s ease-out;
+}
+
+.taskMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.taskMenuItem:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.taskMenuIcon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
 }
 
 .assignees {
@@ -713,6 +787,418 @@
   text-align: center;
 }
 
+/* ── 우측 하단 FAB + 메뉴 ── */
+.fabOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+}
+
+.fabWrap {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--nav-height) + 16px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(61, 99, 221, 0.4);
+  transition: transform 0.18s, box-shadow 0.12s;
+}
+
+.fab:hover {
+  box-shadow: 0 8px 26px rgba(61, 99, 221, 0.5);
+}
+
+.fabActive {
+  transform: rotate(45deg);
+}
+
+.fabMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  animation: fabMenuIn 0.15s ease-out;
+}
+
+@keyframes fabMenuIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fabMenuItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  padding: 10px 16px;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  transition: background 0.1s, color 0.1s;
+}
+
+.fabMenuItem:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.fabMenuIcon {
+  font-size: 16px;
+}
+
+/* ── 테스크 만들기 팝업 ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalFade 0.18s ease-out;
+}
+
+@keyframes modalFade {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.4); }
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: modalPop 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modalTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.modalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.modalClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.modalBody {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.fieldInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.1s;
+}
+
+.fieldInput:focus {
+  border-color: var(--color-primary);
+}
+
+/* 수행 방법 에디터 (게시글 형태) */
+.editorToolbar {
+  display: flex;
+  gap: 6px;
+}
+
+.editorTool {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.editorTool:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.editorTool svg {
+  font-size: 15px;
+}
+
+.editor {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+  min-height: 150px;
+  max-height: 340px;
+  overflow-y: auto;
+  outline: none;
+}
+
+.editor:focus {
+  border-color: var(--color-primary);
+}
+
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.editor img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  margin: 6px 0;
+  display: block;
+}
+
+.typeChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.typeChip {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  padding: 6px 13px;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.typeChip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.typeChipActive {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.modalFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.btnCancel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.btnCancel:hover {
+  background: var(--color-bg);
+}
+
+.btnCreate {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.btnCreate:hover {
+  opacity: 0.92;
+}
+
+.btnCreate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── 테스크 관리 리스트 ── */
+.manageBody {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 56vh;
+  overflow-y: auto;
+}
+
+.manageRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.manageRow:hover {
+  background: var(--color-bg);
+}
+
+.manageType {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+
+.manageRow:hover .manageType {
+  background: var(--color-surface);
+}
+
+.manageName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.manageEdit,
+.manageDelete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.manageEdit:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.manageDelete:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ── 수행 방법 팝업 ── */
+.methodBody {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.methodTaskName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.methodEmpty {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.methodContent {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.methodContent img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  margin: 8px 0;
+  display: block;
+  border: 1px solid var(--color-border);
+}
+
 /* ── 반응형: 태블릿+ 가로 보드 (직원 | 공통 | 추가 | 테스크) ── */
 @media (min-width: 768px) {
   .layout {
@@ -754,6 +1240,11 @@
   .taskSection {
     flex: 1;
     min-width: 0;
+  }
+
+  .fabWrap {
+    right: 28px;
+    bottom: 28px;
   }
 }
 

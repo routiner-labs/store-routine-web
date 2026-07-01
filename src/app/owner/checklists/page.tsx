@@ -2,8 +2,6 @@
 
 import { useRef, useState } from 'react'
 import {
-  LiaAngleLeftSolid,
-  LiaAngleRightSolid,
   LiaTimesSolid,
   LiaPlusSolid,
   LiaGripVerticalSolid,
@@ -378,17 +376,40 @@ function formatHeaderDate(ds: string) {
   return `${m}월 ${d}일 (${w})`
 }
 
-function shiftDate(ds: string, days: number) {
-  const [y, m, d] = ds.split('-').map(Number)
-  const dt = new Date(y, m - 1, d)
-  dt.setDate(dt.getDate() + days)
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
+function formatDate(year: number, month: number, day: number) {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function shiftMonth(year: number, month: number, dir: number) {
+  let m = month + dir
+  let y = year
+  if (m === 0) {
+    y--
+    m = 12
+  }
+  if (m === 13) {
+    y++
+    m = 1
+  }
+  return { year: y, month: m }
+}
+
+function getMonthGrid(year: number, month: number): (number | null)[] {
+  const offset = (new Date(year, month - 1, 1).getDay() + 6) % 7
+  const total = new Date(year, month, 0).getDate()
+  const grid: (number | null)[] = Array(offset).fill(null)
+  for (let d = 1; d <= total; d++) grid.push(d)
+  while (grid.length % 7 !== 0) grid.push(null)
+  return grid
 }
 
 export default function OwnerChecklists() {
   const confirm = useConfirm()
   const { showToast } = useToast()
   const [selectedDate, setSelectedDate] = useState(TODAY)
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [pickerYear, setPickerYear] = useState(() => Number(TODAY.split('-')[0]))
+  const [pickerMonth, setPickerMonth] = useState(() => Number(TODAY.split('-')[1]))
   const [tasksByDate, setTasksByDate] = useState<Record<string, StoreTask[]>>(() => ({
     [TODAY]: createTasksForDate(TODAY),
   }))
@@ -518,10 +539,17 @@ export default function OwnerChecklists() {
     setDragOverSection(null)
   }
 
-  function goToDate(days: number) {
-    const ds = shiftDate(selectedDate, days)
+  function openDatePicker() {
+    const [y, m] = selectedDate.split('-').map(Number)
+    setPickerYear(y)
+    setPickerMonth(m)
+    setDatePickerOpen(true)
+  }
+
+  function selectDate(ds: string) {
     setTasksByDate((prev) => (prev[ds] ? prev : { ...prev, [ds]: createTasksForDate(ds) }))
     setSelectedDate(ds)
+    setDatePickerOpen(false)
   }
 
   function assign(taskId: string, empId: string) {
@@ -1088,14 +1116,75 @@ export default function OwnerChecklists() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.heading}>업무리스트</h1>
-        <div className={styles.dateNav}>
-          <button className={styles.dateBtn} onClick={() => goToDate(-1)} aria-label="이전 날짜">
-            <LiaAngleLeftSolid />
+        <div className={styles.periodNav}>
+          <button className={styles.periodLabelBtn} onClick={openDatePicker}>
+            {formatHeaderDate(selectedDate)}
+            <LiaAngleDownSolid
+              className={`${styles.periodLabelIcon} ${datePickerOpen ? styles.periodLabelIconOpen : ''}`}
+            />
           </button>
-          <span className={styles.dateLabel}>{formatHeaderDate(selectedDate)}</span>
-          <button className={styles.dateBtn} onClick={() => goToDate(1)} aria-label="다음 날짜">
-            <LiaAngleRightSolid />
-          </button>
+          {datePickerOpen && (
+            <>
+              <div className={styles.pickerOverlay} onClick={() => setDatePickerOpen(false)} />
+              <div className={styles.picker}>
+                <div className={styles.pickerHead}>
+                  <button
+                    className={styles.pickerNavBtn}
+                    onClick={() => {
+                      const n = shiftMonth(pickerYear, pickerMonth, -1)
+                      setPickerYear(n.year)
+                      setPickerMonth(n.month)
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <span className={styles.pickerTitle}>
+                    {pickerYear}년 {pickerMonth}월
+                  </span>
+                  <button
+                    className={styles.pickerNavBtn}
+                    onClick={() => {
+                      const n = shiftMonth(pickerYear, pickerMonth, 1)
+                      setPickerYear(n.year)
+                      setPickerMonth(n.month)
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+                <div className={styles.pickerDayGrid}>
+                  {WD_LABELS.map((l, i) => (
+                    <div
+                      key={l}
+                      className={`${styles.pickerDow} ${
+                        i === 5 ? styles.pickerDowSat : i === 6 ? styles.pickerDowSun : ''
+                      }`}
+                    >
+                      {l}
+                    </div>
+                  ))}
+                  {getMonthGrid(pickerYear, pickerMonth).map((d, i) => {
+                    if (!d) return <div key={`e-${i}`} />
+                    const ds = formatDate(pickerYear, pickerMonth, d)
+                    const isToday = ds === TODAY
+                    const isSelected = ds === selectedDate
+                    const dow = (new Date(pickerYear, pickerMonth - 1, d).getDay() + 6) % 7
+                    return (
+                      <button
+                        key={d}
+                        className={`${styles.pickerDay} ${isToday ? styles.pickerDayToday : ''} ${
+                          isSelected ? styles.pickerDaySelected : ''
+                        } ${dow === 5 ? styles.pickerDaySat : dow === 6 ? styles.pickerDaySun : ''}`}
+                        onClick={() => selectDate(ds)}
+                      >
+                        {d}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </header>
 

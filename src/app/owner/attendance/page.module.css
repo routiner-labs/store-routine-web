@@ -26,13 +26,106 @@
   flex-shrink: 0;
 }
 
+/* 모바일: 탭 숨기고 드롭다운 사용 */
 .viewTabs {
-  display: flex;
+  display: none;
   background: var(--color-bg);
   border-radius: var(--radius-sm);
   padding: 3px;
   gap: 2px;
   flex-shrink: 0;
+}
+
+.viewDropdownWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.viewDropdownBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.viewDropdownIcon {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s;
+}
+
+.viewDropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+.viewMenuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.viewMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 120px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: viewMenuIn 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes viewMenuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.viewMenuItem {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+
+.viewMenuItem:hover {
+  background: var(--color-bg);
+}
+
+.viewMenuItemActive,
+.viewMenuItemActive:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .viewTabs {
+    display: flex;
+  }
+
+  .viewDropdownWrap {
+    display: none;
+  }
 }
 
 .tab,
@@ -63,29 +156,11 @@
   font-weight: 600;
 }
 
-/* ── 기간 네비게이션 ── */
+/* ── 기간 네비게이션 (헤더 중앙) ── */
 .periodNav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.navBtn {
-  font-size: 24px;
-  color: var(--color-text-secondary);
-  padding: 4px 10px;
-  line-height: 1;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: background 0.1s, color 0.1s;
-}
-
-.navBtn:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  gap: 4px;
 }
 
 .periodLabel {
@@ -94,9 +169,12 @@
   color: var(--color-primary);
 }
 
-/* ── 기간 레이블 버튼 & 픽커 ── */
+/* ── 기간 레이블 버튼 & 픽커 (헤더 안 절대 중앙) ── */
 .periodNavWrap {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .periodLabelBtn {

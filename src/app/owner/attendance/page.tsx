@@ -7,6 +7,7 @@ import type { AttendanceStatus, CalendarRecord } from '@/types'
 import styles from './page.module.css'
 
 type ViewMode = 'day' | 'week' | 'month'
+const VIEW_LABEL: Record<ViewMode, string> = { day: '일간', week: '주간', month: '월간' }
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
 
@@ -52,12 +53,6 @@ function getWeekDays(year: number, month: number, day: number): Date[] {
     d.setDate(monday.getDate() + i)
     return d
   })
-}
-
-function shiftDate(year: number, month: number, day: number, days: number) {
-  const d = new Date(year, month - 1, day)
-  d.setDate(d.getDate() + days)
-  return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() }
 }
 
 function shiftMonth(year: number, month: number, dir: number) {
@@ -253,25 +248,12 @@ export default function AttendancePage() {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerNavYear, setPickerNavYear] = useState(2026)
   const [pickerNavMonth, setPickerNavMonth] = useState(6)
+  const [viewMenuOpen, setViewMenuOpen] = useState(false)
 
   function openPicker() {
     setPickerNavYear(baseYear)
     setPickerNavMonth(baseMonth)
     setPickerOpen(true)
-  }
-
-  function navigate(dir: 1 | -1) {
-    setSelectedDate(null)
-    if (viewMode === 'day') {
-      const n = shiftDate(baseYear, baseMonth, baseDay, dir)
-      setBaseYear(n.year); setBaseMonth(n.month); setBaseDay(n.day)
-    } else if (viewMode === 'week') {
-      const n = shiftDate(baseYear, baseMonth, baseDay, dir * 7)
-      setBaseYear(n.year); setBaseMonth(n.month); setBaseDay(n.day)
-    } else {
-      const n = shiftMonth(baseYear, baseMonth, dir)
-      setBaseYear(n.year); setBaseMonth(n.month)
-    }
   }
 
   function switchView(mode: ViewMode) {
@@ -303,28 +285,13 @@ export default function AttendancePage() {
       {/* 헤더 */}
       <header className={styles.header}>
         <h1 className={styles.heading}>출근 현황</h1>
-        <div className={styles.viewTabs}>
-          {(['day', 'week', 'month'] as ViewMode[]).map((mode) => (
-            <button
-              key={mode}
-              className={viewMode === mode ? styles.tabActive : styles.tab}
-              onClick={() => switchView(mode)}
-            >
-              {mode === 'day' ? '일간' : mode === 'week' ? '주간' : '월간'}
-            </button>
-          ))}
-        </div>
-      </header>
-
       {/* 기간 네비게이션 */}
       <div className={styles.periodNavWrap}>
         <div className={styles.periodNav}>
-          <button className={styles.navBtn} onClick={() => navigate(-1)}>‹</button>
           <button className={styles.periodLabelBtn} onClick={openPicker}>
             {periodLabel}
             <LiaAngleDownSolid className={`${styles.periodLabelIcon} ${pickerOpen ? styles.periodLabelIconOpen : ''}`} />
           </button>
-          <button className={styles.navBtn} onClick={() => navigate(1)}>›</button>
         </div>
 
         {pickerOpen && (
@@ -415,6 +382,47 @@ export default function AttendancePage() {
           </>
         )}
       </div>
+        <div className={styles.viewTabs}>
+          {(['day', 'week', 'month'] as ViewMode[]).map((mode) => (
+            <button
+              key={mode}
+              className={viewMode === mode ? styles.tabActive : styles.tab}
+              onClick={() => switchView(mode)}
+            >
+              {VIEW_LABEL[mode]}
+            </button>
+          ))}
+        </div>
+        <div className={styles.viewDropdownWrap}>
+          <button className={styles.viewDropdownBtn} onClick={() => setViewMenuOpen((o) => !o)}>
+            {VIEW_LABEL[viewMode]}
+            <LiaAngleDownSolid
+              className={`${styles.viewDropdownIcon} ${viewMenuOpen ? styles.viewDropdownIconOpen : ''}`}
+            />
+          </button>
+          {viewMenuOpen && (
+            <>
+              <div className={styles.viewMenuOverlay} onClick={() => setViewMenuOpen(false)} />
+              <div className={styles.viewMenu}>
+                {(['day', 'week', 'month'] as ViewMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    className={`${styles.viewMenuItem} ${
+                      viewMode === mode ? styles.viewMenuItemActive : ''
+                    }`}
+                    onClick={() => {
+                      switchView(mode)
+                      setViewMenuOpen(false)
+                    }}
+                  >
+                    {VIEW_LABEL[mode]}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </header>
 
       {/* 월간 */}
       {viewMode === 'month' && (

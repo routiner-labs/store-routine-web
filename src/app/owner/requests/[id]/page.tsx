@@ -14,6 +14,7 @@ import {
 import { mockRequests, mockReplies, mockActivityLogs } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
+import { useConfirm } from '@/context/ConfirmContext'
 import type { RequestStatus, RequestType, RequestVisibility, RequestReply, ActivityLog } from '@/types'
 import styles from './page.module.css'
 
@@ -59,9 +60,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   const [statusPopupOpen, setStatusPopupOpen] = useState(false)
   const [typePopupOpen, setTypePopupOpen] = useState(false)
   const [visibilityPopupOpen, setVisibilityPopupOpen] = useState(false)
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [profilePopupOpen, setProfilePopupOpen] = useState(false)
   const { showToast } = useToast()
+  const confirm = useConfirm()
 
   if (!request) {
     return (
@@ -125,8 +126,12 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     showToast(`공개범위가 "${nextLabel}"(으)로 변경되었습니다`)
   }
 
-  function deleteRequest() {
-    setDeleteConfirmOpen(false)
+  async function deleteRequest() {
+    const ok = await confirm({
+      title: '요청을 삭제할까요?',
+      message: '이 요청과 관련 댓글, 활동 내역이 모두 삭제됩니다.',
+    })
+    if (!ok) return
     showToast('요청이 삭제되었습니다', 'error')
     setTimeout(() => router.back(), 800)
   }
@@ -299,7 +304,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
               </button>
               <button
                 className={`${styles.manageBtn} ${styles.manageBtnDanger}`}
-                onClick={() => setDeleteConfirmOpen(true)}
+                onClick={deleteRequest}
               >
                 <LiaTrashAltSolid /> 요청 삭제
               </button>
@@ -398,28 +403,6 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
         </div>
       )}
 
-      {/* 삭제 확인 팝업 */}
-      {deleteConfirmOpen && (
-        <div className={styles.popupOverlay} onClick={() => setDeleteConfirmOpen(false)}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.popupHeader}>
-              <span className={styles.popupTitle}>요청 삭제</span>
-              <button className={styles.popupClose} onClick={() => setDeleteConfirmOpen(false)}>닫기</button>
-            </div>
-            <p className={styles.deleteConfirmText}>
-              이 요청과 관련 댓글, 활동 내역이 모두 삭제됩니다.<br />삭제하시겠습니까?
-            </p>
-            <div className={styles.deleteConfirmActions}>
-              <button className={styles.deleteCancelBtn} onClick={() => setDeleteConfirmOpen(false)}>
-                취소
-              </button>
-              <button className={styles.deleteConfirmBtn} onClick={deleteRequest}>
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 직원 프로필 팝업 */}
       {profilePopupOpen && (

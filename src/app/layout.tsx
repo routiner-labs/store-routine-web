@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ToastProvider } from '@/context/ToastContext'
 import { NotificationProvider } from '@/context/NotificationContext'
+import { ConfirmProvider } from '@/context/ConfirmContext'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <NotificationProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <ConfirmProvider>{children}</ConfirmProvider>
+          </ToastProvider>
         </NotificationProvider>
       </body>
     </html>

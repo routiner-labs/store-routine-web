@@ -8,6 +8,7 @@ import {
   LiaHomeSolid,
   LiaClipboardListSolid,
   LiaInboxSolid,
+  LiaFolderOpenSolid,
   LiaCalendarSolid,
   LiaUsersSolid,
   LiaAngleDownSolid,
@@ -36,6 +37,7 @@ const navGroups: { category: string; items: NavItem[] }[] = [
     items: [
       { href: '/owner/checklists', label: '업무리스트', icon: LiaClipboardListSolid },
       { href: '/owner/requests',   label: '요청함',    icon: LiaInboxSolid },
+      { href: '/owner/documents',  label: '문서함',    icon: LiaFolderOpenSolid },
     ],
   },
   {

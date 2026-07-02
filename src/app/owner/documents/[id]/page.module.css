@@ -150,6 +150,8 @@
   padding: 3px 8px;
   border-radius: 6px;
   white-space: nowrap;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .cat_POS        { background: var(--color-primary-light); color: var(--color-primary); }

@@ -10,6 +10,8 @@ import {
   LiaCogSolid,
   LiaTimesSolid,
   LiaTrashAltSolid,
+  LiaSlidersHSolid,
+  LiaAngleDownSolid,
 } from 'react-icons/lia'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
@@ -54,7 +56,14 @@ export default function OwnerDocuments() {
 
   const [searchText, setSearchText] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
-  const [filterCategory, setFilterCategory] = useState('ALL')
+  const [filterCategories, setFilterCategories] = useState<string[]>([])
+
+  // 세부 검색
+  const [advOpen, setAdvOpen] = useState(false)
+  const [catFilterOpen, setCatFilterOpen] = useState(false)
+  const [filterAuthor, setFilterAuthor] = useState('')
+  const [filterDateFrom, setFilterDateFrom] = useState('')
+  const [filterDateTo, setFilterDateTo] = useState('')
 
   const [categories, setCategories] = useState<DocumentCategory[]>(DOCUMENT_CATEGORIES)
   const [fabOpen, setFabOpen] = useState(false)
@@ -64,12 +73,32 @@ export default function OwnerDocuments() {
 
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? '기타'
 
+  const advActiveCount =
+    (filterCategories.length > 0 ? 1 : 0) +
+    (filterAuthor.trim() ? 1 : 0) +
+    (filterDateFrom || filterDateTo ? 1 : 0)
+
   const filtered = useMemo(() => {
     const q = appliedSearch.trim().toLowerCase()
-    return DOCUMENT_CATALOG.filter((d) => filterCategory === 'ALL' || d.category === filterCategory)
+    const author = filterAuthor.trim().toLowerCase()
+    return DOCUMENT_CATALOG.filter((d) => filterCategories.length === 0 || filterCategories.includes(d.category))
       .filter((d) => !q || d.title.toLowerCase().includes(q) || stripHtml(d.content).toLowerCase().includes(q))
+      .filter((d) => !author || d.authorName.toLowerCase().includes(author))
+      .filter((d) => !filterDateFrom || d.createdAt >= filterDateFrom)
+      .filter((d) => !filterDateTo || d.createdAt <= filterDateTo)
       .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
-  }, [filterCategory, appliedSearch])
+  }, [filterCategories, appliedSearch, filterAuthor, filterDateFrom, filterDateTo])
+
+  function resetAdv() {
+    setFilterCategories([])
+    setFilterAuthor('')
+    setFilterDateFrom('')
+    setFilterDateTo('')
+  }
+
+  function toggleFilterCategory(id: string) {
+    setFilterCategories((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]))
+  }
 
   function goToDetail(id: string) {
     router.push(`/owner/documents/${id}`)
@@ -106,7 +135,7 @@ export default function OwnerDocuments() {
     })
     if (!ok) return
     setCategories((prev) => prev.filter((c) => c.id !== id))
-    if (filterCategory === id) setFilterCategory('ALL')
+    setFilterCategories((prev) => prev.filter((c) => c !== id))
     showToast('카테고리가 삭제되었습니다')
   }
 
@@ -132,30 +161,112 @@ export default function OwnerDocuments() {
         <button className={styles.searchBtn} onClick={() => setAppliedSearch(searchText)}>
           검색
         </button>
+        <button
+          className={`${styles.advBtn} ${advOpen || advActiveCount > 0 ? styles.advBtnActive : ''}`}
+          onClick={() => setAdvOpen((v) => !v)}
+        >
+          <LiaSlidersHSolid />
+          <span className={styles.advBtnLabel}>세부 검색</span>
+        </button>
       </div>
 
-      <div className={styles.catRow}>
-        <button
-          className={`${styles.chip} ${filterCategory === 'ALL' ? styles.chipActive : ''}`}
-          onClick={() => setFilterCategory('ALL')}
-        >
-          전체
-        </button>
-        {categories.map((c) => (
-          <button
-            key={c.id}
-            className={`${styles.chip} ${filterCategory === c.id ? styles.chipActive : ''}`}
-            onClick={() => setFilterCategory(c.id)}
-          >
-            {c.name}
-          </button>
-        ))}
+      <div className={`${styles.advPanel} ${advOpen ? styles.advPanelOpen : ''}`}>
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>내용</span>
+          <div className={styles.advSearchWrap}>
+            <div className={styles.searchWrap}>
+              <LiaSearchSolid className={styles.searchIcon} />
+              <input
+                className={styles.searchInput}
+                placeholder="제목·내용 검색"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') setAppliedSearch(searchText)
+                }}
+              />
+            </div>
+            <button className={styles.searchBtn} onClick={() => setAppliedSearch(searchText)}>
+              검색
+            </button>
+            <button className={styles.advResetBtn} onClick={resetAdv}>
+              <LiaTimesSolid /> 필터 초기화
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>카테고리</span>
+          <div className={`${styles.advSearchWrap} ${styles.advSearchNarrow}`}>
+            <button className={styles.catFilterBtn} onClick={() => setCatFilterOpen(true)}>
+              <span className={styles.catFilterBtnLabel}>
+                {filterCategories.length === 0 ? '전체 카테고리' : `카테고리 ${filterCategories.length}개 선택됨`}
+              </span>
+              <LiaAngleDownSolid />
+            </button>
+            {filterCategories.length > 0 && (
+              <button className={styles.dateClear} onClick={() => setFilterCategories([])}>
+                <LiaTimesSolid />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>작성자</span>
+          <div className={`${styles.advSearchWrap} ${styles.advSearchNarrow}`}>
+            <div className={styles.searchWrap}>
+              <LiaSearchSolid className={styles.searchIcon} />
+              <input
+                className={styles.searchInput}
+                placeholder="이름 검색"
+                value={filterAuthor}
+                onChange={(e) => setFilterAuthor(e.target.value)}
+              />
+            </div>
+            {filterAuthor && (
+              <button className={styles.dateClear} onClick={() => setFilterAuthor('')}>
+                <LiaTimesSolid />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>기간</span>
+          <div className={styles.dateRange}>
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+            />
+            <span className={styles.dateSep}>~</span>
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+            />
+            {(filterDateFrom || filterDateTo) && (
+              <button
+                className={styles.dateClear}
+                onClick={() => {
+                  setFilterDateFrom('')
+                  setFilterDateTo('')
+                }}
+              >
+                <LiaTimesSolid />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className={styles.body}>
         {filtered.length === 0 ? (
           <p className={styles.emptyState}>
-            {appliedSearch || filterCategory !== 'ALL' ? '검색 결과가 없습니다.' : '등록된 문서가 없습니다.'}
+            {appliedSearch || advActiveCount > 0 ? '검색 결과가 없습니다.' : '등록된 문서가 없습니다.'}
           </p>
         ) : (
           <div className={styles.listGroup}>
@@ -194,6 +305,38 @@ export default function OwnerDocuments() {
           <LiaPlusSolid />
         </button>
       </div>
+
+      {/* 카테고리 필터 선택 팝업 (체크박스 다중 선택) */}
+      {catFilterOpen && (
+        <div className={styles.catPopOverlay} onClick={() => setCatFilterOpen(false)}>
+          <div className={styles.catPopCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.catPopHead}>
+              <span className={styles.catPopTitle}>카테고리 선택</span>
+              <button className={styles.modalClose} onClick={() => setCatFilterOpen(false)} aria-label="닫기">
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.catFilterList}>
+              {categories.map((c) => (
+                <label key={c.id} className={styles.catFilterRow}>
+                  <input
+                    type="checkbox"
+                    className={styles.catFilterCheckbox}
+                    checked={filterCategories.includes(c.id)}
+                    onChange={() => toggleFilterCategory(c.id)}
+                  />
+                  <span className={styles.catFilterName}>{c.name}</span>
+                </label>
+              ))}
+            </div>
+            <div className={styles.catFilterFoot}>
+              <button className={styles.advResetBtn} onClick={() => setFilterCategories([])}>
+                전체 해제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 카테고리 관리 팝업 */}
       {catManageOpen && (

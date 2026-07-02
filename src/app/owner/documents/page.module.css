@@ -308,43 +308,231 @@
   opacity: 0.88;
 }
 
-/* ══════════════════════════════════════
-   카테고리 필터 칩
-   ══════════════════════════════════════ */
-.catRow {
+/* 세부 검색 토글 버튼 */
+.advBtn {
   display: flex;
-  gap: 6px;
-  padding: 10px var(--page-x);
-  overflow-x: auto;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 
-.catRow::-webkit-scrollbar {
+.advBtn:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.advBtnActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.advBtnLabel {
   display: none;
 }
 
-.chip {
-  padding: 5px 13px;
+/* ══════════════════════════════════════
+   세부 검색 패널
+   ══════════════════════════════════════ */
+.advPanel {
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 var(--page-x);
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.advPanelOpen {
+  max-height: 400px;
+  opacity: 1;
+  padding: 14px var(--page-x);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.advRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.advLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-width: 52px;
+  padding-top: 6px;
+  flex-shrink: 0;
+}
+
+.advSearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.advSearchNarrow {
+  flex: none;
+  width: 220px;
+}
+
+.dateRange {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dateInput {
+  padding: 5px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: inherit;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.dateSep {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.dateClear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   border-radius: 99px;
+  border: none;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: background 0.1s;
+}
+
+.dateClear:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.advResetBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-text-secondary);
-  background: var(--color-bg);
+  font-family: inherit;
   white-space: nowrap;
   flex-shrink: 0;
   transition: background 0.1s, color 0.1s;
 }
 
-.chip:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+.advResetBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
-.chipActive {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-weight: 600;
+/* 세부 검색 — 카테고리 선택 버튼 */
+.catFilterBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1;
+  max-width: 260px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.1s;
+}
+
+.catFilterBtn:hover {
+  border-color: var(--color-primary);
+}
+
+.catFilterBtnLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 세부 검색 — 카테고리 선택 팝업(체크박스 목록) */
+.catFilterList {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.catFilterRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.catFilterRow:hover {
+  background: var(--color-bg);
+}
+
+.catFilterCheckbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.catFilterName {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.catFilterFoot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 /* ══════════════════════════════════════
@@ -451,6 +639,10 @@
    반응형: 태블릿+
    ══════════════════════════════════════ */
 @media (min-width: 768px) {
+  .advBtnLabel {
+    display: inline;
+  }
+
   .fabWrap {
     right: 28px;
     bottom: 28px;

@@ -143,24 +143,23 @@ export default function OwnerDocuments() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.heading}>문서함</h1>
-      </header>
-
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrap}>
-          <LiaSearchSolid className={styles.searchIcon} />
-          <input
-            className={styles.searchInput}
-            placeholder="문서 검색"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') setAppliedSearch(searchText)
-            }}
-          />
+        <div className={styles.headerSearch}>
+          <div className={styles.searchWrap}>
+            <LiaSearchSolid className={styles.searchIcon} />
+            <input
+              className={styles.searchInput}
+              placeholder="문서 검색"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setAppliedSearch(searchText)
+              }}
+            />
+          </div>
+          <button className={styles.searchBtn} onClick={() => setAppliedSearch(searchText)}>
+            검색
+          </button>
         </div>
-        <button className={styles.searchBtn} onClick={() => setAppliedSearch(searchText)}>
-          검색
-        </button>
         <button
           className={`${styles.advBtn} ${advOpen || advActiveCount > 0 ? styles.advBtnActive : ''}`}
           onClick={() => setAdvOpen((v) => !v)}
@@ -168,7 +167,7 @@ export default function OwnerDocuments() {
           <LiaSlidersHSolid />
           <span className={styles.advBtnLabel}>세부 검색</span>
         </button>
-      </div>
+      </header>
 
       <div className={`${styles.advPanel} ${advOpen ? styles.advPanelOpen : ''}`}>
         <div className={styles.advRow}>

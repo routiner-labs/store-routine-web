@@ -1,0 +1,157 @@
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popup {
+  background: var(--color-surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  animation: popupIn 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
+}
+
+@keyframes popupIn {
+  from { transform: scale(0.94); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.popupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.popupTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.popupClose {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.popupClose:hover {
+  background: var(--color-bg);
+}
+
+.profileBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 20px 24px;
+  gap: 8px;
+}
+
+.profileAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 26px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.profileName {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.profileStatusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.profileBadgeActive   { background: var(--color-primary-light); color: var(--color-primary); }
+.profileBadgeInactive { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+.profileMeta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.profileMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profileMetaLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.profileMetaValue {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.profileDowRow {
+  display: flex;
+  gap: 4px;
+}
+
+.profileDowDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profileDowDotOn {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.profileNotFound {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 8px 0 0;
+}

@@ -896,3 +896,16 @@
     gap: 16px;
   }
 }
+
+/* 모달 내부(홈 팝업)에서 상세 뷰를 감싸는 컨테이너 */
+.viewModal {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--color-bg);
+}
+
+/* 모달 안에는 sticky 헤더가 없으므로 우측 패널을 본문 상단과 같은 높이에 맞춘다 */
+.viewModal .sidePanel {
+  top: 16px;
+}

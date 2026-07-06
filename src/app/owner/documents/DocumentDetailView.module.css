@@ -162,3 +162,23 @@
 .cat_RULE       { background: var(--color-warning-light); color: var(--color-warning); }
 .cat_MARKETING  { background: #FDF2F8; color: #BE185D; }
 .cat_ETC        { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+/* 홈 팝업(모달) 내부 컨테이너 */
+.viewModal {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--color-surface);
+}
+
+/* 읽기 모드 본문이 남는 높이를 채우도록 */
+.viewModal .body {
+  flex: 1;
+}
+
+.modalActionBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 4px 16px 0;
+}

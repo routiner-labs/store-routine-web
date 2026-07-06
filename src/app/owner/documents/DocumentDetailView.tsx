@@ -7,6 +7,7 @@ import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import DocumentForm from './DocumentForm'
+import EmployeeName from '@/components/EmployeeName'
 import styles from './DocumentDetailView.module.css'
 
 const TODAY = '2026-07-02'
@@ -108,7 +109,7 @@ export default function DocumentDetailView({
           </span>
           <h2 className={styles.title}>{doc.title}</h2>
           <p className={styles.meta}>
-            {doc.authorName} · 작성 {doc.createdAt}
+            <EmployeeName name={doc.authorName} /> · 작성 {doc.createdAt}
             {doc.updatedAt !== doc.createdAt && ` · 수정 ${doc.updatedAt}`}
           </p>
           <div className={styles.docContent} dangerouslySetInnerHTML={{ __html: doc.content }} />

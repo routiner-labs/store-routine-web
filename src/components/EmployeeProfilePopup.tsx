@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import type { Employee } from '@/types'
 import { useScrollLock } from '@/lib/useScrollLock'
 import styles from './EmployeeProfilePopup.module.css'
@@ -26,7 +27,9 @@ export default function EmployeeProfilePopup({
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  return (
+  // 어떤 중첩 위치(sticky/transform 등 스태킹 컨텍스트 내부)에서 열려도
+  // 항상 최상위에 뜨도록 body에 portal로 렌더링한다.
+  return createPortal(
     <div className={styles.popupOverlay} onClick={onClose}>
       <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
         <div className={styles.popupHeader}>
@@ -92,6 +95,7 @@ export default function EmployeeProfilePopup({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

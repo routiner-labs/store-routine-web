@@ -7,6 +7,7 @@ import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import EmployeeName from '@/components/EmployeeName'
 import type { AttendanceStatus, CalendarRecord, WeeklySchedule } from '@/types'
 import styles from './page.module.css'
 
@@ -111,7 +112,7 @@ function AttendanceTimeline({ records }: { records: CalendarRecord[] }) {
         return (
           <div key={r.employeeId} className={styles.tlRow}>
             <div className={styles.tlLabelCol}>
-              <span className={styles.tlEmpName}>{r.employeeName}</span>
+              <EmployeeName name={r.employeeName} className={styles.tlEmpName} />
               <span className={`${styles.badge} ${styles[`badge_${r.status}`]}`}>
                 {STATUS_LABEL[r.status]}
               </span>
@@ -650,7 +651,7 @@ export default function AttendancePage() {
                     <div key={emp.id} className={styles.schedRow}>
                       <div className={styles.schedEmp}>
                         <span className={styles.schedAvatar}>{emp.name[0]}</span>
-                        <span className={styles.schedName}>{emp.name}</span>
+                        <EmployeeName name={emp.name} className={styles.schedName} />
                       </div>
                       {sched === null ? (
                         <div className={styles.schedNone}>
@@ -724,7 +725,7 @@ export default function AttendancePage() {
                     <div key={emp.id} className={styles.schedRow}>
                       <div className={styles.schedEmp}>
                         <span className={styles.schedAvatar}>{emp.name[0]}</span>
-                        <span className={styles.schedName}>{emp.name}</span>
+                        <EmployeeName name={emp.name} className={styles.schedName} />
                         {eff.adjusted && <span className={styles.schedAdjBadge}>조정됨</span>}
                       </div>
                       <div className={styles.schedDaySeg}>

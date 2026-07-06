@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid, LiaLockSolid, LiaUsersSolid, LiaPaperPlaneSolid } from 'react-icons/lia'
 import { mockRequests, mockReplies } from '@/mock/data'
 import { useToast } from '@/context/ToastContext'
+import EmployeeName from '@/components/EmployeeName'
 import type { RequestReply } from '@/types'
 import styles from './page.module.css'
 
@@ -121,7 +122,7 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
                   <div className={styles.commentAvatar}>{reply.authorName[0]}</div>
                   <div className={styles.commentBody}>
                     <div className={styles.commentHeader}>
-                      <span className={styles.commentAuthor}>{reply.authorName}</span>
+                      <EmployeeName name={reply.authorName} className={styles.commentAuthor} />
                       {reply.authorRole === 'OWNER' && (
                         <span className={styles.ownerBadge}>사장</span>
                       )}

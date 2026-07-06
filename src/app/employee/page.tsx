@@ -6,6 +6,7 @@ import { LiaAngleRightSolid } from 'react-icons/lia'
 import { mockChecklists, mockSpecialInstructions, mockRequests } from '@/mock/data'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import EmployeeName from '@/components/EmployeeName'
 import type { SpecialInstruction } from '@/types'
 import styles from './page.module.css'
 
@@ -62,7 +63,7 @@ export default function EmployeeHome() {
       <header className={styles.header}>
         <div>
           <p className={styles.greeting}>안녕하세요</p>
-          <h1 className={styles.name}>{ME} 님</h1>
+          <h1 className={styles.name}><EmployeeName name={ME} /> 님</h1>
         </div>
         <div className={styles.storeBadge}>스타벅스 강남점</div>
       </header>

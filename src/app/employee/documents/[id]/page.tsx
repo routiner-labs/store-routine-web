@@ -7,6 +7,7 @@ import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import DocumentForm from '@/app/owner/documents/DocumentForm'
+import EmployeeName from '@/components/EmployeeName'
 import styles from './page.module.css'
 
 // 데모 직원 페르소나
@@ -90,7 +91,7 @@ export default function EmployeeDocumentDetailPage({ params }: { params: Promise
           </span>
           <h2 className={styles.title}>{doc.title}</h2>
           <p className={styles.meta}>
-            {doc.authorName}
+            <EmployeeName name={doc.authorName} />
             {isMine && <span className={styles.mineBadge}>내 문서</span>}
             {' · '}작성 {doc.createdAt}
             {doc.updatedAt !== doc.createdAt && ` · 수정 ${doc.updatedAt}`}

@@ -9,6 +9,7 @@ import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES, type StoreDocument } from '@/moc
 import type { EmployeeRequest, Employee } from '@/types'
 import Modal from '@/components/Modal'
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
+import EmployeeName from '@/components/EmployeeName'
 import RequestDetailView from './requests/RequestDetailView'
 import DocumentDetailView from './documents/DocumentDetailView'
 import styles from './page.module.css'
@@ -132,7 +133,7 @@ export default function OwnerHome() {
                   <span className={styles.requestType}>{req.type}</span>
                   <span className={styles.requestListBody}>
                     <span className={styles.requestContent} title={req.content}>{req.content}</span>
-                    <span className={styles.requestMeta}>{req.employeeName} · {req.createdAt}</span>
+                    <span className={styles.requestMeta}><EmployeeName name={req.employeeName} /> · {req.createdAt}</span>
                   </span>
                 </button>
               ))}

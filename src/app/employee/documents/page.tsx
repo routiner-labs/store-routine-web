@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LiaSearchSolid, LiaAngleRightSolid, LiaPlusSolid } from 'react-icons/lia'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
+import EmployeeName from '@/components/EmployeeName'
 import styles from './page.module.css'
 
 function stripHtml(html: string): string {
@@ -78,7 +79,7 @@ export default function EmployeeDocumentsPage() {
               </div>
               <p className={styles.rowPreview}>{stripHtml(doc.content)}</p>
               <div className={styles.rowBottom}>
-                <span className={styles.rowMeta}>{doc.authorName} · {doc.updatedAt}</span>
+                <span className={styles.rowMeta}><EmployeeName name={doc.authorName} /> · {doc.updatedAt}</span>
                 <LiaAngleRightSolid className={styles.chevron} />
               </div>
             </Link>

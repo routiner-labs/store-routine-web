@@ -17,6 +17,7 @@ import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import type { RequestStatus, RequestType, RequestVisibility, RequestReply, ActivityLog } from '@/types'
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
+import EmployeeName from '@/components/EmployeeName'
 import { useScrollLock } from '@/lib/useScrollLock'
 import styles from './RequestDetailView.module.css'
 
@@ -231,7 +232,7 @@ export default function RequestDetailView({
                     <div className={styles.commentAvatar}>{reply.authorName[0]}</div>
                     <div className={styles.commentBody}>
                       <div className={styles.commentHeader}>
-                        <span className={styles.commentAuthor}>{reply.authorName}</span>
+                        <EmployeeName name={reply.authorName} className={styles.commentAuthor} />
                         {reply.authorRole === 'OWNER' && (
                           <span className={styles.ownerBadge}>사장</span>
                         )}

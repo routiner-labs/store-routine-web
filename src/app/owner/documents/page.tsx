@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import EmployeeName from '@/components/EmployeeName'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import type { StoreDocument, DocumentCategory } from '@/mock/documents'
 import styles from './page.module.css'
@@ -42,7 +43,7 @@ function DocumentRow({
       <p className={styles.listRowPreview}>{stripHtml(doc.content)}</p>
       <div className={styles.listRowBottom}>
         <span className={styles.listRowMeta}>
-          {doc.authorName} · {doc.updatedAt}
+          <EmployeeName name={doc.authorName} /> · {doc.updatedAt}
         </span>
         <LiaAngleRightSolid className={styles.listRowChevron} />
       </div>

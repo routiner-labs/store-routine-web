@@ -9,6 +9,7 @@ import {
 import { mockRequests } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
 import { useScrollLock } from '@/lib/useScrollLock'
+import EmployeeName from '@/components/EmployeeName'
 import type { EmployeeRequest, RequestType, RequestStatus, RequestVisibility } from '@/types'
 import styles from './page.module.css'
 
@@ -73,7 +74,7 @@ function CardItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
       <p className={styles.content}>{request.content}</p>
       <div className={styles.cardBottom}>
         <span className={styles.meta}>
-          {request.employeeName} · {date} {time}
+          <EmployeeName name={request.employeeName} /> · {date} {time}
         </span>
         {request.hasPhoto && <span className={styles.photoBadge}>사진 있음</span>}
       </div>
@@ -94,7 +95,7 @@ function ListItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
       </span>
       <p className={styles.listPreview}>{request.content}</p>
       <div className={styles.listMeta}>
-        <span>{request.employeeName}</span>
+        <EmployeeName name={request.employeeName} />
         <span className={styles.listMetaDot} />
         <VisibilityBadge visibility={request.visibility} />
       </div>
@@ -128,7 +129,7 @@ function KanbanCard({ request, onClick, onDragStart, onDragEnd, dragging }: {
       </div>
       <p className={styles.kanbanCardContent}>{request.content}</p>
       <div className={styles.kanbanCardMeta}>
-        <span>{request.employeeName}</span>
+        <EmployeeName name={request.employeeName} />
         <span>{date}</span>
       </div>
     </div>

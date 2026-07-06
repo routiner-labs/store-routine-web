@@ -41,6 +41,7 @@ import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import EmployeeName from '@/components/EmployeeName'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -874,7 +875,7 @@ export default function OwnerChecklists() {
                       return (
                         <div key={id} className={styles.dutyRow}>
                           <span className={styles.dutyAvatar}>{emp.name[0]}</span>
-                          <span className={styles.dutyName}>{emp.name}</span>
+                          <EmployeeName name={emp.name} className={styles.dutyName} />
                           <button
                             type="button"
                             className={styles.dutyRemove}
@@ -992,7 +993,7 @@ export default function OwnerChecklists() {
               return (
                 <span className={styles.assigneeChip}>
                   <span className={styles.assigneeAvatar}>{emp.name[0]}</span>
-                  {emp.name}
+                  <EmployeeName name={emp.name} />
                   <button
                     className={styles.assigneeRemove}
                     onClick={() => unassign(task.id, task.assigneeIds[0])}
@@ -1015,7 +1016,7 @@ export default function OwnerChecklists() {
                     return (
                       <span key={empId} className={styles.tooltipRow}>
                         <span className={styles.tooltipAvatar}>{emp.name[0]}</span>
-                        <span className={styles.tooltipName}>{emp.name}</span>
+                        <EmployeeName name={emp.name} className={styles.tooltipName} />
                         <button
                           className={styles.tooltipRemove}
                           onClick={() => unassign(task.id, empId)}
@@ -1242,7 +1243,7 @@ export default function OwnerChecklists() {
                 >
                   <span className={styles.empAvatar}>{emp.name[0]}</span>
                   <span className={styles.empInfo}>
-                    <span className={styles.empName}>{emp.name}</span>
+                    <EmployeeName name={emp.name} className={styles.empName} />
                     <span className={styles.empMeta}>할당 {assignedCountByEmp[emp.id] ?? 0}개</span>
                   </span>
                   <span

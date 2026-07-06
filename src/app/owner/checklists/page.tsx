@@ -41,7 +41,10 @@ import type {
 import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
 import Modal from '@/components/Modal'
 import DocumentDetailView from '@/app/owner/documents/DocumentDetailView'
+import RequestDetailView from '@/app/owner/requests/RequestDetailView'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
+import { mockRequests } from '@/mock/data'
+import { LiaInboxSolid } from 'react-icons/lia'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
@@ -484,11 +487,12 @@ export default function OwnerChecklists() {
   const [docPickerOpen, setDocPickerOpen] = useState(false)
   const [docPickerQuery, setDocPickerQuery] = useState('')
   const [viewDocId, setViewDocId] = useState<string | null>(null)
+  const [viewRequestId, setViewRequestId] = useState<string | null>(null)
   const seqRef = useRef(0)
   const methodHtmlRef = useRef('')
 
   // 팝업이 열리면 배경 스크롤 잠금
-  useScrollLock(manageOpen || methodTask !== null || timingTask !== null || dutyPickerOpen || catManageOpen || docPickerOpen || viewDocId !== null)
+  useScrollLock(manageOpen || methodTask !== null || timingTask !== null || dutyPickerOpen || catManageOpen || docPickerOpen || viewDocId !== null || viewRequestId !== null)
 
   const docTitle = (id: string) => DOCUMENT_CATALOG.find((d) => d.id === id)?.title ?? '삭제된 문서'
   const docCategoryName = (id: string) => {
@@ -1700,6 +1704,25 @@ export default function OwnerChecklists() {
                   ))}
                 </div>
               )}
+              {methodTask.requestRef && (() => {
+                const refReq = mockRequests.find((r) => r.id === methodTask.requestRef)
+                return (
+                  <div className={styles.methodDocs}>
+                    <span className={styles.methodDocsTitle}>참조 요청</span>
+                    <button
+                      type="button"
+                      className={styles.methodDocRow}
+                      onClick={() => setViewRequestId(methodTask.requestRef!)}
+                    >
+                      <span className={styles.docRefBadge}>{refReq?.type ?? '요청'}</span>
+                      <span className={styles.methodDocName}>
+                        {refReq ? refReq.content : '원본 요청 열기'}
+                      </span>
+                      <LiaInboxSolid className={styles.methodDocIcon} />
+                    </button>
+                  </div>
+                )
+              })()}
             </div>
           </div>
         </div>
@@ -1756,6 +1779,13 @@ export default function OwnerChecklists() {
       {viewDocId && (
         <Modal title="문서" size="wide" flush onClose={() => setViewDocId(null)}>
           <DocumentDetailView id={viewDocId} mode="modal" onDeleted={() => setViewDocId(null)} />
+        </Modal>
+      )}
+
+      {/* 참조 요청 보기 (요청함 상세와 동일) */}
+      {viewRequestId && (
+        <Modal title="요청 상세" size="wide" flush onClose={() => setViewRequestId(null)}>
+          <RequestDetailView id={viewRequestId} mode="modal" onDeleted={() => setViewRequestId(null)} />
         </Modal>
       )}
     </div>

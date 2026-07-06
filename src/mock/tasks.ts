@@ -63,6 +63,7 @@ export interface TaskTemplate {
   recurEnd?: string // 반복 종료일 (빈 값=무기한)
   defaultAssigneeIds?: string[] // 반복 업무 기본 담당자
   docRefs?: string[] // 참조 문서 (문서함 StoreDocument id)
+  requestRef?: string // 이 테스크를 만든 원본 요청 id (요청함 참조)
 }
 
 export interface StoreTask {
@@ -78,6 +79,7 @@ export interface StoreTask {
   assigneeIds: string[]
   done: boolean
   docRefs: string[]
+  requestRef?: string
 }
 
 // 이때까지 만든 모든 테스크 (마스터 카탈로그)
@@ -201,6 +203,7 @@ export function makeTask(catalogId: string, kind: TaskKind): StoreTask {
     assigneeIds: tpl?.defaultAssigneeIds ?? [],
     done: DEFAULT_DONE.has(catalogId),
     docRefs: tpl?.docRefs ?? [],
+    requestRef: tpl?.requestRef,
   }
 }
 
@@ -215,11 +218,32 @@ export function createTasksForDate(_date: string): StoreTask[] {
 // 모듈 싱글턴이므로 업무리스트 페이지 진입 시 반영된다. (목업: 새로고침 시 초기화)
 let requestTaskSeq = 0
 
+// 해당 요청으로 이미 테스크를 만들었는지 확인
+export function hasTaskForRequest(requestId: string): boolean {
+  return TASK_CATALOG.some((t) => t.requestRef === requestId)
+}
+
+// 요청 삭제 시 그 요청으로 만든 테스크를 카탈로그와 기본 리스트에서 함께 제거한다.
+export function removeTasksForRequest(requestId: string) {
+  const ids = TASK_CATALOG.filter((t) => t.requestRef === requestId).map((t) => t.id)
+  if (ids.length === 0) return
+  for (const id of ids) {
+    const ci = TASK_CATALOG.findIndex((t) => t.id === id)
+    if (ci !== -1) TASK_CATALOG.splice(ci, 1)
+    for (const list of [DEFAULT_COMMON, DEFAULT_EXTRA]) {
+      const li = list.indexOf(id)
+      if (li !== -1) list.splice(li, 1)
+    }
+  }
+}
+
 export function registerTaskFromRequest(input: {
   title: string
   method: string
   category: TaskCategory
   kind: TaskKind
+  docRefs?: string[]
+  requestRef?: string
 }): string {
   requestTaskSeq += 1
   const id = `req-task-${requestTaskSeq}`
@@ -229,6 +253,8 @@ export function registerTaskFromRequest(input: {
     method: input.method,
     category: input.category,
     recurrence: 'ONCE',
+    docRefs: input.docRefs ?? [],
+    requestRef: input.requestRef,
   })
   if (input.kind === 'COMMON') DEFAULT_COMMON.push(id)
   else DEFAULT_EXTRA.push(id)

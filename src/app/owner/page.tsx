@@ -41,6 +41,7 @@ type HomeModal =
 export default function OwnerHome() {
   const { currentStore } = useStore()
   const [requestFilter, setRequestFilter] = useState<RequestFilter | null>('pending')
+  const [openTaskList, setOpenTaskList] = useState<'COMMON' | 'EXTRA' | null>(null)
   const [modal, setModal] = useState<HomeModal | null>(null)
 
   // 업무리스트 페이지와 동일한 오늘자 업무 데이터
@@ -50,6 +51,18 @@ export default function OwnerHome() {
   const commonDone = commonTasks.filter((t) => t.done).length
   const extraDone = extraTasks.filter((t) => t.done).length
   const unassignedCount = todayTasks.filter((t) => t.assigneeIds.length === 0).length
+
+  const empNameById = (empId: string) => mockEmployees.find((e) => e.id === empId)?.name ?? ''
+
+  function assigneeLabel(assigneeIds: string[]) {
+    if (assigneeIds.length === 0) return null
+    if (assigneeIds.length === 1) return empNameById(assigneeIds[0])
+    return `${empNameById(assigneeIds[0])} 외 ${assigneeIds.length - 1}명`
+  }
+
+  function toggleTaskList(kind: 'COMMON' | 'EXTRA') {
+    setOpenTaskList((prev) => (prev === kind ? null : kind))
+  }
 
   const pendingRequests = mockRequests.filter((r) => r.status === 'REQUESTED')
   const confirmedRequests = mockRequests.filter((r) => r.status === 'CONFIRMED')
@@ -150,30 +163,53 @@ export default function OwnerHome() {
             <Link href="/owner/checklists" className={styles.panelLink}>전체 보기</Link>
           </div>
           <div className={styles.panelBody}>
-            <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>공통 업무 리스트</span>
-              <div className={styles.taskRight}>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${commonTasks.length ? (commonDone / commonTasks.length) * 100 : 0}%` }}
-                  />
+            {([
+              { kind: 'COMMON' as const, label: '공통 업무 리스트', tasks: commonTasks, done: commonDone },
+              { kind: 'EXTRA' as const, label: '추가 업무 리스트', tasks: extraTasks, done: extraDone },
+            ]).map(({ kind, label, tasks, done }) => (
+              <div key={kind}>
+                <button
+                  type="button"
+                  className={`${styles.taskRow} ${styles.taskRowToggle}`}
+                  onClick={() => toggleTaskList(kind)}
+                >
+                  <span className={styles.taskLabel}>
+                    {label}
+                    <span className={`${styles.taskChevron} ${openTaskList === kind ? styles.taskChevronOpen : ''}`}>›</span>
+                  </span>
+                  <span className={styles.taskRight}>
+                    <span className={styles.progressBar}>
+                      <span
+                        className={styles.progressFill}
+                        style={{ width: `${tasks.length ? (done / tasks.length) * 100 : 0}%` }}
+                      />
+                    </span>
+                    <span className={styles.progressText}>{done}/{tasks.length}</span>
+                  </span>
+                </button>
+                <div className={`${styles.taskSubWrap} ${openTaskList === kind ? styles.taskSubWrapOpen : ''}`}>
+                  <div className={styles.taskSubList}>
+                    {tasks.length === 0 ? (
+                      <p className={styles.emptyText}>업무가 없습니다.</p>
+                    ) : (
+                      tasks.map((task) => (
+                        <div key={task.id} className={styles.taskSubRow}>
+                          <span className={`${styles.taskSubCheck} ${task.done ? styles.taskSubCheckDone : ''}`}>
+                            {task.done ? '✓' : ''}
+                          </span>
+                          <span className={styles.taskSubTitle} title={task.title}>{task.title}</span>
+                          {task.assigneeIds.length === 0 ? (
+                            <span className={styles.taskSubUnassigned}>미할당</span>
+                          ) : (
+                            <span className={styles.taskSubAssignee}>{assigneeLabel(task.assigneeIds)}</span>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-                <span className={styles.progressText}>{commonDone}/{commonTasks.length}</span>
               </div>
-            </div>
-            <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>추가 업무 리스트</span>
-              <div className={styles.taskRight}>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${extraTasks.length ? (extraDone / extraTasks.length) * 100 : 0}%` }}
-                  />
-                </div>
-                <span className={styles.progressText}>{extraDone}/{extraTasks.length}</span>
-              </div>
-            </div>
+            ))}
             <div className={styles.taskRow}>
               <span className={styles.taskLabel}>미할당 업무</span>
               <span className={unassignedCount > 0 ? styles.unassignedAlert : styles.waitingText}>

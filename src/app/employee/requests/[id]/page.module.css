@@ -314,3 +314,72 @@
     padding: 24px;
   }
 }
+
+/* ─── 댓글 수정/삭제 ─── */
+
+.commentActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.commentActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.commentActionBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.commentActionDanger:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.commentEditWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentEditActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.commentEditSave {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditSave:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.commentEditCancel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditCancel:hover {
+  background: var(--color-border);
+}

@@ -537,6 +537,7 @@
 .dot_STATUS_CHANGED { background: var(--color-warning); }
 .dot_COMMENT_ADDED  { background: var(--color-success); }
 .dot_CONTENT_EDITED { background: var(--color-text-secondary); }
+.dot_TASK_ADDED     { background: #6D28D9; }
 
 .timelineContent {
   flex: 1;
@@ -550,6 +551,11 @@
   font-size: 12px;
   color: var(--color-text);
   line-height: 1.4;
+  /* 한 줄 고정, 넘치면 말줄임(…) — 전체 내용은 툴팁으로 */
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .timelineTime {
@@ -993,4 +999,274 @@
 .taskAddSubmit:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* 업무리스트 추가 팝업 확장 (에디터/문서 참조) */
+
+.popupWide {
+  max-width: 640px;
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.popupWide .taskAddBody {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.taskAddEditor {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.taskAddDocHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.taskAddDocBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.taskAddDocEmpty {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding: 4px 0;
+}
+
+.taskAddDocList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskAddDocRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.taskAddDocBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.taskAddDocName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.taskAddDocRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.taskAddDocRemove:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* 문서 선택 팝업 */
+.taskDocSearch {
+  position: relative;
+  padding: 12px 20px 6px;
+}
+
+.taskDocSearchIcon {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-42%);
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.taskDocSearchInput {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+.taskDocSearchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.taskDocList {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.taskDocRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 8px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.taskDocRow:hover {
+  background: var(--color-bg);
+}
+
+.taskDocCheck {
+  color: var(--color-primary);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.manageBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  background: var(--color-bg);
+}
+
+.manageBtn:disabled:hover {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+/* 활동 내역 호버 툴팁 — 마우스 올리면 즉시 전체 내용 표시.
+   timelineText는 overflow:hidden(말줄임)이라 툴팁이 잘리므로 부모에 부착한다. */
+.timelineContent {
+  position: relative;
+}
+
+.timelineContent::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  background: rgba(20, 20, 20, 0.85);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s;
+  z-index: 100;
+}
+
+.timelineContent:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ─── 댓글 수정/삭제 ─── */
+
+.commentActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.commentActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.commentActionBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.commentActionDanger:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.commentEditWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentEditActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.commentEditSave {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditSave:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.commentEditCancel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditCancel:hover {
+  background: var(--color-border);
 }

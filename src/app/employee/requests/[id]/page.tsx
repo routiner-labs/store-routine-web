@@ -2,9 +2,10 @@
 
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LiaAngleLeftSolid, LiaLockSolid, LiaUsersSolid, LiaPaperPlaneSolid } from 'react-icons/lia'
+import { LiaAngleLeftSolid, LiaLockSolid, LiaUsersSolid, LiaPaperPlaneSolid, LiaPencilAltSolid, LiaTrashAltSolid } from 'react-icons/lia'
 import { mockRequests, mockReplies } from '@/mock/data'
 import { useToast } from '@/context/ToastContext'
+import { useConfirm } from '@/context/ConfirmContext'
 import EmployeeName from '@/components/EmployeeName'
 import type { RequestReply } from '@/types'
 import styles from './page.module.css'
@@ -32,12 +33,15 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
   const { id } = use(params)
   const router = useRouter()
   const { showToast } = useToast()
+  const confirm = useConfirm()
 
   const request = mockRequests.find((r) => r.id === id)
   const [replies, setReplies] = useState<RequestReply[]>(
     mockReplies.filter((r) => r.requestId === id)
   )
   const [replyText, setReplyText] = useState('')
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null)
+  const [editingReplyText, setEditingReplyText] = useState('')
 
   if (!request) {
     return (
@@ -51,6 +55,30 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
   }
 
   const [date, time] = request.createdAt.split(' ')
+
+  function startEditReply(reply: RequestReply) {
+    setEditingReplyId(reply.id)
+    setEditingReplyText(reply.content)
+  }
+
+  function saveEditReply() {
+    const text = editingReplyText.trim()
+    if (!text || !editingReplyId) return
+    setReplies((prev) => prev.map((r) => (r.id === editingReplyId ? { ...r, content: text } : r)))
+    setEditingReplyId(null)
+    setEditingReplyText('')
+    showToast('댓글이 수정되었습니다')
+  }
+
+  async function deleteReply(replyId: string) {
+    const ok = await confirm({
+      title: '댓글을 삭제할까요?',
+      message: '삭제된 댓글은 되돌릴 수 없습니다.',
+    })
+    if (!ok) return
+    setReplies((prev) => prev.filter((r) => r.id !== replyId))
+    showToast('댓글이 삭제되었습니다', 'error')
+  }
 
   function submitReply() {
     const text = replyText.trim()
@@ -127,8 +155,53 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
                         <span className={styles.ownerBadge}>사장</span>
                       )}
                       <span className={styles.commentTime}>{rDate} {rTime}</span>
+                      {reply.authorName === ME && editingReplyId !== reply.id && (
+                        <span className={styles.commentActions}>
+                          <button
+                            className={styles.commentActionBtn}
+                            onClick={() => startEditReply(reply)}
+                            aria-label="댓글 수정"
+                          >
+                            <LiaPencilAltSolid />
+                          </button>
+                          <button
+                            className={`${styles.commentActionBtn} ${styles.commentActionDanger}`}
+                            onClick={() => deleteReply(reply.id)}
+                            aria-label="댓글 삭제"
+                          >
+                            <LiaTrashAltSolid />
+                          </button>
+                        </span>
+                      )}
                     </div>
-                    <p className={styles.commentContent}>{reply.content}</p>
+                    {editingReplyId === reply.id ? (
+                      <div className={styles.commentEditWrap}>
+                        <textarea
+                          className={styles.commentTextarea}
+                          value={editingReplyText}
+                          onChange={(e) => setEditingReplyText(e.target.value)}
+                          rows={2}
+                          autoFocus
+                        />
+                        <div className={styles.commentEditActions}>
+                          <button
+                            className={styles.commentEditSave}
+                            onClick={saveEditReply}
+                            disabled={!editingReplyText.trim()}
+                          >
+                            저장
+                          </button>
+                          <button
+                            className={styles.commentEditCancel}
+                            onClick={() => setEditingReplyId(null)}
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className={styles.commentContent}>{reply.content}</p>
+                    )}
                   </div>
                 </div>
               )

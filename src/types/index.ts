@@ -61,7 +61,7 @@ export interface RequestReply {
   createdAt: string
 }
 
-export type ActivityType = 'CREATED' | 'STATUS_CHANGED' | 'COMMENT_ADDED' | 'CONTENT_EDITED'
+export type ActivityType = 'CREATED' | 'STATUS_CHANGED' | 'COMMENT_ADDED' | 'CONTENT_EDITED' | 'TASK_ADDED'
 
 export interface ActivityLog {
   id: string

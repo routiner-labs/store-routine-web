@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useStore } from '@/context/StoreContext'
-import { mockAttendance, mockChecklists, mockSpecialInstructions, mockRequests } from '@/mock/data'
+import { mockAttendance, mockRequests } from '@/mock/data'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
+import { createTasksForDate } from '@/mock/tasks'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES, type StoreDocument } from '@/mock/documents'
 import type { EmployeeRequest, Employee } from '@/types'
 import Modal from '@/components/Modal'
@@ -42,12 +43,13 @@ export default function OwnerHome() {
   const [requestFilter, setRequestFilter] = useState<RequestFilter | null>('pending')
   const [modal, setModal] = useState<HomeModal | null>(null)
 
-  const openChecklist = mockChecklists.find((c) => c.id === '1')!
-  const openDone = openChecklist.items.filter((i) => i.status === 'DONE').length
-  const openTotal = openChecklist.items.length
-
-  const instructionsDone = mockSpecialInstructions.filter((i) => i.status === 'DONE').length
-  const instructionsTotal = mockSpecialInstructions.length
+  // 업무리스트 페이지와 동일한 오늘자 업무 데이터
+  const todayTasks = createTasksForDate('2026-06-30')
+  const commonTasks = todayTasks.filter((t) => t.kind === 'COMMON')
+  const extraTasks = todayTasks.filter((t) => t.kind === 'EXTRA')
+  const commonDone = commonTasks.filter((t) => t.done).length
+  const extraDone = extraTasks.filter((t) => t.done).length
+  const unassignedCount = todayTasks.filter((t) => t.assigneeIds.length === 0).length
 
   const pendingRequests = mockRequests.filter((r) => r.status === 'REQUESTED')
   const confirmedRequests = mockRequests.filter((r) => r.status === 'CONFIRMED')
@@ -149,32 +151,34 @@ export default function OwnerHome() {
           </div>
           <div className={styles.panelBody}>
             <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>오픈 업무리스트</span>
+              <span className={styles.taskLabel}>공통 업무 리스트</span>
               <div className={styles.taskRight}>
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}
-                    style={{ width: `${(openDone / openTotal) * 100}%` }}
+                    style={{ width: `${commonTasks.length ? (commonDone / commonTasks.length) * 100 : 0}%` }}
                   />
                 </div>
-                <span className={styles.progressText}>{openDone}/{openTotal}</span>
+                <span className={styles.progressText}>{commonDone}/{commonTasks.length}</span>
               </div>
             </div>
             <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>특별 지시</span>
+              <span className={styles.taskLabel}>추가 업무 리스트</span>
               <div className={styles.taskRight}>
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}
-                    style={{ width: `${(instructionsDone / instructionsTotal) * 100}%` }}
+                    style={{ width: `${extraTasks.length ? (extraDone / extraTasks.length) * 100 : 0}%` }}
                   />
                 </div>
-                <span className={styles.progressText}>{instructionsDone}/{instructionsTotal}</span>
+                <span className={styles.progressText}>{extraDone}/{extraTasks.length}</span>
               </div>
             </div>
             <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>마감 업무리스트</span>
-              <span className={styles.waitingText}>대기 중</span>
+              <span className={styles.taskLabel}>미할당 업무</span>
+              <span className={unassignedCount > 0 ? styles.unassignedAlert : styles.waitingText}>
+                {unassignedCount > 0 ? `${unassignedCount}건` : '없음'}
+              </span>
             </div>
           </div>
         </section>

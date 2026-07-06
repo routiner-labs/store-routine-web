@@ -909,3 +909,88 @@
 .viewModal .sidePanel {
   top: 16px;
 }
+
+/* ─── 업무리스트에 추가 팝업 ─── */
+
+.taskAddBody {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.taskAddField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskAddLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.taskAddInput,
+.taskAddSelect {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+.taskAddInput:focus,
+.taskAddSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.taskAddSeg {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.taskAddSegBtn {
+  flex: 1;
+  padding: 9px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+}
+
+.taskAddSegActive {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.taskAddHint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 0;
+}
+
+.taskAddSubmit {
+  width: 100%;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+}
+
+.taskAddSubmit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

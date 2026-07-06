@@ -2031,30 +2031,38 @@
 }
 
 .methodContent {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.8;
   color: var(--color-text);
   word-break: break-word;
 }
 
 .methodContent p {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+}
+
+.methodContent p:last-child {
+  margin-bottom: 0;
 }
 
 .methodContent h2 {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
-  margin: 12px 0 6px;
+  margin: 18px 0 8px;
 }
 
 .methodContent ul,
 .methodContent ol {
   padding-left: 22px;
-  margin: 6px 0;
+  margin: 8px 0 14px;
 }
 
 .methodContent li {
-  margin: 3px 0;
+  margin: 0 0 6px;
+}
+
+.methodContent li::marker {
+  color: var(--color-text-secondary);
 }
 
 .methodContent img {
@@ -2151,4 +2159,105 @@
   .catalogPanel {
     width: 224px;
   }
+}
+
+/* ─── 수행 시간 지정 팝업 ─── */
+
+.timingPopBody {
+  padding: 16px 20px 4px;
+}
+
+.timingTaskName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.timingHint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0 0 14px;
+}
+
+.timingPopFoot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px 18px;
+}
+
+/* ─── 참조 문서 ─── */
+
+.docRefBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.methodDocs {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.methodDocsTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.methodDocRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.methodDocRow:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.methodDocName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.methodDocIcon {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.docPickerSearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px 4px;
+}
+
+.docPickerSearch .panelSearchIcon {
+  left: 26px;
 }

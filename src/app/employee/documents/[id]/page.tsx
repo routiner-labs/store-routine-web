@@ -86,17 +86,23 @@ export default function EmployeeDocumentDetailPage({ params }: { params: Promise
         />
       ) : (
         <div className={styles.body}>
-          <span className={`${styles.catBadge} ${styles[`cat_${doc.category}`]}`}>
-            {categoryName(doc.category)}
-          </span>
-          <h2 className={styles.title}>{doc.title}</h2>
-          <p className={styles.meta}>
-            <EmployeeName name={doc.authorName} />
-            {isMine && <span className={styles.mineBadge}>내 문서</span>}
-            {' · '}작성 {doc.createdAt}
-            {doc.updatedAt !== doc.createdAt && ` · 수정 ${doc.updatedAt}`}
-          </p>
-          <div className={styles.docContent} dangerouslySetInnerHTML={{ __html: doc.content }} />
+          <article className={styles.docCard}>
+            <div className={styles.docHead}>
+              <span className={`${styles.catBadge} ${styles[`cat_${doc.category}`]}`}>
+                {categoryName(doc.category)}
+              </span>
+              <h2 className={styles.title}>{doc.title}</h2>
+              <p className={styles.meta}>
+                <EmployeeName name={doc.authorName} className={styles.authorName} />
+                {isMine && <span className={styles.mineBadge}>내 문서</span>}
+                <span className={styles.metaDates}>
+                  작성 {doc.createdAt}
+                  {doc.updatedAt !== doc.createdAt && ` · 수정 ${doc.updatedAt}`}
+                </span>
+              </p>
+            </div>
+            <div className={styles.docContent} dangerouslySetInnerHTML={{ __html: doc.content }} />
+          </article>
         </div>
       )}
     </div>

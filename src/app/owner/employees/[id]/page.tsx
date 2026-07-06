@@ -13,9 +13,11 @@ import {
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
+import { useScrollLock } from '@/lib/useScrollLock'
 import styles from './page.module.css'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
+const TODAY = '2026-06-30'
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -32,6 +34,14 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [days, setDays] = useState(emp?.schedule?.days ?? [])
   const [startTime, setStartTime] = useState(emp?.schedule?.startTime ?? '09:00')
   const [endTime, setEndTime] = useState(emp?.schedule?.endTime ?? '18:00')
+  const [terminatedAt, setTerminatedAt] = useState(emp?.terminatedAt ?? '')
+
+  // 퇴직 처리 절차 팝업
+  const [terminateOpen, setTerminateOpen] = useState(false)
+  const [terminateDate, setTerminateDate] = useState(TODAY)
+  const [terminateChecked, setTerminateChecked] = useState(false)
+
+  useScrollLock(terminateOpen)
 
   if (!emp) {
     return (
@@ -50,6 +60,22 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   function handleSave() {
     showToast('저장되었습니다')
+  }
+
+  function openTerminate() {
+    setTerminateDate(TODAY)
+    setTerminateChecked(false)
+    setTerminateOpen(true)
+  }
+
+  function confirmTerminate() {
+    if (!terminateChecked) return
+    setStatus('INACTIVE')
+    setTerminatedAt(terminateDate)
+    // 퇴직 처리 시 스케줄 정보 제거
+    setDays([])
+    setTerminateOpen(false)
+    showToast(`${name}님이 퇴직 처리되었습니다`, 'error')
   }
 
   return (
@@ -87,6 +113,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 <span className={styles.metaLabel}>입사일</span>
                 <span className={styles.metaValue}>{hiredAt || '-'}</span>
               </div>
+              {status === 'INACTIVE' && terminatedAt && (
+                <div className={styles.metaRow}>
+                  <span className={styles.metaLabel}>퇴직일</span>
+                  <span className={styles.metaValue}>{terminatedAt}</span>
+                </div>
+              )}
               {emp.schedule && (
                 <div className={styles.metaRow}>
                   <span className={styles.metaLabel}>근무시간</span>
@@ -101,7 +133,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               저장하기
             </button>
             {status === 'ACTIVE' && (
-              <button className={styles.btnTerminate} onClick={() => setStatus('INACTIVE')}>
+              <button className={styles.btnTerminate} onClick={openTerminate}>
                 <LiaUserMinusSolid /> 퇴직 처리
               </button>
             )}
@@ -159,7 +191,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   </button>
                   <button
                     className={`${styles.toggleBtn} ${status === 'INACTIVE' ? styles.toggleBtnActive : ''}`}
-                    onClick={() => setStatus('INACTIVE')}
+                    onClick={() => status === 'ACTIVE' && openTerminate()}
                   >
                     퇴직
                   </button>
@@ -221,13 +253,61 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               저장하기
             </button>
             {status === 'ACTIVE' && (
-              <button className={styles.btnTerminate} onClick={() => setStatus('INACTIVE')}>
+              <button className={styles.btnTerminate} onClick={openTerminate}>
                 퇴직 처리
               </button>
             )}
           </div>
         </main>
       </div>
+
+      {/* 퇴직 처리 절차 팝업 */}
+      {terminateOpen && (
+        <div className={styles.termOverlay} onClick={() => setTerminateOpen(false)}>
+          <div className={styles.termPopup} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.termHead}>
+              <span className={styles.termTitle}>정말로 {name}님을 퇴직 처리할까요?</span>
+            </div>
+            <div className={styles.termBody}>
+              <ul className={styles.termWarnList}>
+                <li>기본 스케줄과 일자별 근무 일정이 모두 삭제됩니다.</li>
+                <li>업무리스트 배정 대상에서 제외됩니다.</li>
+                <li>작성한 요청과 문서는 기록으로 유지됩니다.</li>
+                <li>퇴직 처리 후에는 고용 상태에서 재직중으로 되돌려야 복직됩니다.</li>
+              </ul>
+              <label className={styles.termField}>
+                <span className={styles.termFieldLabel}>퇴직일</span>
+                <input
+                  type="date"
+                  className={styles.termDateInput}
+                  value={terminateDate}
+                  onChange={(e) => setTerminateDate(e.target.value)}
+                />
+              </label>
+              <label className={styles.termCheckRow}>
+                <input
+                  type="checkbox"
+                  checked={terminateChecked}
+                  onChange={(e) => setTerminateChecked(e.target.checked)}
+                />
+                <span>위 내용을 확인했으며 퇴직 처리에 동의합니다.</span>
+              </label>
+            </div>
+            <div className={styles.termActions}>
+              <button
+                className={styles.termConfirmBtn}
+                disabled={!terminateChecked || !terminateDate}
+                onClick={confirmTerminate}
+              >
+                퇴직 처리
+              </button>
+              <button className={styles.termCancelBtn} onClick={() => setTerminateOpen(false)}>
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

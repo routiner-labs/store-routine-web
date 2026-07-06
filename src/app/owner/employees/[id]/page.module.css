@@ -528,3 +528,145 @@
     margin-top: 0;
   }
 }
+
+/* ─── 퇴직 처리 절차 팝업 ─── */
+
+.termOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: termFade 0.15s ease-out;
+}
+
+@keyframes termFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.termPopup {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: termPop 0.16s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes termPop {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.termHead {
+  padding: 20px 22px 0;
+}
+
+.termTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.termBody {
+  padding: 14px 22px 4px;
+}
+
+.termWarnList {
+  background: var(--color-danger-light);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px 12px 30px;
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.termWarnList li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #991B1B;
+}
+
+.termWarnList li::marker {
+  color: var(--color-danger);
+}
+
+.termField {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.termFieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.termDateInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  background: var(--color-bg);
+}
+
+.termCheckRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.termCheckRow input {
+  margin-top: 2px;
+  accent-color: var(--color-danger);
+}
+
+.termActions {
+  display: flex;
+  gap: 8px;
+  padding: 16px 22px 20px;
+}
+
+.termConfirmBtn,
+.termCancelBtn {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, opacity 0.1s;
+}
+
+.termConfirmBtn {
+  color: #fff;
+  background: var(--color-danger);
+}
+
+.termConfirmBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.termCancelBtn {
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+}
+
+.termCancelBtn:hover {
+  background: var(--color-border);
+}

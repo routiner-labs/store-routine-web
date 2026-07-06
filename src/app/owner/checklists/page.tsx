@@ -14,6 +14,7 @@ import {
   LiaAngleDownSolid,
   LiaBookSolid,
   LiaBarsSolid,
+  LiaClockSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { getAttendanceForDate } from '@/mock/calendar'
@@ -38,6 +39,9 @@ import type {
   TaskTiming,
 } from '@/mock/tasks'
 import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
+import Modal from '@/components/Modal'
+import DocumentDetailView from '@/app/owner/documents/DocumentDetailView'
+import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
@@ -474,11 +478,29 @@ export default function OwnerChecklists() {
   }
   const [menuTaskId, setMenuTaskId] = useState<string | null>(null)
   const [methodTask, setMethodTask] = useState<StoreTask | null>(null)
+  const [timingTask, setTimingTask] = useState<StoreTask | null>(null)
+  const [timingDraft, setTimingDraft] = useState<TaskTiming>(DEFAULT_TIMING)
+  const [newDocRefs, setNewDocRefs] = useState<string[]>([])
+  const [docPickerOpen, setDocPickerOpen] = useState(false)
+  const [docPickerQuery, setDocPickerQuery] = useState('')
+  const [viewDocId, setViewDocId] = useState<string | null>(null)
   const seqRef = useRef(0)
   const methodHtmlRef = useRef('')
 
   // 팝업이 열리면 배경 스크롤 잠금
-  useScrollLock(manageOpen || methodTask !== null || dutyPickerOpen || catManageOpen)
+  useScrollLock(manageOpen || methodTask !== null || timingTask !== null || dutyPickerOpen || catManageOpen || docPickerOpen || viewDocId !== null)
+
+  const docTitle = (id: string) => DOCUMENT_CATALOG.find((d) => d.id === id)?.title ?? '삭제된 문서'
+  const docCategoryName = (id: string) => {
+    const doc = DOCUMENT_CATALOG.find((d) => d.id === id)
+    return DOCUMENT_CATEGORIES.find((c) => c.id === doc?.category)?.name ?? '기타'
+  }
+
+  function toggleDocRef(docId: string) {
+    setNewDocRefs((prev) =>
+      prev.includes(docId) ? prev.filter((x) => x !== docId) : [...prev, docId],
+    )
+  }
 
   const tasks = tasksByDate[selectedDate] ?? []
   const commonTasks = tasks.filter((t) => t.kind === 'COMMON')
@@ -603,9 +625,23 @@ export default function OwnerChecklists() {
         kind,
         assigneeIds: tpl.defaultAssigneeIds ?? [],
         done: false,
+        docRefs: tpl.docRefs ?? [],
       }
       return { ...prev, [selectedDate]: [...list, newTask] }
     })
+  }
+
+  function saveTaskTiming() {
+    if (!timingTask) return
+    const taskId = timingTask.id
+    setTasksByDate((prev) => ({
+      ...prev,
+      [selectedDate]: (prev[selectedDate] ?? []).map((t) =>
+        t.id === taskId ? { ...t, timing: timingDraft } : t,
+      ),
+    }))
+    setTimingTask(null)
+    showToast(hasTiming(timingDraft) ? '수행 시간이 지정되었습니다' : '상시 수행으로 변경되었습니다')
   }
 
   function toggleDone(taskId: string) {
@@ -628,6 +664,7 @@ export default function OwnerChecklists() {
     setNewRecurStart('')
     setNewRecurEnd('')
     setNewAssignees([])
+    setNewDocRefs([])
     setRecurExiting(false)
     methodHtmlRef.current = ''
   }
@@ -675,6 +712,7 @@ export default function OwnerChecklists() {
     setNewRecurStart(tpl.recurStart ?? '')
     setNewRecurEnd(tpl.recurEnd ?? '')
     setNewAssignees(tpl.defaultAssigneeIds ?? [])
+    setNewDocRefs(tpl.docRefs ?? [])
     setRecurExiting(false)
     methodHtmlRef.current = tpl.method
   }
@@ -712,6 +750,7 @@ export default function OwnerChecklists() {
       recurStart: newRecurrence === 'RECURRING' ? newRecurStart : '',
       recurEnd: newRecurrence === 'RECURRING' ? newRecurEnd : '',
       defaultAssigneeIds: assignees,
+      docRefs: newDocRefs,
     }
     if (editingId) {
       setCatalog((prev) => prev.map((t) => (t.id === editingId ? { ...t, ...catalogPatch } : t)))
@@ -728,6 +767,7 @@ export default function OwnerChecklists() {
                   timing: newTiming,
                   recurrence: newRecurrence,
                   recurrenceRule: newRule,
+                  docRefs: newDocRefs,
                 }
               : t,
           )
@@ -906,6 +946,40 @@ export default function OwnerChecklists() {
               }}
             />
           </div>
+          <div className={styles.field}>
+            <div className={styles.dutyHead}>
+              <span className={styles.fieldLabel}>참조 문서</span>
+              <button
+                type="button"
+                className={styles.dutyAdd}
+                onClick={() => setDocPickerOpen(true)}
+              >
+                <LiaPlusSolid />
+                문서 추가하기
+              </button>
+            </div>
+            <div className={styles.dutyList}>
+              {newDocRefs.length === 0 ? (
+                <span className={styles.dutyEmpty}>연결된 문서가 없습니다</span>
+              ) : (
+                newDocRefs.map((docId) => (
+                  <div key={docId} className={styles.dutyRow}>
+                    <span className={styles.docRefBadge}>{docCategoryName(docId)}</span>
+                    <span className={styles.dutyName}>{docTitle(docId)}</span>
+                    <button
+                      type="button"
+                      className={styles.dutyRemove}
+                      onClick={() => toggleDocRef(docId)}
+                      aria-label="참조 해제"
+                    >
+                      <LiaTimesSolid />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <span className={styles.fieldHint}>수행 방법 팝업에서 바로 열어볼 수 있습니다.</span>
+          </div>
         </div>
       </>
     )
@@ -974,6 +1048,17 @@ export default function OwnerChecklists() {
               >
                 <LiaBookSolid className={styles.taskMenuIcon} />
                 수행 방법
+              </button>
+              <button
+                className={styles.taskMenuItem}
+                onClick={() => {
+                  setTimingTask(task)
+                  setTimingDraft(task.timing)
+                  setMenuTaskId(null)
+                }}
+              >
+                <LiaClockSolid className={styles.taskMenuIcon} />
+                수행 시간 지정
               </button>
             </div>
           )}
@@ -1530,6 +1615,40 @@ export default function OwnerChecklists() {
         </div>
       )}
 
+      {/* 수행 시간 지정 팝업 (이 날짜의 해당 업무에만 적용) */}
+      {timingTask && (
+        <div className={styles.dutyPopOverlay} onClick={() => setTimingTask(null)}>
+          <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.dutyPopHead}>
+              <span className={styles.dutyPopTitle}>수행 시간 지정</span>
+              <button
+                className={styles.modalClose}
+                onClick={() => setTimingTask(null)}
+                aria-label="닫기"
+              >
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.timingPopBody}>
+              <div className={styles.timingTaskName}>{timingTask.title}</div>
+              <p className={styles.timingHint}>
+                {formatHeaderDate(selectedDate)} 목록의 이 업무에만 적용됩니다.
+              </p>
+              <TimeRangeSlider
+                start={timingDraft.start}
+                end={timingDraft.end}
+                onChange={(start, end) => setTimingDraft({ start, end })}
+              />
+            </div>
+            <div className={styles.timingPopFoot}>
+              <button className={styles.btnCreate} onClick={saveTaskTiming}>
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 수행 방법 팝업 */}
       {methodTask && (
         <div className={styles.modalOverlay} onClick={() => setMethodTask(null)}>
@@ -1564,9 +1683,80 @@ export default function OwnerChecklists() {
               ) : (
                 <p className={styles.methodEmpty}>등록된 수행 방법이 없습니다</p>
               )}
+              {methodTask.docRefs.length > 0 && (
+                <div className={styles.methodDocs}>
+                  <span className={styles.methodDocsTitle}>참조 문서</span>
+                  {methodTask.docRefs.map((docId) => (
+                    <button
+                      key={docId}
+                      type="button"
+                      className={styles.methodDocRow}
+                      onClick={() => setViewDocId(docId)}
+                    >
+                      <span className={styles.docRefBadge}>{docCategoryName(docId)}</span>
+                      <span className={styles.methodDocName}>{docTitle(docId)}</span>
+                      <LiaBookSolid className={styles.methodDocIcon} />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
+      )}
+
+      {/* 참조 문서 선택 팝업 */}
+      {docPickerOpen && (
+        <div className={styles.dutyPopOverlay} onClick={() => { setDocPickerOpen(false); setDocPickerQuery('') }}>
+          <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.dutyPopHead}>
+              <span className={styles.dutyPopTitle}>참조 문서 선택</span>
+              <button
+                className={styles.modalClose}
+                onClick={() => { setDocPickerOpen(false); setDocPickerQuery('') }}
+                aria-label="닫기"
+              >
+                <LiaTimesSolid />
+              </button>
+            </div>
+            <div className={styles.docPickerSearch}>
+              <LiaSearchSolid className={styles.panelSearchIcon} />
+              <input
+                className={styles.panelSearchInput}
+                type="text"
+                placeholder="문서 제목 검색"
+                value={docPickerQuery}
+                onChange={(e) => setDocPickerQuery(e.target.value)}
+              />
+            </div>
+            <div className={styles.dutyPopList}>
+              {DOCUMENT_CATALOG
+                .filter((d) => !docPickerQuery.trim() || d.title.toLowerCase().includes(docPickerQuery.trim().toLowerCase()))
+                .map((d) => {
+                  const on = newDocRefs.includes(d.id)
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      className={styles.dutyPopRow}
+                      onClick={() => toggleDocRef(d.id)}
+                    >
+                      <span className={styles.docRefBadge}>{docCategoryName(d.id)}</span>
+                      <span className={styles.dutyPopName}>{d.title}</span>
+                      {on && <LiaCheckSolid className={styles.dutyPopCheck} />}
+                    </button>
+                  )
+                })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 참조 문서 보기 (문서함 상세와 동일) */}
+      {viewDocId && (
+        <Modal title="문서" size="wide" flush onClose={() => setViewDocId(null)}>
+          <DocumentDetailView id={viewDocId} mode="modal" onDeleted={() => setViewDocId(null)} />
+        </Modal>
       )}
     </div>
   )

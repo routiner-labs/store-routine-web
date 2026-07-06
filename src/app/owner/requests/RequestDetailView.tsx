@@ -10,9 +10,12 @@ import {
   LiaExchangeAltSolid,
   LiaTrashAltSolid,
   LiaPencilAltSolid,
+  LiaClipboardListSolid,
 } from 'react-icons/lia'
 import { mockRequests, mockReplies, mockActivityLogs } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
+import { DEFAULT_CATEGORIES, registerTaskFromRequest } from '@/mock/tasks'
+import type { TaskKind } from '@/mock/tasks'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import type { RequestStatus, RequestType, RequestVisibility, RequestReply, ActivityLog } from '@/types'
@@ -32,6 +35,12 @@ const statusLabel: Record<string, string> = {
 }
 
 const statusActions: RequestStatus[] = ['CONFIRMED', 'IN_PROGRESS', 'DONE', 'REJECTED']
+
+const TYPE_TO_TASK_CATEGORY: Record<string, string> = {
+  재료부족: 'STOCK',
+  청소시설: 'CLEAN',
+  장비고장: 'SAFETY',
+}
 
 function activityText(log: ActivityLog): string {
   switch (log.type) {
@@ -69,11 +78,15 @@ export default function RequestDetailView({
   const [typePopupOpen, setTypePopupOpen] = useState(false)
   const [visibilityPopupOpen, setVisibilityPopupOpen] = useState(false)
   const [profilePopupOpen, setProfilePopupOpen] = useState(false)
+  const [taskAddOpen, setTaskAddOpen] = useState(false)
+  const [taskTitle, setTaskTitle] = useState('')
+  const [taskCategory, setTaskCategory] = useState('ETC')
+  const [taskKind, setTaskKind] = useState<TaskKind>('EXTRA')
   const { showToast } = useToast()
   const confirm = useConfirm()
 
   // 인라인 팝업(상태/유형/공개범위)이 열리면 뒤 페이지 스크롤 잠금
-  useScrollLock(statusPopupOpen || typePopupOpen || visibilityPopupOpen)
+  useScrollLock(statusPopupOpen || typePopupOpen || visibilityPopupOpen || taskAddOpen)
 
   if (!request) {
     return (
@@ -148,6 +161,36 @@ export default function RequestDetailView({
     showToast('요청이 삭제되었습니다', 'error')
     if (mode === 'modal') onDeleted?.()
     else router.back()
+  }
+
+  function openTaskAdd() {
+    if (!request) return
+    const base = request.content.replace(/\s+/g, ' ').trim()
+    setTaskTitle(base.length > 24 ? `${base.slice(0, 24)}…` : base)
+    setTaskCategory(TYPE_TO_TASK_CATEGORY[request.type] ?? 'ETC')
+    setTaskKind('EXTRA')
+    setTaskAddOpen(true)
+  }
+
+  function confirmTaskAdd() {
+    if (!request || !taskTitle.trim()) return
+    registerTaskFromRequest({
+      title: taskTitle.trim(),
+      method: `<p>${request.content}</p><p>요청자: ${request.employeeName} · ${request.createdAt} (요청함에서 추가됨)</p>`,
+      category: taskCategory,
+      kind: taskKind,
+    })
+    setActivityLogs((logs) => [...logs, {
+      id: `a${Date.now()}`,
+      requestId: id,
+      type: 'CONTENT_EDITED',
+      actorName: '사장',
+      actorRole: 'OWNER',
+      detail: `업무리스트에 테스크 추가 (${taskKind === 'COMMON' ? '공통' : '추가'})`,
+      createdAt: '2026-06-30 방금',
+    }])
+    setTaskAddOpen(false)
+    showToast('테스크가 생성되어 오늘 업무리스트에 추가되었습니다')
   }
 
   function submitReply() {
@@ -318,6 +361,9 @@ export default function RequestDetailView({
               <button className={styles.manageBtn} onClick={() => setVisibilityPopupOpen(true)}>
                 <LiaLockSolid /> 공개범위 변경
               </button>
+              <button className={styles.manageBtn} onClick={openTaskAdd}>
+                <LiaClipboardListSolid /> 업무리스트에 추가
+              </button>
               <button
                 className={`${styles.manageBtn} ${styles.manageBtnDanger}`}
                 onClick={deleteRequest}
@@ -414,6 +460,67 @@ export default function RequestDetailView({
                   {visibility === v && <span className={styles.popupOptionCheck}>현재</span>}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 업무리스트에 추가 팝업 */}
+      {taskAddOpen && (
+        <div className={styles.popupOverlay} onClick={() => setTaskAddOpen(false)}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.popupHeader}>
+              <span className={styles.popupTitle}>업무리스트에 추가</span>
+              <button className={styles.popupClose} onClick={() => setTaskAddOpen(false)}>닫기</button>
+            </div>
+            <div className={styles.taskAddBody}>
+              <label className={styles.taskAddField}>
+                <span className={styles.taskAddLabel}>테스크 이름</span>
+                <input
+                  className={styles.taskAddInput}
+                  type="text"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  placeholder="테스크 이름을 입력하세요"
+                />
+              </label>
+              <label className={styles.taskAddField}>
+                <span className={styles.taskAddLabel}>카테고리</span>
+                <select
+                  className={styles.taskAddSelect}
+                  value={taskCategory}
+                  onChange={(e) => setTaskCategory(e.target.value)}
+                >
+                  {DEFAULT_CATEGORIES.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </label>
+              <div className={styles.taskAddField}>
+                <span className={styles.taskAddLabel}>추가할 리스트</span>
+                <div className={styles.taskAddSeg}>
+                  {(['COMMON', 'EXTRA'] as TaskKind[]).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      className={`${styles.taskAddSegBtn} ${taskKind === k ? styles.taskAddSegActive : ''}`}
+                      onClick={() => setTaskKind(k)}
+                    >
+                      {k === 'COMMON' ? '공통 업무' : '추가 업무'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className={styles.taskAddHint}>
+                요청 내용이 수행 방법으로 함께 저장됩니다. 단건 업무로 오늘 업무리스트에 추가됩니다.
+              </p>
+              <button
+                className={styles.taskAddSubmit}
+                disabled={!taskTitle.trim()}
+                onClick={confirmTaskAdd}
+              >
+                테스크 생성하고 추가
+              </button>
             </div>
           </div>
         </div>

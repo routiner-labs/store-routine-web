@@ -28,7 +28,7 @@ function categoryName(id: string) {
   return DOCUMENT_CATEGORIES.find((c) => c.id === id)?.name ?? id
 }
 
-type RequestFilter = 'pending' | 'inProgress' | 'equipment'
+type RequestFilter = 'pending' | 'confirmed' | 'inProgress'
 
 type HomeModal =
   | { kind: 'request'; request: EmployeeRequest }
@@ -49,18 +49,16 @@ export default function OwnerHome() {
   const instructionsTotal = mockSpecialInstructions.length
 
   const pendingRequests = mockRequests.filter((r) => r.status === 'REQUESTED')
+  const confirmedRequests = mockRequests.filter((r) => r.status === 'CONFIRMED')
   const inProgressRequests = mockRequests.filter((r) => r.status === 'IN_PROGRESS')
-  const equipmentRequests = mockRequests.filter(
-    (r) => r.type === '장비고장' && r.status !== 'DONE'
-  )
 
   const filteredRequests =
     requestFilter === 'pending'
       ? pendingRequests
-      : requestFilter === 'inProgress'
-        ? inProgressRequests
-        : requestFilter === 'equipment'
-          ? equipmentRequests
+      : requestFilter === 'confirmed'
+        ? confirmedRequests
+        : requestFilter === 'inProgress'
+          ? inProgressRequests
           : []
 
   function toggleFilter(filter: RequestFilter) {
@@ -103,21 +101,19 @@ export default function OwnerHome() {
             </button>
             <button
               type="button"
+              onClick={() => toggleFilter('confirmed')}
+              className={`${styles.requestStat} ${requestFilter === 'confirmed' ? styles.requestStatActive : ''}`}
+            >
+              <span className={styles.requestCount}>{confirmedRequests.length}</span>
+              <span className={styles.requestLabel}>확인됨</span>
+            </button>
+            <button
+              type="button"
               onClick={() => toggleFilter('inProgress')}
               className={`${styles.requestStat} ${requestFilter === 'inProgress' ? styles.requestStatActive : ''}`}
             >
               <span className={styles.requestCount}>{inProgressRequests.length}</span>
               <span className={styles.requestLabel}>처리 중</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => toggleFilter('equipment')}
-              className={`${styles.requestStat} ${requestFilter === 'equipment' ? styles.requestStatActive : ''}`}
-            >
-              <span className={`${styles.requestCount} ${equipmentRequests.length > 0 ? styles.countAlert : ''}`}>
-                {equipmentRequests.length}
-              </span>
-              <span className={styles.requestLabel}>장비 이상</span>
             </button>
           </div>
           {requestFilter === null ? (

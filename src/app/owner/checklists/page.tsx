@@ -40,6 +40,7 @@ import type {
 import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
+import { useScrollLock } from '@/lib/useScrollLock'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -475,6 +476,9 @@ export default function OwnerChecklists() {
   const seqRef = useRef(0)
   const methodHtmlRef = useRef('')
 
+  // 팝업이 열리면 배경 스크롤 잠금
+  useScrollLock(manageOpen || methodTask !== null || dutyPickerOpen || catManageOpen)
+
   const tasks = tasksByDate[selectedDate] ?? []
   const commonTasks = tasks.filter((t) => t.kind === 'COMMON')
   const extraTasks = tasks.filter((t) => t.kind === 'EXTRA')
@@ -655,15 +659,8 @@ export default function OwnerChecklists() {
 
   function setRecurrence(value: Recurrence) {
     if (value === newRecurrence) return
-    if (value === 'ONCE') {
-      // 퇴장 애니메이션 후 언마운트
-      setNewRecurrence('ONCE')
-      setRecurExiting(true)
-      setTimeout(() => setRecurExiting(false), 210)
-    } else {
-      setRecurExiting(false)
-      setNewRecurrence('RECURRING')
-    }
+    setRecurExiting(false)
+    setNewRecurrence(value)
   }
 
   function selectTask(tpl: TaskTemplate) {

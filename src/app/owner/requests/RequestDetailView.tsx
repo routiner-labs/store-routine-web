@@ -145,7 +145,8 @@ export default function RequestDetailView({
     })
     if (!ok) return
     showToast('요청이 삭제되었습니다', 'error')
-    setTimeout(() => (mode === 'modal' ? onDeleted?.() : router.back()), 800)
+    if (mode === 'modal') onDeleted?.()
+    else router.back()
   }
 
   function submitReply() {

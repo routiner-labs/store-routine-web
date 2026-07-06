@@ -1,0 +1,239 @@
+.page {
+  padding-bottom: calc(var(--nav-height) + 16px);
+  min-height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--appbar-height);
+  z-index: 10;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── 요약 ─── */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 0;
+  border-right: 1px solid var(--color-border);
+}
+
+.summaryItem:last-child {
+  border-right: none;
+}
+
+.summaryNum {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.summaryLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ─── 이번 주 ─── */
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+}
+
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.dayCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 4px;
+  min-height: 96px;
+}
+
+.dayCardOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.dayCardToday {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.dayDow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.dowSat { color: var(--color-primary); }
+.dowSun { color: var(--color-danger); }
+
+.dayDate {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.dayTime {
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.dayOff {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.todayBadge {
+  position: absolute;
+  top: -8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+/* ─── 근무 패턴 ─── */
+
+.patternCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.patternRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.patternLabel {
+  width: 68px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.patternValue {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dowRow {
+  display: flex;
+  gap: 4px;
+}
+
+.dowDot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dowDotOn {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.patternHint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ─── Responsive ─── */
+
+@media (min-width: 768px) {
+  .body {
+    padding: 20px var(--page-x);
+  }
+
+  .weekGrid {
+    gap: 10px;
+  }
+
+  .dayCard {
+    min-height: 110px;
+    padding: 14px 6px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .summary {
+    grid-column: 1 / -1;
+  }
+}

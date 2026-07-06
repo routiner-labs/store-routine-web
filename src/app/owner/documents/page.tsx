@@ -15,6 +15,7 @@ import {
 } from 'react-icons/lia'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
+import { useScrollLock } from '@/lib/useScrollLock'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import type { StoreDocument, DocumentCategory } from '@/mock/documents'
 import styles from './page.module.css'
@@ -70,6 +71,8 @@ export default function OwnerDocuments() {
   const [catManageOpen, setCatManageOpen] = useState(false)
   const [catDraft, setCatDraft] = useState('')
   const catSeqRef = useRef(0)
+
+  useScrollLock(catFilterOpen || catManageOpen)
 
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? '기타'
 

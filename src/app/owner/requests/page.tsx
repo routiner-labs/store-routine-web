@@ -8,6 +8,7 @@ import {
 } from 'react-icons/lia'
 import { mockRequests } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
+import { useScrollLock } from '@/lib/useScrollLock'
 import type { EmployeeRequest, RequestType, RequestStatus, RequestVisibility } from '@/types'
 import styles from './page.module.css'
 
@@ -154,6 +155,8 @@ export default function OwnerRequests() {
   const [requests, setRequests] = useState(mockRequests)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<RequestStatus | null>(null)
+
+  useScrollLock(authorPopupOpen)
 
   const availableTypes: RequestType[] = [...new Set(requests.map((r) => r.type))]
 

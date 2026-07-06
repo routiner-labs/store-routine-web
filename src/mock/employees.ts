@@ -29,6 +29,15 @@ export const mockEmployees: Employee[] = [
     schedule: { days: [2, 3, 5, 6], startTime: '11:00', endTime: '20:00' },
   },
   {
+    // 사장이 아직 스케줄을 생성하지 않은 직원 (schedule 없음)
+    id: 'emp5',
+    name: '최수아',
+    phone: '010-7890-1234',
+    birthDate: '2001-02-14',
+    status: 'ACTIVE',
+    hiredAt: '2026-06-20',
+  },
+  {
     id: 'emp4',
     name: '최준호',
     phone: '010-4567-8901',

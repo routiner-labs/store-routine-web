@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useToast } from '@/context/ToastContext'
 import styles from './page.module.css'
 
 const requestTypes = [
@@ -14,32 +15,28 @@ const requestTypes = [
   { type: '기타', label: '기타' },
 ]
 
-export default function NewRequestPage() {
+function NewRequestForm() {
   const router = useRouter()
-  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  // 홈 바로가기(?type=)에서 넘어온 유형을 미리 선택
+  const initialType = searchParams.get('type')
+  const [selectedType, setSelectedType] = useState<string | null>(
+    requestTypes.some((t) => t.type === initialType) ? initialType : null
+  )
   const [content, setContent] = useState('')
   const [photoAttached, setPhotoAttached] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const { showToast } = useToast()
 
   function handleSubmit() {
     if (!selectedType || !content.trim()) return
-    setSubmitted(true)
-    setTimeout(() => router.push('/employee'), 1500)
-  }
-
-  if (submitted) {
-    return (
-      <div className={styles.successPage}>
-        <p className={styles.successText}>요청이 등록되었습니다</p>
-        <p className={styles.successSub}>사장님에게 알림이 전송되었습니다</p>
-      </div>
-    )
+    showToast('요청이 등록되었습니다')
+    router.push('/employee/requests')
   }
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/employee" className={styles.backBtn}>‹ 뒤로</Link>
+        <Link href="/employee/requests" className={styles.backBtn}>‹ 뒤로</Link>
         <h1 className={styles.title}>요청하기</h1>
       </header>
 
@@ -90,5 +87,13 @@ export default function NewRequestPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewRequestPage() {
+  return (
+    <Suspense>
+      <NewRequestForm />
+    </Suspense>
   )
 }

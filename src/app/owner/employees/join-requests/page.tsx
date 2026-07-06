@@ -4,11 +4,31 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid, LiaCheckSolid, LiaTimesSolid } from 'react-icons/lia'
 import { mockJoinRequests } from '@/mock/employees'
+import { useToast } from '@/context/ToastContext'
+import { useConfirm } from '@/context/ConfirmContext'
 import styles from './page.module.css'
 
 export default function JoinRequestsPage() {
   const router = useRouter()
+  const { showToast } = useToast()
+  const confirm = useConfirm()
   const [requests, setRequests] = useState(mockJoinRequests)
+
+  function approve(id: string, name: string) {
+    setRequests((prev) => prev.filter((r) => r.id !== id))
+    showToast(`${name}님의 가입을 수락했습니다`)
+  }
+
+  async function reject(id: string, name: string) {
+    const ok = await confirm({
+      title: '가입 신청을 거절할까요?',
+      message: `${name}님의 가입 신청이 거절됩니다.`,
+      confirmText: '거절',
+    })
+    if (!ok) return
+    setRequests((prev) => prev.filter((r) => r.id !== id))
+    showToast(`${name}님의 가입 신청을 거절했습니다`, 'error')
+  }
 
   return (
     <div className={styles.page}>
@@ -31,18 +51,18 @@ export default function JoinRequestsPage() {
               <div className={styles.info}>
                 <span className={styles.name}>{req.name}</span>
                 <span className={styles.meta}>{req.phone} · {req.requestedAt}</span>
-                {req.message && <span className={styles.msg}>"{req.message}"</span>}
+                {req.message && <span className={styles.msg}>&ldquo;{req.message}&rdquo;</span>}
               </div>
               <div className={styles.actions}>
                 <button
                   className={styles.btnReject}
-                  onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
+                  onClick={() => reject(req.id, req.name)}
                 >
                   <LiaTimesSolid /> 거절
                 </button>
                 <button
                   className={styles.btnApprove}
-                  onClick={() => setRequests((prev) => prev.filter((r) => r.id !== req.id))}
+                  onClick={() => approve(req.id, req.name)}
                 >
                   <LiaCheckSolid /> 수락
                 </button>

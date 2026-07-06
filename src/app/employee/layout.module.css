@@ -2,8 +2,14 @@
   min-height: 100dvh;
 }
 
-.main {
+.content {
+  display: flex;
+  flex-direction: column;
   padding-bottom: var(--nav-height);
+}
+
+.main {
+  flex: 1;
 }
 
 @media (min-width: 768px) {
@@ -13,8 +19,9 @@
     min-height: 100vh;
   }
 
-  .main {
+  .content {
     padding-bottom: 0;
+    min-height: 100vh;
   }
 }
 

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LiaUserPlusSolid, LiaAngleRightSolid, LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid } from 'react-icons/lia'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
+import { useToast } from '@/context/ToastContext'
+import { useScrollLock } from '@/lib/useScrollLock'
 import type { EmploymentStatus } from '@/types'
 import styles from './page.module.css'
 
@@ -17,9 +19,11 @@ export default function EmployeesPage() {
   const [advOpen, setAdvOpen] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
   const [invitePhone, setInvitePhone] = useState('')
-  const [inviteSent, setInviteSent] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
+  const { showToast } = useToast()
+
+  useScrollLock(inviteOpen)
 
   const advActiveCount =
     (filterStatus !== 'ALL' ? 1 : 0) +
@@ -47,12 +51,11 @@ export default function EmployeesPage() {
   function closeInvite() {
     setInviteOpen(false)
     setInvitePhone('')
-    setInviteSent(false)
   }
 
   function sendInvite() {
-    setInviteSent(true)
-    setTimeout(closeInvite, 1800)
+    showToast(`${invitePhone}로 초대 링크를 전송했습니다`)
+    closeInvite()
   }
 
   return (
@@ -204,30 +207,21 @@ export default function EmployeesPage() {
               <button className={styles.sheetClose} onClick={closeInvite}>닫기</button>
             </div>
             <div className={styles.sheetBody}>
-              {inviteSent ? (
-                <div className={styles.inviteSuccess}>
-                  <p className={styles.inviteSuccessTitle}>초대장을 보냈습니다</p>
-                  <p className={styles.inviteSuccessDesc}>{invitePhone}로 초대 링크를 전송했습니다.</p>
-                </div>
-              ) : (
-                <>
-                  <p className={styles.inviteDesc}>전화번호를 입력하면 초대 링크를 문자로 발송합니다.</p>
-                  <input
-                    type="tel"
-                    placeholder="010-0000-0000"
-                    value={invitePhone}
-                    onChange={(e) => setInvitePhone(e.target.value)}
-                    className={styles.phoneInput}
-                  />
-                  <button
-                    className={styles.btnPrimary}
-                    disabled={invitePhone.replace(/\D/g, '').length < 10}
-                    onClick={sendInvite}
-                  >
-                    초대장 보내기
-                  </button>
-                </>
-              )}
+              <p className={styles.inviteDesc}>전화번호를 입력하면 초대 링크를 문자로 발송합니다.</p>
+              <input
+                type="tel"
+                placeholder="010-0000-0000"
+                value={invitePhone}
+                onChange={(e) => setInvitePhone(e.target.value)}
+                className={styles.phoneInput}
+              />
+              <button
+                className={styles.btnPrimary}
+                disabled={invitePhone.replace(/\D/g, '').length < 10}
+                onClick={sendInvite}
+              >
+                초대장 보내기
+              </button>
             </div>
           </div>
         </div>

@@ -128,6 +128,14 @@ export const mockReplies: RequestReply[] = [
     createdAt: '2026-06-29 16:10',
   },
   {
+    id: 'r3',
+    requestId: '2',
+    content: '금요일 마감은 제가 나갈게요. 2시간 일찍 퇴근하셔도 됩니다.',
+    authorName: '사장',
+    authorRole: 'OWNER',
+    createdAt: '2026-06-30 12:40',
+  },
+  {
     id: 'r2',
     requestId: '3',
     content: 'A/S 업체에 연락했습니다. 내일 오후 방문 예정입니다.',

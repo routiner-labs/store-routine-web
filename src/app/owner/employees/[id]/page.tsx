@@ -12,6 +12,7 @@ import {
   LiaUserMinusSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
+import { useToast } from '@/context/ToastContext'
 import styles from './page.module.css'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
@@ -19,6 +20,7 @@ const DOW = ['월', '화', '수', '목', '금', '토', '일']
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { showToast } = useToast()
 
   const emp = mockEmployees.find((e) => e.id === id)
 
@@ -30,7 +32,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [days, setDays] = useState(emp?.schedule?.days ?? [])
   const [startTime, setStartTime] = useState(emp?.schedule?.startTime ?? '09:00')
   const [endTime, setEndTime] = useState(emp?.schedule?.endTime ?? '18:00')
-  const [saved, setSaved] = useState(false)
 
   if (!emp) {
     return (
@@ -48,8 +49,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   }
 
   function handleSave() {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    showToast('저장되었습니다')
   }
 
   return (
@@ -61,10 +61,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </button>
           <span className={styles.headerTitle}>{name || '직원 상세'}</span>
           <button
-            className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`}
+            className={styles.saveBtn}
             onClick={handleSave}
           >
-            <LiaSaveSolid /> {saved ? '저장됨' : '저장'}
+            <LiaSaveSolid /> 저장
           </button>
         </div>
       </header>
@@ -98,7 +98,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
           <div className={styles.leftActions}>
             <button className={styles.btnSave} onClick={handleSave}>
-              {saved ? '저장됨' : '저장하기'}
+              저장하기
             </button>
             {status === 'ACTIVE' && (
               <button className={styles.btnTerminate} onClick={() => setStatus('INACTIVE')}>
@@ -218,7 +218,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           {/* 모바일 전용 액션 버튼 */}
           <div className={styles.mobileActions}>
             <button className={styles.btnSave} onClick={handleSave}>
-              {saved ? '저장됨' : '저장하기'}
+              저장하기
             </button>
             {status === 'ACTIVE' && (
               <button className={styles.btnTerminate} onClick={() => setStatus('INACTIVE')}>

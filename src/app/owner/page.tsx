@@ -41,7 +41,7 @@ type HomeModal =
 export default function OwnerHome() {
   const { currentStore } = useStore()
   const [requestFilter, setRequestFilter] = useState<RequestFilter | null>('pending')
-  const [openTaskList, setOpenTaskList] = useState<'COMMON' | 'EXTRA' | null>(null)
+  const [openTaskLists, setOpenTaskLists] = useState<Set<'COMMON' | 'EXTRA' | 'UNASSIGNED'>>(new Set())
   const [modal, setModal] = useState<HomeModal | null>(null)
 
   // 업무리스트 페이지와 동일한 오늘자 업무 데이터
@@ -50,7 +50,8 @@ export default function OwnerHome() {
   const extraTasks = todayTasks.filter((t) => t.kind === 'EXTRA')
   const commonDone = commonTasks.filter((t) => t.done).length
   const extraDone = extraTasks.filter((t) => t.done).length
-  const unassignedCount = todayTasks.filter((t) => t.assigneeIds.length === 0).length
+  const unassignedTasks = todayTasks.filter((t) => t.assigneeIds.length === 0)
+  const unassignedCount = unassignedTasks.length
 
   const empNameById = (empId: string) => mockEmployees.find((e) => e.id === empId)?.name ?? ''
 
@@ -60,8 +61,16 @@ export default function OwnerHome() {
     return `${empNameById(assigneeIds[0])} 외 ${assigneeIds.length - 1}명`
   }
 
-  function toggleTaskList(kind: 'COMMON' | 'EXTRA') {
-    setOpenTaskList((prev) => (prev === kind ? null : kind))
+  function toggleTaskList(kind: 'COMMON' | 'EXTRA' | 'UNASSIGNED') {
+    setOpenTaskLists((prev) => {
+      const next = new Set(prev)
+      if (next.has(kind)) {
+        next.delete(kind)
+      } else {
+        next.add(kind)
+      }
+      return next
+    })
   }
 
   const pendingRequests = mockRequests.filter((r) => r.status === 'REQUESTED')
@@ -175,7 +184,7 @@ export default function OwnerHome() {
                 >
                   <span className={styles.taskLabel}>
                     {label}
-                    <span className={`${styles.taskChevron} ${openTaskList === kind ? styles.taskChevronOpen : ''}`}>›</span>
+                    <span className={`${styles.taskChevron} ${openTaskLists.has(kind) ? styles.taskChevronOpen : ''}`}>›</span>
                   </span>
                   <span className={styles.taskRight}>
                     <span className={styles.progressBar}>
@@ -187,7 +196,7 @@ export default function OwnerHome() {
                     <span className={styles.progressText}>{done}/{tasks.length}</span>
                   </span>
                 </button>
-                <div className={`${styles.taskSubWrap} ${openTaskList === kind ? styles.taskSubWrapOpen : ''}`}>
+                <div className={`${styles.taskSubWrap} ${openTaskLists.has(kind) ? styles.taskSubWrapOpen : ''}`}>
                   <div className={styles.taskSubList}>
                     {tasks.length === 0 ? (
                       <p className={styles.emptyText}>업무가 없습니다.</p>
@@ -210,11 +219,37 @@ export default function OwnerHome() {
                 </div>
               </div>
             ))}
-            <div className={styles.taskRow}>
-              <span className={styles.taskLabel}>미할당 업무</span>
-              <span className={unassignedCount > 0 ? styles.unassignedAlert : styles.waitingText}>
-                {unassignedCount > 0 ? `${unassignedCount}건` : '없음'}
-              </span>
+            <div>
+              <button
+                type="button"
+                className={`${styles.taskRow} ${styles.taskRowToggle}`}
+                onClick={() => toggleTaskList('UNASSIGNED')}
+              >
+                <span className={styles.taskLabel}>
+                  미할당 업무
+                  <span className={`${styles.taskChevron} ${openTaskLists.has('UNASSIGNED') ? styles.taskChevronOpen : ''}`}>›</span>
+                </span>
+                <span className={unassignedCount > 0 ? styles.unassignedAlert : styles.waitingText}>
+                  {unassignedCount > 0 ? `${unassignedCount}건` : '없음'}
+                </span>
+              </button>
+              <div className={`${styles.taskSubWrap} ${openTaskLists.has('UNASSIGNED') ? styles.taskSubWrapOpen : ''}`}>
+                <div className={styles.taskSubList}>
+                  {unassignedTasks.length === 0 ? (
+                    <p className={styles.emptyText}>업무가 없습니다.</p>
+                  ) : (
+                    unassignedTasks.map((task) => (
+                      <div key={task.id} className={styles.taskSubRow}>
+                        <span className={`${styles.taskSubCheck} ${task.done ? styles.taskSubCheckDone : ''}`}>
+                          {task.done ? '✓' : ''}
+                        </span>
+                        <span className={styles.taskSubTitle} title={task.title}>{task.title}</span>
+                        <span className={styles.taskSubAssignee}>{task.kind === 'COMMON' ? '공통' : '추가'}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>

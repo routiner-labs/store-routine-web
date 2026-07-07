@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { LiaUserPlusSolid, LiaAngleRightSolid } from 'react-icons/lia'
 import { useStore } from '@/context/StoreContext'
 import { mockAttendance, mockRequests } from '@/mock/data'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
@@ -89,8 +90,6 @@ export default function OwnerHome() {
   function toggleFilter(filter: RequestFilter) {
     setRequestFilter((prev) => (prev === filter ? null : filter))
   }
-
-  const clockedInCount = mockAttendance.filter((r) => r.status === 'CLOCKED_IN').length
 
   const recentDocs = [...DOCUMENT_CATALOG]
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
@@ -281,20 +280,9 @@ export default function OwnerHome() {
         {/* ── 출근 현황 (가입 신청 건수 포함) ── */}
         <section className={`${styles.panel} ${styles.areaAttendance}`}>
           <div className={styles.panelHeader}>
-            <h2 className={styles.panelTitle}>
-              출근 현황
-              <span className={styles.count}>{clockedInCount}/{mockAttendance.length}</span>
-            </h2>
+            <h2 className={styles.panelTitle}>출근 현황</h2>
             <Link href="/owner/attendance" className={styles.panelLink}>전체 보기</Link>
           </div>
-          <button
-            type="button"
-            onClick={() => setModal({ kind: 'joins' })}
-            className={styles.joinSummary}
-          >
-            <span className={styles.joinSummaryLabel}>가입 신청</span>
-            <span className={styles.joinSummaryCount}>{mockJoinRequests.length}건</span>
-          </button>
           <div className={styles.panelBody}>
             {mockAttendance.map((record) => {
               const emp = mockEmployees.find((e) => e.name === record.employeeName)
@@ -324,6 +312,22 @@ export default function OwnerHome() {
               )
             })}
           </div>
+          <button
+            type="button"
+            onClick={() => setModal({ kind: 'joins' })}
+            className={styles.joinSummary}
+          >
+            <span className={`${styles.joinSummaryIcon} ${mockJoinRequests.length > 0 ? styles.joinSummaryIconAlert : ''}`}>
+              <LiaUserPlusSolid />
+            </span>
+            <span className={styles.joinSummaryBody}>
+              <span className={styles.joinSummaryLabel}>가입 신청</span>
+              <span className={styles.joinSummaryValue}>
+                {mockJoinRequests.length > 0 ? `${mockJoinRequests.length}건 대기 중` : '대기 중인 신청 없음'}
+              </span>
+            </span>
+            <LiaAngleRightSolid className={styles.joinSummaryArrow} />
+          </button>
         </section>
       </div>
 

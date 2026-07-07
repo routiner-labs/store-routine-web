@@ -20,6 +20,7 @@ import { mockEmployees } from '@/mock/employees'
 import { DEFAULT_CATEGORIES, registerTaskFromRequest, hasTaskForRequest, removeTasksForRequest } from '@/mock/tasks'
 import type { TaskKind } from '@/mock/tasks'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
+import DocumentDetailView from '@/app/owner/documents/DocumentDetailView'
 import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
@@ -94,6 +95,7 @@ export default function RequestDetailView({
   const [taskAdded, setTaskAdded] = useState(() => hasTaskForRequest(id))
   const [taskDocPickerOpen, setTaskDocPickerOpen] = useState(false)
   const [taskDocQuery, setTaskDocQuery] = useState('')
+  const [taskDocPreviewId, setTaskDocPreviewId] = useState<string | null>(null)
   const [taskMethodInitial, setTaskMethodInitial] = useState('')
   const taskMethodRef = useRef('')
   const { showToast } = useToast()
@@ -114,6 +116,17 @@ export default function RequestDetailView({
     )
   }
 
+  function filterTaskDocs(query: string) {
+    const q = query.trim().toLowerCase()
+    return DOCUMENT_CATALOG.filter((d) => !q || d.title.toLowerCase().includes(q))
+  }
+
+  function openTaskDocPicker() {
+    setTaskDocQuery('')
+    setTaskDocPreviewId(taskDocRefs[0] ?? DOCUMENT_CATALOG[0]?.id ?? null)
+    setTaskDocPickerOpen(true)
+  }
+
   if (!request) {
     return (
       <div className={styles.notFound}>
@@ -127,6 +140,7 @@ export default function RequestDetailView({
 
   const authorEmployee = mockEmployees.find((e) => e.name === request.employeeName)
   const [date, time] = request.createdAt.split(' ')
+  const filteredTaskDocs = filterTaskDocs(taskDocQuery)
 
   function changeStatus(next: RequestStatus) {
     const prevLabel = statusLabel[status]
@@ -649,7 +663,7 @@ export default function RequestDetailView({
                   <button
                     type="button"
                     className={styles.taskAddDocBtn}
-                    onClick={() => setTaskDocPickerOpen(true)}
+                    onClick={openTaskDocPicker}
                   >
                     문서 추가하기
                   </button>
@@ -687,42 +701,74 @@ export default function RequestDetailView({
         </div>
       )}
 
-      {/* 참조 문서 선택 팝업 */}
+      {/* 참조 문서 선택 팝업: 좌측 검색+리스트 고정, 우측 문서 내용 뷰어 */}
       {taskDocPickerOpen && (
         <div className={styles.popupOverlay} onClick={() => { setTaskDocPickerOpen(false); setTaskDocQuery('') }}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+          <div className={`${styles.popup} ${styles.taskDocPopup}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>참조 문서 선택</span>
               <button className={styles.popupClose} onClick={() => { setTaskDocPickerOpen(false); setTaskDocQuery('') }}>닫기</button>
             </div>
-            <div className={styles.taskDocSearch}>
-              <LiaSearchSolid className={styles.taskDocSearchIcon} />
-              <input
-                className={styles.taskDocSearchInput}
-                type="text"
-                placeholder="문서 제목 검색"
-                value={taskDocQuery}
-                onChange={(e) => setTaskDocQuery(e.target.value)}
-              />
-            </div>
-            <div className={styles.taskDocList}>
-              {DOCUMENT_CATALOG
-                .filter((d) => !taskDocQuery.trim() || d.title.toLowerCase().includes(taskDocQuery.trim().toLowerCase()))
-                .map((d) => {
-                  const on = taskDocRefs.includes(d.id)
-                  return (
-                    <button
-                      key={d.id}
-                      type="button"
-                      className={styles.taskDocRow}
-                      onClick={() => toggleTaskDocRef(d.id)}
-                    >
-                      <span className={styles.taskAddDocBadge}>{docCategoryName(d.id)}</span>
-                      <span className={styles.taskAddDocName}>{d.title}</span>
-                      {on && <LiaCheckSolid className={styles.taskDocCheck} />}
-                    </button>
-                  )
-                })}
+            <div className={styles.taskDocSplit}>
+              <div className={styles.taskDocListPane}>
+                <div className={styles.taskDocSearch}>
+                  <LiaSearchSolid className={styles.taskDocSearchIcon} />
+                  <input
+                    className={styles.taskDocSearchInput}
+                    type="text"
+                    placeholder="문서 제목 검색"
+                    value={taskDocQuery}
+                    onChange={(e) => {
+                      const q = e.target.value
+                      setTaskDocQuery(q)
+                      const filtered = filterTaskDocs(q)
+                      if (!filtered.some((d) => d.id === taskDocPreviewId)) {
+                        setTaskDocPreviewId(filtered[0]?.id ?? null)
+                      }
+                    }}
+                  />
+                </div>
+                <div className={styles.taskDocList}>
+                  {filteredTaskDocs.length === 0 ? (
+                    <p className={styles.taskDocEmpty}>검색 결과가 없습니다.</p>
+                  ) : (
+                    filteredTaskDocs.map((d) => {
+                      const on = taskDocRefs.includes(d.id)
+                      const active = taskDocPreviewId === d.id
+                      return (
+                        <div
+                          key={d.id}
+                          className={`${styles.taskDocRow} ${active ? styles.taskDocRowActive : ''}`}
+                        >
+                          <button
+                            type="button"
+                            className={styles.taskDocRowMain}
+                            onClick={() => setTaskDocPreviewId(d.id)}
+                          >
+                            <span className={styles.taskAddDocBadge}>{docCategoryName(d.id)}</span>
+                            <span className={styles.taskAddDocName}>{d.title}</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`${styles.taskDocToggle} ${on ? styles.taskDocToggleActive : ''}`}
+                            onClick={() => toggleTaskDocRef(d.id)}
+                            aria-label={on ? '참조 해제' : '참조 추가'}
+                          >
+                            <LiaCheckSolid />
+                          </button>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+              <div className={styles.taskDocViewerPane}>
+                {taskDocPreviewId ? (
+                  <DocumentDetailView id={taskDocPreviewId} mode="modal" />
+                ) : (
+                  <p className={styles.taskDocViewerHint}>왼쪽에서 문서를 선택하면 내용을 볼 수 있습니다.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

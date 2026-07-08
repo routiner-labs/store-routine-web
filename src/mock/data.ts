@@ -3,14 +3,15 @@ import type { Checklist, AttendanceRecord, SpecialInstruction, EmployeeRequest, 
 export interface RequestCategory {
   id: string
   name: string
+  color?: string // 뱃지 색상(hex). 없으면 중립(회색) 스타일
 }
 
 export const REQUEST_CATEGORIES: RequestCategory[] = [
-  { id: 'cat-material', name: '재료부족' },
-  { id: 'cat-equipment', name: '장비고장' },
-  { id: 'cat-schedule', name: '근무변경' },
-  { id: 'cat-customer', name: '고객이슈' },
-  { id: 'cat-facility', name: '청소시설' },
+  { id: 'cat-material', name: '재료부족', color: '#C2410C' },
+  { id: 'cat-equipment', name: '장비고장', color: '#B91C1C' },
+  { id: 'cat-schedule', name: '근무변경', color: '#3D63DD' },
+  { id: 'cat-customer', name: '고객이슈', color: '#6D28D9' },
+  { id: 'cat-facility', name: '청소시설', color: '#15803D' },
   { id: 'cat-etc', name: '기타' },
 ]
 

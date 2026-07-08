@@ -15,6 +15,7 @@ import {
   LiaBookSolid,
   LiaBarsSolid,
   LiaClockSolid,
+  LiaPaintBrushSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { getAttendanceForDate } from '@/mock/calendar'
@@ -48,7 +49,9 @@ import { LiaInboxSolid } from 'react-icons/lia'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import EmployeeName from '@/components/EmployeeName'
+import CategoryColorPicker from '@/components/CategoryColorPicker'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -448,21 +451,33 @@ export default function OwnerChecklists() {
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES)
   const [catManageOpen, setCatManageOpen] = useState(false)
   const [catDraft, setCatDraft] = useState('')
+  const [catDraftColor, setCatDraftColor] = useState<string | undefined>(undefined)
+  const [catColorPickingId, setCatColorPickingId] = useState<string | null>(null) // 카테고리 id 또는 'NEW'(추가 행)
   const catSeqRef = useRef(0)
 
   const categoryName = (id: TaskCategory) => categories.find((c) => c.id === id)?.name ?? '미분류'
+  const categoryColor = (id: TaskCategory) => categories.find((c) => c.id === id)?.color
 
   function addCategory() {
     const name = catDraft.trim()
     if (!name) return
     catSeqRef.current += 1
-    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name }])
+    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name, color: catDraftColor }])
     setCatDraft('')
+    setCatDraftColor(undefined)
     showToast('카테고리가 추가되었습니다')
   }
 
   function renameCategory(id: string, name: string) {
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)))
+  }
+
+  function setCategoryColor(id: string, color: string) {
+    if (id === 'NEW') {
+      setCatDraftColor(color)
+      return
+    }
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, color } : c)))
   }
 
   async function deleteCategory(id: string) {
@@ -1457,6 +1472,15 @@ export default function OwnerChecklists() {
             <div className={styles.catManageBody}>
               {categories.map((c) => (
                 <div key={c.id} className={styles.catManageRow}>
+                  <button
+                    type="button"
+                    className={styles.catColorBtn}
+                    style={categoryBadgeStyle(c.color)}
+                    onClick={() => setCatColorPickingId(c.id)}
+                    aria-label={`${c.name} 뱃지 색상 변경`}
+                  >
+                    <LiaPaintBrushSolid />
+                  </button>
                   <input
                     className={styles.catManageInput}
                     value={c.name}
@@ -1472,6 +1496,15 @@ export default function OwnerChecklists() {
                 </div>
               ))}
               <div className={styles.catAddRow}>
+                <button
+                  type="button"
+                  className={styles.catColorBtn}
+                  style={categoryBadgeStyle(catDraftColor)}
+                  onClick={() => setCatColorPickingId('NEW')}
+                  aria-label="새 카테고리 뱃지 색상 선택"
+                >
+                  <LiaPaintBrushSolid />
+                </button>
                 <input
                   className={styles.catManageInput}
                   value={catDraft}
@@ -1493,6 +1526,24 @@ export default function OwnerChecklists() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 뱃지 색상 선택 팝업 (스펙트럼 + RGB) */}
+      {catColorPickingId && (
+        <CategoryColorPicker
+          initialColor={
+            catColorPickingId === 'NEW'
+              ? catDraftColor
+              : categories.find((c) => c.id === catColorPickingId)?.color
+          }
+          previewText={
+            catColorPickingId === 'NEW'
+              ? catDraft.trim() || '새 카테고리'
+              : categoryName(catColorPickingId)
+          }
+          onApply={(hex) => setCategoryColor(catColorPickingId, hex)}
+          onClose={() => setCatColorPickingId(null)}
+        />
       )}
 
       {/* 담당자 선택 팝업 */}
@@ -1575,7 +1626,7 @@ export default function OwnerChecklists() {
                         } ${inactive ? styles.manageListItemOff : ''}`}
                         onClick={() => selectTask(tpl)}
                       >
-                        <span className={styles.catBadge}>
+                        <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(tpl.category ?? 'ETC'))}>
                           {categoryName(tpl.category ?? 'ETC')}
                         </span>
                         <span className={styles.manageListName}>{tpl.title}</span>
@@ -1585,7 +1636,7 @@ export default function OwnerChecklists() {
                   })}
                   {editingId === null && (
                     <div className={`${styles.manageListItem} ${styles.manageListItemActive}`}>
-                      <span className={styles.catBadge}>{categoryName(newCategory)}</span>
+                      <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(newCategory))}>{categoryName(newCategory)}</span>
                       <span className={styles.manageListName}>
                         {newTitle.trim() || '새 테스크'}
                       </span>
@@ -1670,7 +1721,7 @@ export default function OwnerChecklists() {
             <div className={styles.methodBody}>
               <div className={styles.methodTaskName}>{methodTask.title}</div>
               <div className={styles.methodMeta}>
-                <span className={styles.catBadge}>{categoryName(methodTask.category)}</span>
+                <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(methodTask.category))}>{categoryName(methodTask.category)}</span>
                 <span>{describeTiming(methodTask.timing)}</span>
                 <span>·</span>
                 <span>

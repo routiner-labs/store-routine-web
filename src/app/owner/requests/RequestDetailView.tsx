@@ -28,12 +28,13 @@ import type { RequestStatus, RequestType, RequestVisibility, RequestReply, Activ
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
 import EmployeeName from '@/components/EmployeeName'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import styles from './RequestDetailView.module.css'
 
 const REQUEST_TYPES: RequestType[] = REQUEST_CATEGORIES.map((c) => c.name)
 
-function typeTagClass(styles: Record<string, string>, type: string): string {
-  return styles[`type_${type}`] ?? styles.type_default
+function typeBadgeStyle(type: string) {
+  return categoryBadgeStyle(REQUEST_CATEGORIES.find((c) => c.name === type)?.color)
 }
 
 const statusLabel: Record<string, string> = {
@@ -326,7 +327,7 @@ export default function RequestDetailView({
           {/* 게시글 */}
           <article className={styles.post}>
             <div className={styles.postTopRow}>
-              <span className={`${styles.typeTag} ${typeTagClass(styles, type)}`}>
+              <span className={styles.typeTag} style={typeBadgeStyle(type)}>
                 {type}
               </span>
               {visibility === 'OWNER_ONLY' ? (

@@ -1577,6 +1577,23 @@
   color: var(--color-danger);
 }
 
+/* 뱃지 색상 선택(페인트붓) — 배경/글자색은 categoryBadgeStyle inline으로 적용 */
+.catColorBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: opacity 0.1s;
+}
+
+.catColorBtn:hover {
+  opacity: 0.8;
+}
+
 .catAddBtn {
   width: 36px;
   height: 36px;
@@ -1987,11 +2004,10 @@
   cursor: not-allowed;
 }
 
+/* 색상은 카테고리에 저장된 값으로 inline style 적용 (categoryBadgeStyle) */
 .catBadge {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-light);
   border-radius: 6px;
   padding: 2px 8px;
   flex-shrink: 0;

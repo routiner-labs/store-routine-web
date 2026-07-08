@@ -6,6 +6,7 @@ import { LiaAngleLeftSolid, LiaPencilAltSolid, LiaTrashAltSolid } from 'react-ic
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import DocumentForm from './DocumentForm'
 import EmployeeName from '@/components/EmployeeName'
 import styles from './DocumentDetailView.module.css'
@@ -14,6 +15,10 @@ const TODAY = '2026-07-02'
 
 function categoryName(id: string): string {
   return DOCUMENT_CATEGORIES.find((c) => c.id === id)?.name ?? '기타'
+}
+
+function categoryColor(id: string): string | undefined {
+  return DOCUMENT_CATEGORIES.find((c) => c.id === id)?.color
 }
 
 export default function DocumentDetailView({
@@ -106,7 +111,7 @@ export default function DocumentDetailView({
         <div className={styles.body}>
           <article className={styles.docCard}>
             <div className={styles.docHead}>
-              <span className={`${styles.catBadge} ${styles[`cat_${doc.category}`]}`}>
+              <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(doc.category))}>
                 {categoryName(doc.category)}
               </span>
               <h2 className={styles.title}>{doc.title}</h2>

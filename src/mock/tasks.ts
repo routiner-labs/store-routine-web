@@ -13,15 +13,16 @@ export type TaskCategory = string // 카테고리 id
 export interface Category {
   id: string
   name: string
+  color?: string // 뱃지 색상(hex). 없으면 중립(회색) 스타일
 }
 export const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'PREP', name: '준비' },
-  { id: 'CLEAN', name: '청소' },
-  { id: 'HYGIENE', name: '위생' },
-  { id: 'STOCK', name: '재고' },
-  { id: 'SAFETY', name: '안전' },
-  { id: 'CLOSE', name: '마감' },
-  { id: 'ETC', name: '기타' },
+  { id: 'PREP', name: '준비', color: '#3D63DD' },
+  { id: 'CLEAN', name: '청소', color: '#3D63DD' },
+  { id: 'HYGIENE', name: '위생', color: '#3D63DD' },
+  { id: 'STOCK', name: '재고', color: '#3D63DD' },
+  { id: 'SAFETY', name: '안전', color: '#3D63DD' },
+  { id: 'CLOSE', name: '마감', color: '#3D63DD' },
+  { id: 'ETC', name: '기타', color: '#3D63DD' },
 ]
 
 export type RecurrenceFreq = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'

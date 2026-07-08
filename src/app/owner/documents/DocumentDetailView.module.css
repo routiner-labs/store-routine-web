@@ -180,25 +180,14 @@
   border: 1px solid var(--color-border);
 }
 
-/* ── 카테고리 뱃지 ── */
+/* ── 카테고리 뱃지 (색상은 categoryBadgeStyle inline으로 적용) ── */
 .catBadge {
   font-size: 11px;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 6px;
   white-space: nowrap;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
 }
-
-.cat_POS        { background: var(--color-primary-light); color: var(--color-primary); }
-.cat_SERVICE    { background: #F5F3FF; color: #6D28D9; }
-.cat_CLEAN      { background: #F0FDF4; color: #15803D; }
-.cat_STOCK      { background: #ECFEFF; color: #0E7490; }
-.cat_SAFETY     { background: #FEF2F2; color: #B91C1C; }
-.cat_RULE       { background: var(--color-warning-light); color: var(--color-warning); }
-.cat_MARKETING  { background: #FDF2F8; color: #BE185D; }
-.cat_ETC        { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 
 /* 홈 팝업(모달) 내부 컨테이너 */
 .viewModal {

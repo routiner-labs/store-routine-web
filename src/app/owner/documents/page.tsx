@@ -13,14 +13,17 @@ import {
   LiaTrashAltSolid,
   LiaSlidersHSolid,
   LiaUsersSolid,
+  LiaPaintBrushSolid,
 } from 'react-icons/lia'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { useHoverTooltip } from '@/lib/useHoverTooltip'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import EmployeeName from '@/components/EmployeeName'
 import MultiSelectFilter from '@/components/MultiSelectFilter'
 import DateRangeFilter from '@/components/DateRangeFilter'
+import CategoryColorPicker from '@/components/CategoryColorPicker'
 import { mockEmployees } from '@/mock/employees'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import type { StoreDocument, DocumentCategory } from '@/mock/documents'
@@ -33,16 +36,18 @@ function stripHtml(html: string): string {
 function DocumentRow({
   doc,
   categoryName,
+  categoryColor,
   onClick,
 }: {
   doc: StoreDocument
   categoryName: string
+  categoryColor?: string
   onClick: () => void
 }) {
   return (
     <button className={styles.listRow} onClick={onClick}>
       <div className={styles.listRowTop}>
-        <span className={`${styles.catBadge} ${styles[`cat_${doc.category}`]}`}>{categoryName}</span>
+        <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor)}>{categoryName}</span>
         <span className={styles.listRowTitle}>{doc.title}</span>
       </div>
       <p className={styles.listRowPreview}>{stripHtml(doc.content)}</p>
@@ -76,6 +81,8 @@ export default function OwnerDocuments() {
   const [fabOpen, setFabOpen] = useState(false)
   const [catManageOpen, setCatManageOpen] = useState(false)
   const [catDraft, setCatDraft] = useState('')
+  const [catDraftColor, setCatDraftColor] = useState<string | undefined>(undefined)
+  const [catColorPickingId, setCatColorPickingId] = useState<string | null>(null) // 카테고리 id 또는 'NEW'(추가 행)
   const catSeqRef = useRef(0)
 
   useScrollLock(catManageOpen)
@@ -87,6 +94,7 @@ export default function OwnerDocuments() {
   } = useHoverTooltip<HTMLSpanElement>()
 
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? '기타'
+  const categoryColor = (id: string) => categories.find((c) => c.id === id)?.color
   const knownAuthorNames = new Set(mockEmployees.map((e) => e.name))
 
   function addAuthorTag(name: string) {
@@ -140,13 +148,22 @@ export default function OwnerDocuments() {
     const name = catDraft.trim()
     if (!name) return
     catSeqRef.current += 1
-    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name }])
+    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name, color: catDraftColor }])
     setCatDraft('')
+    setCatDraftColor(undefined)
     showToast('카테고리가 추가되었습니다')
   }
 
   function renameCategory(id: string, name: string) {
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)))
+  }
+
+  function setCategoryColor(id: string, color: string) {
+    if (id === 'NEW') {
+      setCatDraftColor(color)
+      return
+    }
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, color } : c)))
   }
 
   async function deleteCategory(id: string) {
@@ -320,6 +337,7 @@ export default function OwnerDocuments() {
                 key={doc.id}
                 doc={doc}
                 categoryName={categoryName(doc.category)}
+                categoryColor={categoryColor(doc.category)}
                 onClick={() => goToDetail(doc.id)}
               />
             ))}
@@ -395,6 +413,15 @@ export default function OwnerDocuments() {
             <div className={styles.catManageBody}>
               {categories.map((c) => (
                 <div key={c.id} className={styles.catManageRow}>
+                  <button
+                    type="button"
+                    className={styles.catColorBtn}
+                    style={categoryBadgeStyle(c.color)}
+                    onClick={() => setCatColorPickingId(c.id)}
+                    aria-label={`${c.name} 뱃지 색상 변경`}
+                  >
+                    <LiaPaintBrushSolid />
+                  </button>
                   <input
                     className={styles.catManageInput}
                     value={c.name}
@@ -410,6 +437,15 @@ export default function OwnerDocuments() {
                 </div>
               ))}
               <div className={styles.catAddRow}>
+                <button
+                  type="button"
+                  className={styles.catColorBtn}
+                  style={categoryBadgeStyle(catDraftColor)}
+                  onClick={() => setCatColorPickingId('NEW')}
+                  aria-label="새 카테고리 뱃지 색상 선택"
+                >
+                  <LiaPaintBrushSolid />
+                </button>
                 <input
                   className={styles.catManageInput}
                   value={catDraft}
@@ -431,6 +467,24 @@ export default function OwnerDocuments() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 뱃지 색상 RGB 조정 팝업 */}
+      {catColorPickingId && (
+        <CategoryColorPicker
+          initialColor={
+            catColorPickingId === 'NEW'
+              ? catDraftColor
+              : categories.find((c) => c.id === catColorPickingId)?.color
+          }
+          previewText={
+            catColorPickingId === 'NEW'
+              ? catDraft.trim() || '새 카테고리'
+              : categoryName(catColorPickingId)
+          }
+          onApply={(hex) => setCategoryColor(catColorPickingId, hex)}
+          onClose={() => setCatColorPickingId(null)}
+        />
       )}
     </div>
   )

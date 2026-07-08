@@ -1,16 +1,17 @@
 export interface DocumentCategory {
   id: string
   name: string
+  color?: string // 뱃지 색상(hex). 없으면 중립(회색) 스타일
 }
 
 export const DOCUMENT_CATEGORIES: DocumentCategory[] = [
-  { id: 'POS', name: '포스·결제' },
-  { id: 'SERVICE', name: '고객 응대' },
-  { id: 'CLEAN', name: '청소·시설' },
-  { id: 'STOCK', name: '재고·보관' },
-  { id: 'SAFETY', name: '안전·비상' },
-  { id: 'RULE', name: '매장 운영 규칙' },
-  { id: 'MARKETING', name: '이벤트·마케팅' },
+  { id: 'POS', name: '포스·결제', color: '#3D63DD' },
+  { id: 'SERVICE', name: '고객 응대', color: '#6D28D9' },
+  { id: 'CLEAN', name: '청소·시설', color: '#15803D' },
+  { id: 'STOCK', name: '재고·보관', color: '#0E7490' },
+  { id: 'SAFETY', name: '안전·비상', color: '#B91C1C' },
+  { id: 'RULE', name: '매장 운영 규칙', color: '#D97706' },
+  { id: 'MARKETING', name: '이벤트·마케팅', color: '#BE185D' },
   { id: 'ETC', name: '기타' },
 ]
 

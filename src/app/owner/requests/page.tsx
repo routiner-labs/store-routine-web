@@ -6,18 +6,20 @@ import { useRouter } from 'next/navigation'
 import {
   LiaThLargeSolid, LiaListSolid, LiaLockSolid, LiaUsersSolid,
   LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid, LiaInfoCircleSolid,
-  LiaPlusSolid, LiaCogSolid, LiaFileAltSolid, LiaTrashAltSolid,
+  LiaPlusSolid, LiaCogSolid, LiaFileAltSolid, LiaTrashAltSolid, LiaPaintBrushSolid,
 } from 'react-icons/lia'
 import { mockRequests, REQUEST_CATEGORIES } from '@/mock/data'
 import type { RequestCategory } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { useHoverTooltip } from '@/lib/useHoverTooltip'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import EmployeeName from '@/components/EmployeeName'
 import MultiSelectFilter from '@/components/MultiSelectFilter'
 import DateRangeFilter from '@/components/DateRangeFilter'
+import CategoryColorPicker from '@/components/CategoryColorPicker'
 import type { EmployeeRequest, RequestType, RequestStatus, RequestVisibility } from '@/types'
 import styles from './page.module.css'
 
@@ -46,10 +48,6 @@ const VISIBILITY_OPTIONS: Array<{ value: VisibilityFilter; label: string }> = [
   { value: 'ALL', label: '전체공개' },
 ]
 
-function typeTagClass(type: string): string {
-  return styles[`type_${type}`] ?? styles.type_default
-}
-
 function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
@@ -67,7 +65,7 @@ function VisibilityIcon({ visibility }: { visibility: string }) {
   )
 }
 
-function CardItem({ request, onClick }: { request: EmployeeRequest; onClick: () => void }) {
+function CardItem({ request, typeStyle, onClick }: { request: EmployeeRequest; typeStyle: React.CSSProperties; onClick: () => void }) {
   const [date, time] = request.createdAt.split(' ')
   const isUnread = request.status === 'REQUESTED'
   return (
@@ -77,7 +75,7 @@ function CardItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
     >
       <div className={styles.cardTop}>
         <div className={styles.cardTags}>
-          <span className={`${styles.typeTag} ${typeTagClass(request.type)}`}>
+          <span className={styles.typeTag} style={typeStyle}>
             {request.type}
           </span>
         </div>
@@ -97,7 +95,7 @@ function CardItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
   )
 }
 
-function ListItem({ request, onClick }: { request: EmployeeRequest; onClick: () => void }) {
+function ListItem({ request, typeStyle, onClick }: { request: EmployeeRequest; typeStyle: React.CSSProperties; onClick: () => void }) {
   const [date, time] = request.createdAt.split(' ')
   const isUnread = request.status === 'REQUESTED'
   return (
@@ -105,7 +103,7 @@ function ListItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
       className={`${styles.listRow} ${isUnread ? styles.listRowUnread : ''}`}
       onClick={onClick}
     >
-      <span className={`${styles.listTypeBadge} ${typeTagClass(request.type)}`}>
+      <span className={styles.listTypeBadge} style={typeStyle}>
         {request.type}
       </span>
       <p className={styles.listPreview}>{request.content}</p>
@@ -123,8 +121,9 @@ function ListItem({ request, onClick }: { request: EmployeeRequest; onClick: () 
   )
 }
 
-function KanbanCard({ request, onClick, onDragStart, onDragEnd, dragging }: {
+function KanbanCard({ request, typeStyle, onClick, onDragStart, onDragEnd, dragging }: {
   request: EmployeeRequest
+  typeStyle: React.CSSProperties
   onClick: () => void
   onDragStart: () => void
   onDragEnd: () => void
@@ -140,7 +139,7 @@ function KanbanCard({ request, onClick, onDragStart, onDragEnd, dragging }: {
       onDragEnd={onDragEnd}
     >
       <div className={styles.kanbanCardTop}>
-        <span className={`${styles.typeTag} ${typeTagClass(request.type)}`}>{request.type}</span>
+        <span className={styles.typeTag} style={typeStyle}>{request.type}</span>
         <VisibilityIcon visibility={request.visibility} />
       </div>
       <p className={styles.kanbanCardContent}>{request.content}</p>
@@ -176,6 +175,8 @@ export default function OwnerRequests() {
   const [fabOpen, setFabOpen] = useState(false)
   const [catManageOpen, setCatManageOpen] = useState(false)
   const [catDraft, setCatDraft] = useState('')
+  const [catDraftColor, setCatDraftColor] = useState<string | undefined>(undefined)
+  const [catColorPickingId, setCatColorPickingId] = useState<string | null>(null) // 카테고리 id 또는 'NEW'(추가 행)
   const catSeqRef = useRef(0)
   const confirm = useConfirm()
   const { showToast } = useToast()
@@ -190,6 +191,9 @@ export default function OwnerRequests() {
 
   const availableTypes: RequestType[] = [...new Set(requests.map((r) => r.type))]
   const knownAuthorNames = new Set(mockEmployees.map((e) => e.name))
+
+  // 요청은 카테고리 "이름"을 저장하므로 이름으로 색을 찾는다. 목록에 없는 이름(삭제된 카테고리 등)은 중립 스타일.
+  const typeStyleOf = (typeName: string) => categoryBadgeStyle(categories.find((c) => c.name === typeName)?.color)
 
   function addAuthorTag(name: string) {
     const v = name.trim()
@@ -266,13 +270,22 @@ export default function OwnerRequests() {
     const name = catDraft.trim()
     if (!name) return
     catSeqRef.current += 1
-    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name }])
+    setCategories((prev) => [...prev, { id: `cat-${catSeqRef.current}`, name, color: catDraftColor }])
     setCatDraft('')
+    setCatDraftColor(undefined)
     showToast('카테고리가 추가되었습니다')
   }
 
   function renameCategory(id: string, name: string) {
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)))
+  }
+
+  function setCategoryColor(id: string, color: string) {
+    if (id === 'NEW') {
+      setCatDraftColor(color)
+      return
+    }
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, color } : c)))
   }
 
   async function deleteCategory(id: string) {
@@ -290,13 +303,13 @@ export default function OwnerRequests() {
     if (view === 'card') {
       return (
         <div className={styles.cardGrid}>
-          {items.map((r) => <CardItem key={r.id} request={r} onClick={() => goToDetail(r.id)} />)}
+          {items.map((r) => <CardItem key={r.id} request={r} typeStyle={typeStyleOf(r.type)} onClick={() => goToDetail(r.id)} />)}
         </div>
       )
     }
     return (
       <div className={styles.listGroup}>
-        {items.map((r) => <ListItem key={r.id} request={r} onClick={() => goToDetail(r.id)} />)}
+        {items.map((r) => <ListItem key={r.id} request={r} typeStyle={typeStyleOf(r.type)} onClick={() => goToDetail(r.id)} />)}
       </div>
     )
   }
@@ -555,6 +568,7 @@ export default function OwnerRequests() {
                     <KanbanCard
                       key={r.id}
                       request={r}
+                      typeStyle={typeStyleOf(r.type)}
                       onClick={() => goToDetail(r.id)}
                       onDragStart={() => handleDragStart(r.id)}
                       onDragEnd={handleDragEnd}
@@ -636,6 +650,15 @@ export default function OwnerRequests() {
             <div className={styles.catManageBody}>
               {categories.map((c) => (
                 <div key={c.id} className={styles.catManageRow}>
+                  <button
+                    type="button"
+                    className={styles.catColorBtn}
+                    style={categoryBadgeStyle(c.color)}
+                    onClick={() => setCatColorPickingId(c.id)}
+                    aria-label={`${c.name} 뱃지 색상 변경`}
+                  >
+                    <LiaPaintBrushSolid />
+                  </button>
                   <input
                     className={styles.catManageInput}
                     value={c.name}
@@ -651,6 +674,15 @@ export default function OwnerRequests() {
                 </div>
               ))}
               <div className={styles.catAddRow}>
+                <button
+                  type="button"
+                  className={styles.catColorBtn}
+                  style={categoryBadgeStyle(catDraftColor)}
+                  onClick={() => setCatColorPickingId('NEW')}
+                  aria-label="새 카테고리 뱃지 색상 선택"
+                >
+                  <LiaPaintBrushSolid />
+                </button>
                 <input
                   className={styles.catManageInput}
                   value={catDraft}
@@ -672,6 +704,24 @@ export default function OwnerRequests() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 뱃지 색상 선택 팝업 (스펙트럼 + RGB) */}
+      {catColorPickingId && (
+        <CategoryColorPicker
+          initialColor={
+            catColorPickingId === 'NEW'
+              ? catDraftColor
+              : categories.find((c) => c.id === catColorPickingId)?.color
+          }
+          previewText={
+            catColorPickingId === 'NEW'
+              ? catDraft.trim() || '새 카테고리'
+              : categories.find((c) => c.id === catColorPickingId)?.name ?? ''
+          }
+          onApply={(hex) => setCategoryColor(catColorPickingId, hex)}
+          onClose={() => setCatColorPickingId(null)}
+        />
       )}
     </div>
   )

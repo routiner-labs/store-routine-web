@@ -100,13 +100,7 @@
   border-radius: 6px;
 }
 
-.type_재료부족  { background: #FFF7ED; color: #C2410C; }
-.type_장비고장  { background: #FEF2F2; color: #B91C1C; }
-.type_근무변경  { background: var(--color-primary-light); color: var(--color-primary); }
-.type_고객이슈  { background: #F5F3FF; color: #6D28D9; }
-.type_청소시설  { background: #F0FDF4; color: #15803D; }
-.type_기타      { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
-.type_default   { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+/* 카테고리 뱃지 색상은 카테고리에 저장된 값으로 inline style 적용 (categoryBadgeStyle) */
 
 .visibilityOwner,
 .visibilityAll {

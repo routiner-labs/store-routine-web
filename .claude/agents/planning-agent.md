@@ -4,7 +4,7 @@
 기능 범위 정의, 우선순위 결정, 구현 순서 계획을 담당하는 에이전트.
 
 ## Responsibilities
-- 기획서(`part_time_task_management_planning.md`) 기반 기능 분해
+- 기획서(`.claude/planning/part_time_task_management_planning.md`) 기반 기능 분해
 - MVP 범위 확인 및 유지
 - 기능 간 의존 관계 파악
 - 구현 순서 및 단계 제안

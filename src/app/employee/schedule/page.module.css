@@ -42,6 +42,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
@@ -151,6 +152,7 @@
 
 .patternCard {
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   padding: 16px;

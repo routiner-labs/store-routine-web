@@ -49,6 +49,7 @@
   display: flex;
   flex-direction: column;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;

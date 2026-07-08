@@ -121,6 +121,7 @@
 .row {
   display: block;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: var(--shadow-sm);
@@ -144,12 +145,12 @@
 }
 
 .cat_POS        { background: var(--color-primary-light); color: var(--color-primary); }
-.cat_SERVICE    { background: #F5F3FF; color: #6D28D9; }
-.cat_CLEAN      { background: #F0FDF4; color: #15803D; }
-.cat_STOCK      { background: #ECFEFF; color: #0E7490; }
-.cat_SAFETY     { background: #FEF2F2; color: #B91C1C; }
+.cat_SERVICE    { background: rgba(109, 40, 217, 0.12); color: color-mix(in srgb, #6D28D9 var(--category-badge-text-mix, 100%), #fff); }
+.cat_CLEAN      { background: rgba(21, 128, 61, 0.12); color: color-mix(in srgb, #15803D var(--category-badge-text-mix, 100%), #fff); }
+.cat_STOCK      { background: rgba(14, 116, 144, 0.12); color: color-mix(in srgb, #0E7490 var(--category-badge-text-mix, 100%), #fff); }
+.cat_SAFETY     { background: rgba(185, 28, 28, 0.12); color: color-mix(in srgb, #B91C1C var(--category-badge-text-mix, 100%), #fff); }
 .cat_RULE       { background: var(--color-warning-light); color: var(--color-warning); }
-.cat_MARKETING  { background: #FDF2F8; color: #BE185D; }
+.cat_MARKETING  { background: rgba(190, 24, 93, 0.12); color: color-mix(in srgb, #BE185D var(--category-badge-text-mix, 100%), #fff); }
 .cat_ETC        { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 
 .rowTitle {

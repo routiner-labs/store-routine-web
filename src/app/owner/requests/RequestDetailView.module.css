@@ -580,6 +580,7 @@
 
 .popup {
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: 16px;
   width: 100%;
   max-width: 340px;

@@ -19,6 +19,7 @@ import {
 import type { IconType } from 'react-icons'
 import { useNotification } from '@/context/NotificationContext'
 import type { NotificationType } from '@/context/NotificationContext'
+import SystemSettings from '@/components/SystemSettings'
 import styles from '../owner/OwnerNav.module.css'
 
 type NavItem = { href: string; label: string; icon: IconType; exact?: boolean }
@@ -96,6 +97,7 @@ export default function EmployeeNav() {
         <div className={styles.userSection}>
           <span className={styles.userAvatar}>이</span>
           <span className={styles.userName}>이지은</span>
+          <SystemSettings />
         </div>
       </nav>
 

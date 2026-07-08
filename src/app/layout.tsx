@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ToastProvider } from '@/context/ToastContext'
 import { NotificationProvider } from '@/context/NotificationContext'
 import { ConfirmProvider } from '@/context/ConfirmContext'
+import { ThemeProvider } from '@/context/ThemeContext'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,13 +12,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body>
-        <NotificationProvider>
-          <ToastProvider>
-            <ConfirmProvider>{children}</ConfirmProvider>
-          </ToastProvider>
-        </NotificationProvider>
+        {/* 첫 페인트 전에 저장된 테마를 적용해 라이트→다크 깜빡임을 막는다 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}`,
+          }}
+        />
+        <ThemeProvider>
+          <NotificationProvider>
+            <ToastProvider>
+              <ConfirmProvider>{children}</ConfirmProvider>
+            </ToastProvider>
+          </NotificationProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

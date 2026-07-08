@@ -158,6 +158,7 @@
 .row {
   display: block;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: var(--shadow-sm);
@@ -178,11 +179,11 @@
   border-radius: 6px;
 }
 
-.type_재료부족 { background: #FFF7ED; color: #C2410C; }
-.type_장비고장 { background: #FEF2F2; color: #B91C1C; }
+.type_재료부족 { background: rgba(194, 65, 12, 0.12); color: color-mix(in srgb, #C2410C var(--category-badge-text-mix, 100%), #fff); }
+.type_장비고장 { background: rgba(185, 28, 28, 0.12); color: color-mix(in srgb, #B91C1C var(--category-badge-text-mix, 100%), #fff); }
 .type_근무변경 { background: var(--color-primary-light); color: var(--color-primary); }
-.type_고객이슈 { background: #F5F3FF; color: #6D28D9; }
-.type_청소시설 { background: #F0FDF4; color: #15803D; }
+.type_고객이슈 { background: rgba(109, 40, 217, 0.12); color: color-mix(in srgb, #6D28D9 var(--category-badge-text-mix, 100%), #fff); }
+.type_청소시설 { background: rgba(21, 128, 61, 0.12); color: color-mix(in srgb, #15803D var(--category-badge-text-mix, 100%), #fff); }
 .type_기타 { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 
 .statusBadge {

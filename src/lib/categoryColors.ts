@@ -19,7 +19,9 @@ export function rgbToHex(r: number, g: number, b: number): string {
   return `#${p(r)}${p(g)}${p(b)}`.toUpperCase()
 }
 
-// 뱃지에 inline style로 적용할 색상 값
+// 뱃지에 inline style로 적용할 색상 값.
+// 텍스트는 --category-badge-text-mix(라이트 100% = 원색, 다크 62% = 흰색을 섞어 밝게)로
+// 테마에 맞게 자동 보정된다.
 export function categoryBadgeStyle(color?: string): CSSProperties {
   if (!color) {
     return {
@@ -31,6 +33,6 @@ export function categoryBadgeStyle(color?: string): CSSProperties {
   const { r, g, b } = hexToRgb(color)
   return {
     background: `rgba(${r}, ${g}, ${b}, 0.12)`,
-    color,
+    color: `color-mix(in srgb, ${color} var(--category-badge-text-mix, 100%), #fff)`,
   }
 }

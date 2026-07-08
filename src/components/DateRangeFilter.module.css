@@ -84,6 +84,7 @@
   width: 100%;
   max-width: 320px;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-lg);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   display: flex;

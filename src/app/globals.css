@@ -1,4 +1,7 @@
 :root {
+  color-scheme: light;
+  /* 카테고리 뱃지 텍스트 혼합 비율 — 다크에서는 흰색을 섞어 밝게 만든다 (categoryBadgeStyle) */
+  --category-badge-text-mix: 100%;
   --color-primary: #3D63DD;
   --color-primary-light: #EEF3FF;
   --color-success: #059669;
@@ -12,6 +15,8 @@
   --color-text: #111827;
   --color-text-secondary: #6B7280;
   --color-border: #E5E7EB;
+  /* 그림자만으로 구분되는 카드의 외곽선 — 라이트에서는 투명, 다크에서는 보더로 경계를 살린다 */
+  --surface-outline: transparent;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -25,6 +30,30 @@
   --sidebar-lg: 220px;
   --content-max: 960px;
   --page-x: 16px;
+}
+
+/* ── 다크 모드 토큰 ──
+   같은 시맨틱 토큰을 어두운 값으로 재정의한다.
+   컴포넌트 CSS는 토큰만 사용하므로 여기만 바꾸면 앱 전체가 전환된다. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --category-badge-text-mix: 62%;
+  --color-primary: #6D87F0;
+  --color-primary-light: #202B4E;
+  --color-success: #34D399;
+  --color-success-light: #102E24;
+  --color-warning: #FBBF24;
+  --color-warning-light: #33270F;
+  --color-danger: #F87171;
+  --color-danger-light: #3A1D1D;
+  --color-bg: #101216;
+  --color-surface: #1A1D24;
+  --color-text: #E7E9EF;
+  --color-text-secondary: #9BA1AF;
+  --color-border: #3D4352;
+  --surface-outline: #3D4352;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 @media (min-width: 768px) {
@@ -55,6 +84,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* 테마 전환 시 색이 한 번에 확 바뀌지 않고 서서히 넘어가도록.
+   개별 컴포넌트가 자체 transition을 선언한 경우 그쪽이 우선된다(빠른 hover 등 유지). */
+body,
+body *,
+body *::before,
+body *::after {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 a {

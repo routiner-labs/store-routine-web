@@ -110,6 +110,7 @@
   align-items: center;
   gap: 14px;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: var(--shadow-sm);
@@ -168,7 +169,7 @@
   width: 100%;
   text-align: left;
   background: var(--color-warning-light);
-  border: 1px solid #FDE68A;
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
   border-radius: var(--radius-md);
   padding: 14px 16px;
 }
@@ -194,7 +195,7 @@
   flex-shrink: 0;
 }
 
-.ist_READ { color: var(--color-warning); background: #FEF3C7; }
+.ist_READ { color: var(--color-warning); background: var(--color-warning-light); }
 .ist_DONE { color: var(--color-success); background: var(--color-success-light); }
 
 /* ─── 내 요청 현황 ─── */
@@ -217,6 +218,7 @@
 
 .myRequestList {
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -299,6 +301,7 @@
 
 .popup {
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: 16px;
   width: 100%;
   max-width: 340px;
@@ -384,6 +387,7 @@
   justify-content: center;
   gap: 8px;
   background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
   border-radius: var(--radius-md);
   padding: 18px 12px;
   box-shadow: var(--shadow-sm);

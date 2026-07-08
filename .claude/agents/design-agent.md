@@ -375,8 +375,47 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
   - 트리거가 이미 충분히 넓어 카드 내용과 폭이 맞으면(카테고리/유형/상태) `left` + `width`(트리거와 동일 폭)로 배치.
   - 트리거(뱃지)가 카드보다 좁으면(작성자 요약 뱃지) `right`(뷰포트 우측 끝 기준 거리)로 배치해 우측 끝을 맞추고 카드는 `min-width`만큼 좌측으로 자라나게 한다. `left`+`width`를 쓰면 좁은 트리거 폭에 카드가 눌려 우측 끝이 어긋난다.
 
+## 다크 모드
+
+다크 모드는 **모든 페이지의 기본 요구사항**이다. 새 페이지/컴포넌트를 설계·구현할 때 라이트만 만들고 끝내지 않는다 — 두 테마 모두에서 확인하는 것까지가 작업 완료 조건이다.
+
+### 동작 구조
+
+- 테마는 `documentElement`의 `data-theme` 속성(`light`/`dark`)으로 전환된다. 모든 토큰이 `globals.css`의 `:root[data-theme='dark']`에서 어두운 값으로 재정의되므로, **토큰만 쓰면 컴포넌트는 아무 것도 안 해도 다크 모드가 된다.**
+- 상태 관리: `src/context/ThemeContext.tsx`(`useTheme()` — `theme`/`setTheme`). localStorage `theme` 키로 유지되고, `src/app/layout.tsx`의 인라인 스크립트가 첫 페인트 전에 적용해 깜빡임을 막는다.
+- 설정 UI: 사이드바 좌측 하단(종 모양 왼쪽) 톱니바퀴 → "시스템 설정" 팝업(`src/components/SystemSettings.tsx`, 좌측 설정 항목 / 우측 상세 조정) → 테마 → 다크 모드 활성화/비활성화.
+- 테마 전환 시 급격한 색 변화를 막기 위해 globals.css에서 전역 `background-color/color/border-color 0.25s` 트랜지션을 건다. 개별 컴포넌트가 자체 `transition`을 선언하면 그쪽이 우선(빠른 hover 유지)이므로 신경쓸 필요 없다.
+
+### 토큰 이중 정의 (globals.css)
+
+| 토큰 | 라이트 | 다크 |
+|---|---|---|
+| `--color-primary` | `#3D63DD` | `#6D87F0` |
+| `--color-primary-light` | `#EEF3FF` | `#202B4E` |
+| `--color-success` / `-light` | `#059669` / `#ECFDF5` | `#34D399` / `#102E24` |
+| `--color-warning` / `-light` | `#D97706` / `#FFFBEB` | `#FBBF24` / `#33270F` |
+| `--color-danger` / `-light` | `#DC2626` / `#FEF2F2` | `#F87171` / `#3A1D1D` |
+| `--color-bg` | `#F3F4F8` | `#101216` |
+| `--color-surface` | `#FFFFFF` | `#1A1D24` |
+| `--color-text` | `#111827` | `#E7E9EF` |
+| `--color-text-secondary` | `#6B7280` | `#9BA1AF` |
+| `--color-border` | `#E5E7EB` | `#3D4352` (다크에서 경계가 흐릿하지 않도록 충분히 밝게) |
+| `--category-badge-text-mix` | `100%` | `62%` (뱃지 텍스트에 흰색을 섞어 밝게) |
+
+`color-scheme`도 함께 전환되어 네이티브 컨트롤(date/checkbox/select 등)이 자동으로 다크 스타일을 쓴다.
+
+### 다크 모드 설계 규칙
+
+1. **색은 반드시 토큰으로.** `#fff`, `#F3F4F8` 같은 표면/배경/텍스트/보더 하드코딩 금지. 라이트에서 흰 배경이 필요하면 `var(--color-surface)`, 회색 배경은 `var(--color-bg)`.
+2. **예외적으로 허용되는 하드코딩**: 컬러 배경 위 흰 텍스트(`color: #fff` on primary 버튼), 오버레이(`rgba(0,0,0,0.4)`), 다크 툴팁(`rgba(20,20,20,0.85)` + 흰 텍스트) — 이들은 양쪽 테마에서 모두 성립한다.
+3. **옅은 색 배경/보더가 필요하면 고정 파스텔 hex를 쓰지 말 것.** 배경은 `rgba(r, g, b, 0.12)` 틴트(카테고리 뱃지 방식), 보더는 `color-mix(in srgb, var(--color-danger) 35%, transparent)` 방식 — 이러면 다크에서도 자연스럽다.
+4. **카테고리 뱃지처럼 데이터가 색을 가지는 경우** `categoryBadgeStyle()`(src/lib/categoryColors.ts)을 재사용한다. 이미 `--category-badge-text-mix`로 다크에서 텍스트를 밝게 보정한다.
+5. **새 토큰이 필요하면** 라이트/다크 양쪽 값을 반드시 함께 정의하고 위 표에 추가한다.
+6. **검증**: 페이지를 만들었으면 시스템 설정에서 다크 모드를 켜고 실제로 확인한다. 특히 보더 경계, 옅은 배경 위 텍스트, 그림자 대비를 본다.
+
+---
+
 ### 향후 확장 고려사항
 
-- **다크 모드**: blue-900(`#162577`)을 배경으로, blue-300(`#93A8FA`)을 프라이머리로 전환
 - **알바생 전용 테마**: 현재 사장과 같은 블루 계열 사용. 구분이 필요하면 알바생은 teal 계열 검토 가능
 - **매장별 컬러**: 향후 매장마다 색상 커스터마이징이 필요할 경우 CSS custom property 레이어 분리

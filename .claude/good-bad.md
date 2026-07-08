@@ -10,6 +10,7 @@
 - 모든 컨펌 창의 버튼 배치는 컨펌(확인/삭제) 버튼이 왼쪽, 취소 버튼이 오른쪽이다.
 - 삭제·저장·추가 등 사용자 액션이 완료되면 토스트 메세지로 결과를 알린다. 공용 `useToast()`(`src/context/ToastContext.tsx`)를 사용한다.
 - 무언가 작성하거나 설정하는(새로 만들기, 관리 등) 버튼은 기본적으로 화면 우측 하단 FAB(플로팅 버튼)에 둔다. `src/app/owner/checklists/page.module.css`의 `.fabWrap`/`.fab`/`.fabActive`/`.fabOverlay`/`.fabMenu`/`.fabMenuItem` 패턴과 위치(모바일: `right:16px; bottom: calc(var(--nav-height) + 16px)`, 태블릿+(`min-width:768px`): `right:28px; bottom:28px`)를 그대로 따른다. 옵션이 여러 개면 FAB 클릭 시 메뉴(`fabMenu`)를 펼치고, 옵션이 하나면 FAB 버튼 클릭이 바로 그 액션으로 이동한다.
+- 모든 페이지/컴포넌트는 다크 모드까지 기본으로 지원해야 한다. 색은 반드시 CSS 토큰(`--color-*`)만 쓰고 표면/배경/텍스트/보더 색 하드코딩 금지, 옅은 배경·보더가 필요하면 rgba 틴트/`color-mix` 방식 사용. 작업 후 시스템 설정(사이드바 하단 톱니바퀴)에서 다크 모드를 켜고 실제 확인까지 해야 완료 — 상세 규칙은 `agents/design-agent.md`의 "다크 모드" 섹션 참고.
 - 세부검색(고급 검색) 패널은 이제 표준 패턴이 정해졌다. 새로 만들거나 손댈 때 반드시 이 패턴을 따른다 — 상세는 `agents/design-agent.md`의 "세부검색(Advanced Search) 패턴" 섹션 참고.
   - 항목 순서: 내용 → 작성자 → 기간 → 카테고리 (그 뒤에 페이지 고유 필드, 예: 상태/공개범위).
   - N개 선택(카테고리·유형·상태 등)은 `src/components/MultiSelectFilter.tsx`를 재사용한다(체크박스 팝업 + 검색 + 적용 버튼 — 체크만으로 즉시 반영하지 않는다).

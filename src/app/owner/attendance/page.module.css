@@ -1,0 +1,1306 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: 24px;
+}
+
+/* ── 헤더 ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--appbar-height);
+  z-index: 10;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* 모바일: 탭 숨기고 드롭다운 사용 */
+.viewTabs {
+  display: none;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.viewDropdownWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.viewDropdownBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.viewDropdownIcon {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s;
+}
+
+.viewDropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+.viewMenuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.viewMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 120px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: viewMenuIn 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes viewMenuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.viewMenuItem {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+
+.viewMenuItem:hover {
+  background: var(--color-bg);
+}
+
+.viewMenuItemActive,
+.viewMenuItemActive:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .viewTabs {
+    display: flex;
+  }
+
+  .viewDropdownWrap {
+    display: none;
+  }
+}
+
+.tab,
+.tabActive {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.tab {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.tab:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.tabActive {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── 기간 네비게이션 (헤더 중앙) ── */
+.periodNav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.periodLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* ── 기간 레이블 버튼 & 픽커 (헤더 안 절대 중앙) ── */
+.periodNavWrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.periodLabelBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+  font-family: inherit;
+}
+
+.periodLabelBtn:hover {
+  background: var(--color-primary-light);
+}
+
+.periodLabelIcon {
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.periodLabelIconOpen {
+  transform: rotate(180deg);
+}
+
+.pickerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  min-width: 272px;
+  max-width: calc(100vw - 32px);
+  animation: pickerIn 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes pickerIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.pickerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pickerNavBtn {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: background 0.1s, color 0.1s;
+}
+
+.pickerNavBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.pickerTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 날짜 그리드 (일간 / 주간) */
+.pickerDayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.pickerDow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 4px 0 6px;
+}
+
+.pickerDowSat { color: var(--color-primary); }
+.pickerDowSun { color: var(--color-danger); }
+
+.pickerDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+
+.pickerDay:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.pickerDayToday {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.pickerDaySelected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.pickerDaySat { color: var(--color-primary); }
+.pickerDaySun { color: var(--color-danger); }
+
+/* 월 그리드 (월간) */
+.pickerMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pickerMonth {
+  padding: 10px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  text-align: center;
+  font-family: inherit;
+}
+
+.pickerMonth:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.pickerMonthSelected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ── 월간 달력 ── */
+.monthWrap {
+  flex: 1;
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(61, 99, 221, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px;
+  box-shadow: 0 4px 20px rgba(61, 99, 221, 0.10);
+}
+
+.calHead {
+  padding: 11px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+}
+
+.calHeadSat { color: var(--color-primary); }
+.calHeadSun { color: var(--color-danger); }
+
+.calEmpty {
+  min-height: 72px;
+  background: var(--color-bg);
+}
+
+.calCell {
+  min-height: 72px;
+  padding: 8px 9px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.calCell:hover {
+  background: var(--color-primary-light);
+}
+
+.calCellSelected {
+  background: var(--color-primary-light);
+}
+
+.calNum {
+  font-size: 13px;
+  font-weight: 500;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.calCellToday {
+  background: rgba(61, 99, 221, 0.04);
+}
+
+.calCellToday .calNum {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.calCellSelected:not(.calCellToday) .calNum {
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(61, 99, 221, 0.2);
+}
+
+.calCount {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.calCountAlert {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.calDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .calEmpty, .calCell { min-height: 92px; }
+  .calNum { font-size: 14px; width: 26px; height: 26px; }
+  .calCount { font-size: 12px; }
+}
+
+@media (min-width: 1024px) {
+  .calEmpty, .calCell { min-height: 112px; }
+}
+
+/* ── 주간 뷰 — 날짜별 7열 깃 그래프 ── */
+.weekWrap {
+  flex: 1;
+  padding: 16px;
+}
+
+.gitWeek {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(61, 99, 221, 0.08);
+}
+
+.gitCol {
+  flex: 1 0 124px;
+  min-width: 124px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border);
+}
+
+.gitCol:first-child {
+  border-left: none;
+}
+
+/* 날짜 헤더 */
+.gitColHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.gitColHead:hover {
+  background: var(--color-primary-light);
+}
+
+.gitColHeadSel {
+  background: var(--color-primary-light);
+}
+
+.gitColDow {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1;
+}
+
+.gitColDate {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.gitColHeadToday .gitColDate {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 컬럼 본문 — 세로 줄기 */
+.gitColBody {
+  position: relative;
+  flex: 1;
+  padding: 12px 8px 14px 0;
+  min-height: 88px;
+}
+
+/* 한 줄기 세로선 */
+.gitColBody::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--color-border);
+  z-index: 0;
+}
+
+.gitColBodyEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gitColBodyEmpty::before {
+  display: none;
+}
+
+.gitEmpty {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* 점이 올라앉는 레인 (세로선 중앙 정렬) */
+.gitLane {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  align-self: flex-start;
+}
+
+/* 이벤트 행 */
+.gitEvent {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+}
+
+.gitDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface);
+  box-sizing: content-box;
+  position: relative;
+  z-index: 1;
+}
+
+.gitDot_CLOCKED_IN  { background: var(--color-primary); }
+.gitDot_CLOCKED_OUT { background: var(--color-success); }
+.gitDot_LATE        { background: var(--color-warning); }
+.gitDot_ABSENT      { background: var(--color-danger); }
+.gitDot_SCHEDULED   { background: var(--color-text-secondary); }
+
+.gitEventBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.gitLabel {
+  font-size: 12px;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.gitTime {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* ── 일간 뷰 ── */
+.dayWrap {
+  margin: 16px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(61, 99, 221, 0.08);
+}
+
+/* ── 공통: 뱃지 ── */
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.badge_CLOCKED_OUT { background: var(--color-success-light); color: var(--color-success); }
+.badge_CLOCKED_IN  { background: var(--color-primary-light); color: var(--color-primary); }
+.badge_SCHEDULED   { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+.badge_LATE        { background: var(--color-warning-light); color: var(--color-warning); }
+.badge_ABSENT      { background: var(--color-danger-light); color: var(--color-danger); }
+
+/* ── 바텀시트 (날짜 상세) ── */
+/* position: fixed 이므로 달력 레이아웃에 영향 없음 */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: overlayIn 0.2s ease-out;
+}
+
+@keyframes overlayIn {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.35); }
+}
+
+.sheet {
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: 20px 20px 0 0;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  animation: sheetUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-primary-light);
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sheetTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sheetClose {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.sheetClose:hover {
+  background: var(--color-bg);
+}
+
+.sheetBody {
+  overflow-y: auto;
+  padding: 14px 16px calc(var(--nav-height) + 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  gap: 8px;
+}
+
+.record_LATE   { border-left-color: var(--color-warning); }
+.record_ABSENT { border-left-color: var(--color-danger); opacity: 0.8; }
+
+.recordName {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.recordTime {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding: 8px 0;
+}
+
+/* 태블릿 이상: 센터 모달로 전환 */
+@media (min-width: 768px) {
+  .sheetOverlay {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sheet {
+    width: 680px;
+    border-radius: 16px;
+    max-height: 72vh;
+    animation: modalIn 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes modalIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .sheetBody {
+    padding-bottom: 20px;
+  }
+}
+
+/* ── 날짜 상세 — Gantt 타임라인 ── */
+.tlWrap {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tlAxisRow {
+  display: flex;
+  align-items: flex-end;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.tlLabelCol {
+  width: 76px;
+  flex-shrink: 0;
+  padding-right: 10px;
+  position: sticky;
+  left: 0;
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+.tlRow {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.tlRow .tlLabelCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tlEmpName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tlEmpTime {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tlTrackCol {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.tlAxisRow .tlTrackCol {
+  height: 100%;
+}
+
+.tlRow .tlTrackCol {
+  height: 32px;
+}
+
+.tlHourMark {
+  position: absolute;
+  bottom: 0;
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.tlGridLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* 예정 시간 바 (background) */
+.tlBarSched {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.tlBarSchedAbsent {
+  opacity: 0.4;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-bg),
+    var(--color-bg) 3px,
+    var(--color-border) 3px,
+    var(--color-border) 6px
+  );
+}
+
+/* 실제 근무 바 (foreground) */
+.tlBarActual {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  border-radius: 4px;
+}
+
+.tlBarActual_CLOCKED_OUT { background: var(--color-success); }
+.tlBarActual_CLOCKED_IN  { background: var(--color-primary); }
+.tlBarActual_LATE        { background: var(--color-warning); }
+
+/* 근무 중 (퇴근 시간 미확정) — 오른쪽 끝 페이드 */
+.tlBarOngoing::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, transparent, var(--color-surface));
+  border-radius: 0 4px 4px 0;
+}
+
+@media (min-width: 768px) {
+  .tlLabelCol { width: 104px; }
+  .tlEmpName  { font-size: 14px; }
+  .tlEmpTime  { font-size: 11px; }
+  .tlHourMark { font-size: 11px; }
+  .tlAxisRow  { height: 28px; }
+  .tlRow      { padding: 13px 0; }
+  .tlRow .tlTrackCol { height: 46px; }
+  .tlBarSched, .tlBarActual { top: 9px; bottom: 9px; }
+}
+
+@media (min-width: 1024px) {
+  .sheet { width: 820px; max-height: 78vh; }
+  .tlLabelCol { width: 120px; }
+  .tlEmpName  { font-size: 15px; }
+  .tlEmpTime  { font-size: 12px; }
+  .tlHourMark { font-size: 12px; }
+  .tlAxisRow  { height: 32px; }
+  .tlRow      { padding: 16px 0; }
+  .tlRow .tlTrackCol { height: 56px; }
+  .tlBarSched, .tlBarActual { top: 11px; bottom: 11px; }
+}
+
+/* ─── 스케줄 관리 FAB ─── */
+
+.fabWrap {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--nav-height) + 16px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(61, 99, 221, 0.4);
+  transition: transform 0.18s, box-shadow 0.12s;
+}
+
+.fab:hover {
+  box-shadow: 0 8px 26px rgba(61, 99, 221, 0.5);
+}
+
+@media (min-width: 768px) {
+  .fabWrap {
+    right: 28px;
+    bottom: 28px;
+  }
+}
+
+/* ─── 직원 스케줄 입력 팝업 ─── */
+
+.schedOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: schedFade 0.15s ease-out;
+}
+
+@keyframes schedFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.schedModal {
+  width: 100%;
+  max-width: 640px;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: schedPop 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes schedPop {
+  from { transform: scale(0.94); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.schedHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.schedTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.schedClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 17px;
+}
+
+.schedClose:hover {
+  background: var(--color-bg);
+}
+
+.schedBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 20px;
+  min-height: 0;
+}
+
+.schedRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.schedRow:last-child {
+  border-bottom: none;
+}
+
+.schedEmp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.schedDays {
+  display: flex;
+  gap: 4px;
+}
+
+.schedDay {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedDayOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.schedTimes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedTimeInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  background: var(--color-bg);
+}
+
+.schedTimeSep {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.schedFoot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.schedSave {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+}
+
+@media (min-width: 768px) {
+  .schedRow {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+/* ─── 스케줄 팝업: 탭/생성/일자별 조정 ─── */
+
+.schedTabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.schedTabBtn {
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.schedTabActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.schedGuide {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 12px 0 4px;
+}
+
+.schedGuideInline {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.schedNone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  grid-column: 2 / -1;
+}
+
+.schedNoneText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.schedCreateBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.schedRemoveBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.schedRemoveBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.schedDateRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 4px;
+  flex-wrap: wrap;
+}
+
+.schedDateInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  background: var(--color-bg);
+}
+
+.schedAdjBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.schedDaySeg {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.schedSegBtn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+}
+
+.schedSegOn {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.schedSegOff {
+  background: var(--color-text-secondary);
+  color: #fff;
+}
+
+.schedOffText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}

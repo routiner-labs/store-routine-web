@@ -1,0 +1,385 @@
+.page {
+  padding-bottom: calc(var(--nav-height) + 16px);
+  min-height: 100dvh;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 60dvh;
+  color: var(--color-text-secondary);
+}
+
+.backLink {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status_REQUESTED   { color: var(--color-primary);        background: var(--color-primary-light); }
+.status_CONFIRMED   { color: var(--color-success);        background: var(--color-success-light); }
+.status_IN_PROGRESS { color: var(--color-warning);        background: var(--color-warning-light); }
+.status_DONE        { color: var(--color-text-secondary); background: var(--color-border); }
+.status_REJECTED    { color: var(--color-danger);         background: var(--color-danger-light); }
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.statusHint {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+}
+
+.hint_REQUESTED   { color: var(--color-primary); background: var(--color-primary-light); }
+.hint_CONFIRMED   { color: var(--color-success); background: var(--color-success-light); }
+.hint_IN_PROGRESS { color: var(--color-warning); background: var(--color-warning-light); }
+.hint_DONE        { color: var(--color-text-secondary); background: var(--color-surface); border: 1px solid var(--color-border); }
+.hint_REJECTED    { color: var(--color-danger); background: var(--color-danger-light); }
+
+.post {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.postTopRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.typeTag {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.type_재료부족 { background: rgba(194, 65, 12, 0.12); color: color-mix(in srgb, #C2410C var(--category-badge-text-mix, 100%), #fff); }
+.type_장비고장 { background: rgba(185, 28, 28, 0.12); color: color-mix(in srgb, #B91C1C var(--category-badge-text-mix, 100%), #fff); }
+.type_근무변경 { background: var(--color-primary-light); color: var(--color-primary); }
+.type_고객이슈 { background: rgba(109, 40, 217, 0.12); color: color-mix(in srgb, #6D28D9 var(--category-badge-text-mix, 100%), #fff); }
+.type_청소시설 { background: rgba(21, 128, 61, 0.12); color: color-mix(in srgb, #15803D var(--category-badge-text-mix, 100%), #fff); }
+.type_기타 { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+.visibilityOwner,
+.visibilityAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.postDate {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.postContent {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+
+.photoPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.commentsSection {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.commentsTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.emptyComments {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding: 8px 0 16px;
+}
+
+.commentList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.comment {
+  display: flex;
+  gap: 10px;
+}
+
+.commentAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.commentBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.commentAuthor {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ownerBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+
+.commentTime {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.commentContent {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+
+.commentInputRow {
+  display: flex;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.commentInputAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.commentInputWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentTextarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  background: var(--color-bg);
+}
+
+.commentTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.commentSubmit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  align-self: flex-end;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+}
+
+.commentSubmit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ─── Responsive ─── */
+
+@media (min-width: 768px) {
+  .body {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    width: 100%;
+    padding: 24px;
+  }
+}
+
+/* ─── 댓글 수정/삭제 ─── */
+
+.commentActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.commentActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.commentActionBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.commentActionDanger:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.commentEditWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentEditActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.commentEditSave {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditSave:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.commentEditCancel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.commentEditCancel:hover {
+  background: var(--color-border);
+}

@@ -1,0 +1,200 @@
+/* ── 톱니바퀴 버튼 (NotificationBell의 벨 버튼과 동일한 시각 언어) ── */
+.gearBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 8px;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.1s;
+  flex-shrink: 0;
+}
+
+.gearBtn:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.gearIcon {
+  font-size: 22px;
+}
+
+/* ── 시스템 설정 팝업 ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: settingsFade 0.15s ease-out;
+}
+
+@keyframes settingsFade {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.4); }
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  height: 420px;
+  max-height: calc(100vh - 32px);
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.close:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* 좌: 설정 항목 목록 / 우: 상세 조정 */
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.menu {
+  width: 150px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.menuItem:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.menuItemActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.menuIcon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.detail {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.detailSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.detailInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.detailLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.detailDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.segBtn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: background 0.1s, color 0.1s;
+}
+
+.segBtnActive {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}

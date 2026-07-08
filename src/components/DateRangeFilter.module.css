@@ -1,0 +1,411 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: calc(100% - 30px);
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.1s;
+}
+
+.trigger:hover {
+  border-color: var(--color-primary);
+}
+
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.triggerChevron {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.clearBtn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 99px;
+  border: none;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.clearBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ══════════════════════════════════════
+   선택 팝업
+   ══════════════════════════════════════ */
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: drfFade 0.15s ease-out;
+}
+
+@keyframes drfFade {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.4); }
+}
+
+.popupCard {
+  width: 100%;
+  max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.popupTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.popupClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.popupClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ══════════════════════════════════════
+   달력
+   ══════════════════════════════════════ */
+.calHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 4px;
+}
+
+.calNavBtn {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: background 0.1s, color 0.1s;
+  font-family: inherit;
+}
+
+.calNavBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* 연월 다이얼이 열려있을 때: DOM에서 빼면 제목이 왼쪽으로 쏠리므로 자리만 남기고 숨긴다 */
+.calNavBtnHidden {
+  visibility: hidden;
+}
+
+.calTitleBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.calTitleBtn:hover {
+  background: var(--color-bg);
+}
+
+.calTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.calTitleChevron {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: transform 0.15s;
+}
+
+.calTitleChevronOpen {
+  transform: rotate(180deg);
+}
+
+/* 연월 선택 다이얼 (위아래로 쓸어서 고르는 스크롤 휠) */
+.dialRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px 4px;
+}
+
+.dialCol {
+  position: relative;
+  flex: 1;
+  max-width: 120px;
+}
+
+.dialHighlight {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 36px;
+  transform: translateY(-50%);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.dialScroll {
+  position: relative;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.dialScroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 마우스로 꾹 눌러 끄는 동안: 스냅이 드래그와 다투지 않도록 잠시 끄고 커서를 바꾼다 */
+.dialScrollDragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.dialItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  scroll-snap-align: center;
+  transition: color 0.1s;
+}
+
+.dialItemActive {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.dialConfirmBtn {
+  display: block;
+  margin: 6px 14px 14px;
+  width: calc(100% - 28px);
+  padding: 9px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.dialConfirmBtn:hover {
+  opacity: 0.9;
+}
+
+/* 달력 ↔ 연월 다이얼 전환 시 부드럽게 나타나도록 */
+.calViewSwitch {
+  animation: calViewSwitchIn 0.16s ease-out;
+}
+
+@keyframes calViewSwitchIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.calDowRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 10px;
+}
+
+.calDow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 4px 0 6px;
+}
+
+.calDowSat { color: var(--color-primary); }
+.calDowSun { color: var(--color-danger); }
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 10px 10px;
+}
+
+.calCell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calCellInRange {
+  background: var(--color-primary-light);
+}
+
+.calCellRangeStart {
+  background: var(--color-primary-light);
+  border-radius: 999px 0 0 999px;
+}
+
+.calCellRangeEnd {
+  background: var(--color-primary-light);
+  border-radius: 0 999px 999px 0;
+}
+
+.calDay {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.calDay:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.calDaySelected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.calDaySat { color: var(--color-primary); }
+.calDaySun { color: var(--color-danger); }
+
+.popupFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.calRangeHint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popupFootBtns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.resetBtn {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.resetBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.applyBtn {
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.1s;
+}
+
+.applyBtn:hover {
+  opacity: 0.9;
+}

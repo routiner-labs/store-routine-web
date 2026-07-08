@@ -1,0 +1,347 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* X 버튼 자리(30px)를 항상 비워둬서, 나타나거나 사라져도 트리거 박스 너비가 변하지 않도록 한다.
+   X는 이 여백에 뜨므로 트리거 박스 안이 아니라 박스 바깥 우측에 위치한다. */
+.triggerHoverArea {
+  position: relative;
+  width: calc(100% - 30px);
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.1s;
+}
+
+.trigger:hover {
+  border-color: var(--color-primary);
+}
+
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.triggerChevron {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.clearBtn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 99px;
+  border: none;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.clearBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* 마우스 오버 시 선택된 항목 목록 — 작성자 필드 요약 툴팁과 동일 패턴.
+   document.body에 포털로 그려서 세부검색 패널의 overflow:hidden에 잘리지 않는다.
+   위치·폭은 useHoverTooltip이 트리거 기준으로 계산해 style로 넘겨준다(인풋 박스와 동일한 폭). */
+.filterTooltip {
+  position: fixed;
+  padding-top: 6px;
+  z-index: 400;
+  animation: filterTooltipIn 0.12s ease-out;
+}
+
+@keyframes filterTooltipIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.filterTooltipCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.tooltipRow:hover {
+  background: var(--color-bg);
+}
+
+.tooltipAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tooltipName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltipRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 3px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.tooltipRemove:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ══════════════════════════════════════
+   선택 팝업
+   ══════════════════════════════════════ */
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: msfFade 0.15s ease-out;
+}
+
+@keyframes msfFade {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.4); }
+}
+
+.popupCard {
+  width: 100%;
+  max-width: 340px;
+  max-height: 70vh;
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.popupTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.popupClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.popupClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.popupSearch {
+  position: relative;
+  margin: 10px 12px 4px;
+  flex-shrink: 0;
+}
+
+.popupSearchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.popupSearchInput {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+.popupSearchInput:focus {
+  border-color: var(--color-primary);
+}
+
+/* 검색 결과 수와 무관하게 팝업 크기가 고정되도록 높이를 정해두고 내부에서만 스크롤한다 */
+.optionList {
+  height: 300px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.optionRow:hover {
+  background: var(--color-bg);
+}
+
+.optionCheckbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.optionLabel {
+  font-size: 14px;
+  color: var(--color-text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionSublabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.optionEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.popupFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.resetBtn {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.resetBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.applyBtn {
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.1s;
+}
+
+.applyBtn:hover {
+  opacity: 0.9;
+}

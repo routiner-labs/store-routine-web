@@ -67,8 +67,8 @@ Avoid vague names such as processData, handleItem, manager, helper, or util unle
 
 Examples:
 
-processData ❌
-allocateOutboundLocation ✅
+processData [Bad]
+allocateOutboundLocation [Good]
 3. Surgical Changes
 
 Touch only what is required.
@@ -150,6 +150,29 @@ Verify naming still reflects business intent.
 Verify the implementation remains readable.
 
 Strong verification is preferred over fast completion.
+
+## Good / Bad
+
+작업 전 `.claude/good-bad.md` 파일을 반드시 확인한다.
+
+- **Good** 항목 — 해당 상황에서 적극적으로 적용한다.
+- **Bad** 항목 — 어떤 상황에서도 하지 않는다.
+
+사용자가 "싫다", "하지 마", "앞으로 이렇게 해줘" 등의 피드백을 주면 즉시 해당 파일에 추가한다.
+
+---
+
+## Work History
+
+모든 작업이 완료된 후 `history/` 폴더에 날짜별 MD 파일을 작성한다.
+
+- 파일명: `.claude/history/YYYY-MM-DD.md`
+- 같은 날 여러 작업이 있으면 같은 파일에 섹션을 추가한다.
+- 기록 항목: 작업한 파일 목록, 변경 이유, 주요 결정 사항, 화면/기능 목록
+
+작업 기록 없이 대화를 마치지 않는다.
+
+---
 
 These guidelines are working if:
 

@@ -1,0 +1,8 @@
+.name {
+  cursor: pointer;
+}
+
+.name:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}

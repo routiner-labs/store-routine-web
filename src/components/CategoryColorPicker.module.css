@@ -1,0 +1,214 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 340;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: ccpFade 0.15s ease-out;
+}
+
+@keyframes ccpFade {
+  from { background: rgba(0, 0, 0, 0); }
+  to   { background: rgba(0, 0, 0, 0.4); }
+}
+
+.card {
+  width: 100%;
+  max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.close:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.previewWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+}
+
+.previewBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hexLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 스펙트럼(좌) + 색상 바 + RGB 상세값(우) ── */
+.pickerBody {
+  display: flex;
+  gap: 10px;
+  padding: 4px 16px 6px;
+}
+
+.svBox {
+  position: relative;
+  flex: 1;
+  height: 150px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.svHandle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hueBar {
+  position: relative;
+  width: 16px;
+  height: 150px;
+  border-radius: 99px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(
+    to bottom,
+    #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%
+  );
+  cursor: pointer;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.hueHandle {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 8px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.channelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.channelLabel {
+  width: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.channelInput {
+  width: 52px;
+  padding: 5px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--color-text);
+  text-align: center;
+  outline: none;
+  font-family: inherit;
+}
+
+.channelInput:focus {
+  border-color: var(--color-primary);
+}
+
+.foot {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 16px;
+}
+
+.applyBtn {
+  flex: 1;
+  padding: 9px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.applyBtn:hover {
+  opacity: 0.9;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 9px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+
+.cancelBtn:hover {
+  background: var(--color-bg);
+}

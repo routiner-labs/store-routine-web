@@ -3,7 +3,7 @@ export type TaskStatus = 'PENDING' | 'DONE' | 'SKIPPED' | 'NEEDS_REVIEW'
 export type RequestStatus = 'REQUESTED' | 'CONFIRMED' | 'IN_PROGRESS' | 'DONE' | 'REJECTED'
 export type CompletionType = 'CHECK' | 'PHOTO' | 'NUMBER' | 'MEMO' | 'SELECT' | 'OWNER_CONFIRM'
 export type ChecklistType = 'OPEN' | 'CLOSE' | 'CLEANING' | 'INVENTORY' | 'SPECIAL'
-export type RequestType = '재료부족' | '장비고장' | '근무변경' | '고객이슈' | '청소시설' | '기타'
+export type RequestType = string // 요청 카테고리 이름 (사용자 관리, REQUEST_CATEGORIES 참고)
 export type InstructionStatus = 'ASSIGNED' | 'READ' | 'DONE' | 'NEEDS_REVIEW'
 
 export interface ChecklistItem {

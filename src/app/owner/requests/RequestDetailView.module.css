@@ -106,6 +106,7 @@
 .type_고객이슈  { background: #F5F3FF; color: #6D28D9; }
 .type_청소시설  { background: #F0FDF4; color: #15803D; }
 .type_기타      { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+.type_default   { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 
 .visibilityOwner,
 .visibilityAll {

@@ -328,6 +328,42 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 ---
 
+### 세부검색(Advanced Search) 패턴
+
+문서함(`owner/documents`)·요청함(`owner/requests`)의 세부검색 패널을 여러 차례 다듬으며 정착된 표준. 새 목록 페이지에 세부검색을 추가하거나 기존 것을 고칠 때 반드시 이 패턴을 그대로 따른다(재구현하지 말 것).
+
+#### 항목 순서
+
+```
+내용 → 작성자 → 기간 → 카테고리 → (페이지 고유 필드: 상태, 공개범위 등)
+```
+
+공통 필드(내용/작성자/기간/카테고리) 순서는 모든 페이지에서 동일해야 한다. 페이지마다 있는 추가 필드는 카테고리 뒤에 붙인다.
+
+#### 재사용 컴포넌트
+
+| 용도 | 컴포넌트 | 핵심 동작 |
+|---|---|---|
+| N개 선택 (카테고리·유형·상태) | `src/components/MultiSelectFilter.tsx` | 트리거 클릭 → 팝업(검색 인풋 + 체크박스 목록, `optionList` 높이 고정 300px로 팝업 크기 불변) → **적용** 버튼을 눌러야 실제 반영. 팝업을 배경 클릭/닫기로 닫으면 draft는 버려짐. |
+| 기간(날짜 범위) | `src/components/DateRangeFilter.tsx` | 시작일·종료일 입력 두 개가 아니라 달력 팝업 하나. 첫 클릭=시작일, 다음 클릭=종료일(시작일보다 이른 날짜를 찍으면 그 날짜로 재시작). 상단 "YYYY년 M월" 클릭 시 연/월 스크롤 다이얼(위아래로 쓸어서 선택, PC는 마우스 드래그도 지원)로 전환. 달력↔다이얼 전환 시 `calViewSwitch`(fade+slide) 애니메이션. |
+| 사람(작성자) | 컴포넌트화되지 않은 조합 패턴 — `owner/documents`/`owner/requests`의 작성자 필드 참고 | 텍스트 태그 입력(Enter로 추가, 빈 입력에서 Backspace로 마지막 태그 삭제) + 우측에 `MultiSelectFilter`를 `renderTrigger`로 커스텀 트리거(사람 아이콘 버튼)로 붙여 같은 팝업 재사용. 팝업 적용 시 "알려진 이름(옵션에 있는 이름)"만 교체하고 직접 타이핑한 자유 텍스트 태그는 보존. 매칭은 `LIKE %%`(부분일치, `some(name => field.toLowerCase().includes(name.toLowerCase()))`). |
+| 선택값 호버 툴팁 | `src/lib/useHoverTooltip.ts` | `anchorRef`를 트리거(또는 뱃지)에 붙이면 `rect`(top/left/right/width, `document.body` 포털용 좌표)와 mouseenter/leave 핸들러를 반환. 절대 `position:absolute`로 부모 기준 배치하지 말 것 — 세부검색 패널이 `overflow:hidden`이라 잘린다. 항상 포털 + `position:fixed`. |
+
+#### 트리거 박스 규칙
+
+- 같은 이름의 필드(카테고리/작성자/기간/상태 등)는 폭을 통일한다. 공용 클래스명은 페이지별 `.advSearchNarrow`(현재 260px) — 폭을 바꿀 땐 관련된 모든 페이지의 `.advSearchNarrow`를 같이 바꾼다.
+- 트리거 폭은 X(선택 해제) 버튼 유무와 무관하게 고정이어야 한다. 우측 30px을 항상 비워두고 그 여백에 X를 `position:absolute`로 띄운다(트리거 자체 `width: calc(100% - 30px)`).
+- 체크박스/태그는 즉시 반영하지 않는다. 팝업에는 반드시 "적용" 버튼이 있고, 그걸 눌러야 실제 필터 state에 반영된다.
+
+#### 호버 툴팁 규칙
+
+- 선택값이 있을 때만(카테고리/유형/상태: 1개 이상, 작성자: 1개 이상) 트리거에 마우스 오버 시 요약 카드(아바타 첫 글자 + 이름/라벨 + 개별 제거 버튼)를 띄운다. `owner/checklists`의 담당자 2명+ 툴팁과 같은 시각 언어(아바타 원형, 카드 스타일).
+- 반드시 `useHoverTooltip` + `createPortal(..., document.body)` 조합으로 렌더한다. 세부검색 패널(`.advPanel`)이 `overflow:hidden`이라 일반 `position:absolute` 자식은 z-index와 무관하게 잘린다.
+- 트리거와 툴팁 사이에 시각적 간격(px)을 CSS `margin`/좌표 오프셋으로 만들지 않는다 — 마우스가 그 틈을 지날 때 hover가 끊겨 툴팁이 바로 닫힌다. 간격은 툴팁 쪽 `padding-top`으로만 준다(`useHoverTooltip`의 `rect.top`은 트리거 바로 아래, 간격 0).
+- 정렬 기준은 트리거 폭에 따라 다르다:
+  - 트리거가 이미 충분히 넓어 카드 내용과 폭이 맞으면(카테고리/유형/상태) `left` + `width`(트리거와 동일 폭)로 배치.
+  - 트리거(뱃지)가 카드보다 좁으면(작성자 요약 뱃지) `right`(뷰포트 우측 끝 기준 거리)로 배치해 우측 끝을 맞추고 카드는 `min-width`만큼 좌측으로 자라나게 한다. `left`+`width`를 쓰면 좁은 트리거 폭에 카드가 눌려 우측 끝이 어긋난다.
+
 ### 향후 확장 고려사항
 
 - **다크 모드**: blue-900(`#162577`)을 배경으로, blue-300(`#93A8FA`)을 프라이머리로 전환

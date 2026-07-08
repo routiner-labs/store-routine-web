@@ -383,55 +383,7 @@
 
 .advSearchNarrow {
   flex: none;
-  width: 220px;
-}
-
-.dateRange {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.dateInput {
-  padding: 5px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  color: var(--color-text);
-  background: var(--color-bg);
-  font-family: inherit;
-}
-
-.dateInput:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.dateSep {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.dateClear {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 99px;
-  border: none;
-  background: var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  flex-shrink: 0;
-  transition: background 0.1s;
-}
-
-.dateClear:hover {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
+  width: 260px;
 }
 
 .advResetBtn {
@@ -457,77 +409,171 @@
   border-color: var(--color-danger);
 }
 
-/* 세부 검색 — 카테고리 선택 버튼 */
-.catFilterBtn {
+/* ══════════════════════════════════════
+   작성자 — 태그 입력(직접 타이핑) + 우측 버튼(직원 선택 팝업)
+   ══════════════════════════════════════ */
+.authorField {
+  position: relative;
+  width: 100%;
+}
+
+.authorTagList {
+  width: calc(100% - 30px);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex: 1;
-  max-width: 260px;
-  padding: 7px 10px;
+  gap: 6px;
+  padding: 7px 8px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
-  color: var(--color-text);
-  font-size: 13px;
-  font-family: inherit;
-  transition: border-color 0.1s;
 }
 
-.catFilterBtn:hover {
+.authorTagList:focus-within {
   border-color: var(--color-primary);
 }
 
-.catFilterBtnLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.authorTagInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--color-text);
+  font-family: inherit;
+  padding: 0;
 }
 
-/* 세부 검색 — 카테고리 선택 팝업(체크박스 목록) */
-.catFilterList {
-  padding: 6px;
+/* 2명 이상이면 "이름 외 N"으로 요약해 우측에 붙인다. 좌측은 계속 텍스트 입력이 가능한 공간이다. */
+.authorSummaryBadge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 99px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.authorSummaryBadge > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.authorSummaryBadge > button:hover {
+  opacity: 1;
+}
+
+/* 마우스 오버 시 전체 이름 목록 — 업무리스트 담당자 툴팁과 동일 패턴 */
+/* document.body에 포털로 그려서 세부검색 패널의 overflow:hidden에 잘리지 않는다.
+   위치·폭은 useHoverTooltip이 뱃지 기준으로 계산해 style로 넘겨준다. */
+.authorSummaryTooltip {
+  position: fixed;
+  padding-top: 6px;
+  z-index: 400;
+  animation: authorTooltipIn 0.12s ease-out;
+}
+
+@keyframes authorTooltipIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.authorSummaryTooltipCard {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow-y: auto;
+  min-width: 144px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
 }
 
-.catFilterRow {
+.tooltipRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 10px;
+  gap: 8px;
+  padding: 5px 6px;
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.1s;
 }
 
-.catFilterRow:hover {
+.tooltipRow:hover {
   background: var(--color-bg);
 }
 
-.catFilterCheckbox {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
+.tooltipAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.catFilterName {
-  font-size: 14px;
+.tooltipName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
   color: var(--color-text);
 }
 
-.catFilterFoot {
+.tooltipRemove {
   display: flex;
-  justify-content: flex-end;
-  padding: 10px 12px;
-  border-top: 1px solid var(--color-border);
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 3px;
+  border-radius: 50%;
   flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.tooltipRemove:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.authorFieldIcon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 99px;
+  border: none;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.authorFieldIcon:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 /* ══════════════════════════════════════

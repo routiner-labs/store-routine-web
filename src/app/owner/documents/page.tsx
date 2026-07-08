@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import {
   LiaSearchSolid,
@@ -11,12 +12,16 @@ import {
   LiaTimesSolid,
   LiaTrashAltSolid,
   LiaSlidersHSolid,
-  LiaAngleDownSolid,
+  LiaUsersSolid,
 } from 'react-icons/lia'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { useHoverTooltip } from '@/lib/useHoverTooltip'
 import EmployeeName from '@/components/EmployeeName'
+import MultiSelectFilter from '@/components/MultiSelectFilter'
+import DateRangeFilter from '@/components/DateRangeFilter'
+import { mockEmployees } from '@/mock/employees'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import type { StoreDocument, DocumentCategory } from '@/mock/documents'
 import styles from './page.module.css'
@@ -62,8 +67,8 @@ export default function OwnerDocuments() {
 
   // 세부 검색
   const [advOpen, setAdvOpen] = useState(false)
-  const [catFilterOpen, setCatFilterOpen] = useState(false)
-  const [filterAuthor, setFilterAuthor] = useState('')
+  const [filterAuthor, setFilterAuthor] = useState<string[]>([])
+  const [authorInputText, setAuthorInputText] = useState('')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
 
@@ -73,21 +78,37 @@ export default function OwnerDocuments() {
   const [catDraft, setCatDraft] = useState('')
   const catSeqRef = useRef(0)
 
-  useScrollLock(catFilterOpen || catManageOpen)
+  useScrollLock(catManageOpen)
+  const {
+    anchorRef: authorAnchorRef,
+    rect: authorTooltipRect,
+    anchorHandlers: authorAnchorHandlers,
+    tooltipHandlers: authorTooltipHandlers,
+  } = useHoverTooltip<HTMLSpanElement>()
 
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? '기타'
+  const knownAuthorNames = new Set(mockEmployees.map((e) => e.name))
+
+  function addAuthorTag(name: string) {
+    const v = name.trim()
+    if (!v || filterAuthor.includes(v)) return
+    setFilterAuthor((prev) => [...prev, v])
+  }
+
+  function removeAuthorTag(name: string) {
+    setFilterAuthor((prev) => prev.filter((n) => n !== name))
+  }
 
   const advActiveCount =
     (filterCategories.length > 0 ? 1 : 0) +
-    (filterAuthor.trim() ? 1 : 0) +
+    (filterAuthor.length > 0 ? 1 : 0) +
     (filterDateFrom || filterDateTo ? 1 : 0)
 
   const filtered = useMemo(() => {
     const q = appliedSearch.trim().toLowerCase()
-    const author = filterAuthor.trim().toLowerCase()
     return DOCUMENT_CATALOG.filter((d) => filterCategories.length === 0 || filterCategories.includes(d.category))
       .filter((d) => !q || d.title.toLowerCase().includes(q) || stripHtml(d.content).toLowerCase().includes(q))
-      .filter((d) => !author || d.authorName.toLowerCase().includes(author))
+      .filter((d) => filterAuthor.length === 0 || filterAuthor.some((name) => d.authorName.toLowerCase().includes(name.toLowerCase())))
       .filter((d) => !filterDateFrom || d.createdAt >= filterDateFrom)
       .filter((d) => !filterDateTo || d.createdAt <= filterDateTo)
       .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
@@ -95,13 +116,10 @@ export default function OwnerDocuments() {
 
   function resetAdv() {
     setFilterCategories([])
-    setFilterAuthor('')
+    setFilterAuthor([])
+    setAuthorInputText('')
     setFilterDateFrom('')
     setFilterDateTo('')
-  }
-
-  function toggleFilterCategory(id: string) {
-    setFilterCategories((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]))
   }
 
   function goToDetail(id: string) {
@@ -199,69 +217,93 @@ export default function OwnerDocuments() {
         </div>
 
         <div className={styles.advRow}>
-          <span className={styles.advLabel}>카테고리</span>
-          <div className={`${styles.advSearchWrap} ${styles.advSearchNarrow}`}>
-            <button className={styles.catFilterBtn} onClick={() => setCatFilterOpen(true)}>
-              <span className={styles.catFilterBtnLabel}>
-                {filterCategories.length === 0 ? '전체 카테고리' : `카테고리 ${filterCategories.length}개 선택됨`}
-              </span>
-              <LiaAngleDownSolid />
-            </button>
-            {filterCategories.length > 0 && (
-              <button className={styles.dateClear} onClick={() => setFilterCategories([])}>
-                <LiaTimesSolid />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.advRow}>
           <span className={styles.advLabel}>작성자</span>
-          <div className={`${styles.advSearchWrap} ${styles.advSearchNarrow}`}>
-            <div className={styles.searchWrap}>
-              <LiaSearchSolid className={styles.searchIcon} />
-              <input
-                className={styles.searchInput}
-                placeholder="이름 검색"
-                value={filterAuthor}
-                onChange={(e) => setFilterAuthor(e.target.value)}
+          <div className={styles.advSearchNarrow}>
+            <div className={styles.authorField}>
+              <div className={styles.authorTagList}>
+                <input
+                  className={styles.authorTagInput}
+                  placeholder={filterAuthor.length === 0 ? '이름 입력 후 Enter' : ''}
+                  value={authorInputText}
+                  onChange={(e) => setAuthorInputText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addAuthorTag(authorInputText)
+                      setAuthorInputText('')
+                    } else if (e.key === 'Backspace' && !authorInputText && filterAuthor.length > 0) {
+                      removeAuthorTag(filterAuthor[filterAuthor.length - 1])
+                    }
+                  }}
+                />
+                {filterAuthor.length > 0 && (
+                  <span
+                    className={styles.authorSummaryBadge}
+                    ref={authorAnchorRef}
+                    {...authorAnchorHandlers}
+                  >
+                    {filterAuthor.length === 1 ? filterAuthor[0] : `${filterAuthor[0]} 외 ${filterAuthor.length - 1}`}
+                    <button
+                      type="button"
+                      onClick={() => setFilterAuthor([])}
+                      aria-label="작성자 선택 해제"
+                    >
+                      <LiaTimesSolid />
+                    </button>
+                  </span>
+                )}
+              </div>
+              <MultiSelectFilter
+                title="작성자"
+                searchPlaceholder="이름 검색"
+                options={mockEmployees.map((emp) => ({ id: emp.name, label: emp.name, sublabel: emp.phone }))}
+                selectedIds={filterAuthor.filter((n) => knownAuthorNames.has(n))}
+                onApply={(ids) => {
+                  const freeTags = filterAuthor.filter((n) => !knownAuthorNames.has(n))
+                  setFilterAuthor([...freeTags, ...ids])
+                }}
+                renderTrigger={({ open }) => (
+                  <button
+                    type="button"
+                    className={styles.authorFieldIcon}
+                    onClick={open}
+                    aria-label="직원 선택"
+                  >
+                    <LiaUsersSolid />
+                  </button>
+                )}
               />
             </div>
-            {filterAuthor && (
-              <button className={styles.dateClear} onClick={() => setFilterAuthor('')}>
-                <LiaTimesSolid />
-              </button>
-            )}
           </div>
         </div>
 
         <div className={styles.advRow}>
           <span className={styles.advLabel}>기간</span>
-          <div className={styles.dateRange}>
-            <input
-              type="date"
-              className={styles.dateInput}
-              value={filterDateFrom}
-              onChange={(e) => setFilterDateFrom(e.target.value)}
+          <div className={styles.advSearchNarrow}>
+            <DateRangeFilter
+              title="기간"
+              placeholder="전체 기간"
+              startDate={filterDateFrom}
+              endDate={filterDateTo}
+              onApply={(start, end) => {
+                setFilterDateFrom(start)
+                setFilterDateTo(end)
+              }}
             />
-            <span className={styles.dateSep}>~</span>
-            <input
-              type="date"
-              className={styles.dateInput}
-              value={filterDateTo}
-              onChange={(e) => setFilterDateTo(e.target.value)}
+          </div>
+        </div>
+
+        <div className={styles.advRow}>
+          <span className={styles.advLabel}>카테고리</span>
+          <div className={styles.advSearchNarrow}>
+            <MultiSelectFilter
+              title="카테고리"
+              placeholder="전체 카테고리"
+              searchPlaceholder="카테고리 검색"
+              options={categories.map((c) => ({ id: c.id, label: c.name }))}
+              selectedIds={filterCategories}
+              onApply={setFilterCategories}
             />
-            {(filterDateFrom || filterDateTo) && (
-              <button
-                className={styles.dateClear}
-                onClick={() => {
-                  setFilterDateFrom('')
-                  setFilterDateTo('')
-                }}
-              >
-                <LiaTimesSolid />
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -309,36 +351,31 @@ export default function OwnerDocuments() {
         </button>
       </div>
 
-      {/* 카테고리 필터 선택 팝업 (체크박스 다중 선택) */}
-      {catFilterOpen && (
-        <div className={styles.catPopOverlay} onClick={() => setCatFilterOpen(false)}>
-          <div className={styles.catPopCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.catPopHead}>
-              <span className={styles.catPopTitle}>카테고리 선택</span>
-              <button className={styles.modalClose} onClick={() => setCatFilterOpen(false)} aria-label="닫기">
-                <LiaTimesSolid />
-              </button>
-            </div>
-            <div className={styles.catFilterList}>
-              {categories.map((c) => (
-                <label key={c.id} className={styles.catFilterRow}>
-                  <input
-                    type="checkbox"
-                    className={styles.catFilterCheckbox}
-                    checked={filterCategories.includes(c.id)}
-                    onChange={() => toggleFilterCategory(c.id)}
-                  />
-                  <span className={styles.catFilterName}>{c.name}</span>
-                </label>
-              ))}
-            </div>
-            <div className={styles.catFilterFoot}>
-              <button className={styles.advResetBtn} onClick={() => setFilterCategories([])}>
-                전체 해제
-              </button>
-            </div>
+      {/* 작성자 선택 목록 툴팁 (document.body 포털) */}
+      {authorTooltipRect && filterAuthor.length >= 1 && createPortal(
+        <div
+          className={styles.authorSummaryTooltip}
+          style={{ top: authorTooltipRect.top, right: authorTooltipRect.right }}
+          {...authorTooltipHandlers}
+        >
+          <div className={styles.authorSummaryTooltipCard}>
+            {filterAuthor.map((name) => (
+              <span key={name} className={styles.tooltipRow}>
+                <span className={styles.tooltipAvatar}>{name[0]}</span>
+                <span className={styles.tooltipName}>{name}</span>
+                <button
+                  type="button"
+                  className={styles.tooltipRemove}
+                  onClick={() => removeAuthorTag(name)}
+                  aria-label={`${name} 제거`}
+                >
+                  <LiaTimesSolid />
+                </button>
+              </span>
+            ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* 카테고리 관리 팝업 */}

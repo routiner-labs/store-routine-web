@@ -15,7 +15,7 @@ import {
   LiaCheckSolid,
   LiaTimesSolid,
 } from 'react-icons/lia'
-import { mockRequests, mockReplies, mockActivityLogs } from '@/mock/data'
+import { mockRequests, mockReplies, mockActivityLogs, REQUEST_CATEGORIES } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
 import { DEFAULT_CATEGORIES, registerTaskFromRequest, hasTaskForRequest, removeTasksForRequest } from '@/mock/tasks'
 import type { TaskKind } from '@/mock/tasks'
@@ -30,7 +30,11 @@ import EmployeeName from '@/components/EmployeeName'
 import { useScrollLock } from '@/lib/useScrollLock'
 import styles from './RequestDetailView.module.css'
 
-const REQUEST_TYPES: RequestType[] = ['재료부족', '장비고장', '근무변경', '고객이슈', '청소시설', '기타']
+const REQUEST_TYPES: RequestType[] = REQUEST_CATEGORIES.map((c) => c.name)
+
+function typeTagClass(styles: Record<string, string>, type: string): string {
+  return styles[`type_${type}`] ?? styles.type_default
+}
 
 const statusLabel: Record<string, string> = {
   REQUESTED: '미확인',
@@ -322,7 +326,7 @@ export default function RequestDetailView({
           {/* 게시글 */}
           <article className={styles.post}>
             <div className={styles.postTopRow}>
-              <span className={`${styles.typeTag} ${styles[`type_${type}`]}`}>
+              <span className={`${styles.typeTag} ${typeTagClass(styles, type)}`}>
                 {type}
               </span>
               {visibility === 'OWNER_ONLY' ? (

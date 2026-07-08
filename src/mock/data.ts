@@ -1,4 +1,18 @@
-import type { Checklist, AttendanceRecord, SpecialInstruction, EmployeeRequest, RequestReply, ActivityLog } from '@/types'
+import type { Checklist, AttendanceRecord, SpecialInstruction, EmployeeRequest, RequestReply, ActivityLog, RequestVisibility } from '@/types'
+
+export interface RequestCategory {
+  id: string
+  name: string
+}
+
+export const REQUEST_CATEGORIES: RequestCategory[] = [
+  { id: 'cat-material', name: '재료부족' },
+  { id: 'cat-equipment', name: '장비고장' },
+  { id: 'cat-schedule', name: '근무변경' },
+  { id: 'cat-customer', name: '고객이슈' },
+  { id: 'cat-facility', name: '청소시설' },
+  { id: 'cat-etc', name: '기타' },
+]
 
 export const mockAttendance: AttendanceRecord[] = [
   {
@@ -157,3 +171,37 @@ export const mockActivityLogs: ActivityLog[] = [
   { id: 'a6', requestId: '3', type: 'STATUS_CHANGED', actorName: '사장',   actorRole: 'OWNER',    detail: '미확인 → 처리 중',   createdAt: '2026-06-30 10:05' },
   { id: 'a7', requestId: '3', type: 'COMMENT_ADDED',  actorName: '사장',   actorRole: 'OWNER',    createdAt: '2026-06-30 10:20' },
 ]
+
+// 사장이 요청함에 직접 작성한 항목을 등록한다.
+// 모듈 싱글턴이므로 목록 페이지 재진입 시 반영된다. (목업: 새로고침 시 초기화)
+let requestSeq = 0
+
+export function addRequest(input: {
+  type: string
+  content: string
+  visibility: RequestVisibility
+  hasPhoto: boolean
+  employeeName: string
+}): string {
+  requestSeq += 1
+  const id = `owner-req-${requestSeq}`
+  mockRequests.unshift({
+    id,
+    type: input.type,
+    content: input.content,
+    status: 'REQUESTED',
+    visibility: input.visibility,
+    createdAt: '2026-06-30 방금',
+    employeeName: input.employeeName,
+    hasPhoto: input.hasPhoto,
+  })
+  mockActivityLogs.push({
+    id: `a-${id}`,
+    requestId: id,
+    type: 'CREATED',
+    actorName: input.employeeName,
+    actorRole: 'OWNER',
+    createdAt: '2026-06-30 방금',
+  })
+  return id
+}

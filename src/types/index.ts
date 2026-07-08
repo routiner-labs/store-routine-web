@@ -77,6 +77,7 @@ export interface Store {
   id: string
   name: string
   address?: string
+  code: string // 매장 식별번호 (시스템이 생성하는 8자리)
 }
 
 export interface CalendarRecord {

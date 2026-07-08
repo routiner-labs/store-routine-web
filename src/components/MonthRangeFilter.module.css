@@ -1,0 +1,49 @@
+/* 월 그리드 (3열 x 4행) — 범위 하이라이트는 DateRangeFilter 달력과 동일한 시각 언어 */
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 4px;
+  padding: 8px 12px 12px;
+}
+
+.monthCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 0;
+}
+
+.inRange {
+  background: var(--color-primary-light);
+}
+
+.rangeStart {
+  background: var(--color-primary-light);
+  border-radius: 999px 0 0 999px;
+}
+
+.rangeEnd {
+  background: var(--color-primary-light);
+  border-radius: 0 999px 999px 0;
+}
+
+.monthBtn {
+  width: calc(100% - 12px);
+  padding: 9px 0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background 0.1s, color 0.1s;
+}
+
+.monthBtn:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.selected {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}

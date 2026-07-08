@@ -1,0 +1,524 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-bottom: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 12px;
+  padding: 16px var(--page-x);
+  width: 100%;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── 내 정보 ── */
+.profileRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 16px 16px;
+}
+
+.profileAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.profileRole {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.infoLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.smallBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.1s;
+}
+
+.smallBtn:hover {
+  background: var(--color-bg);
+}
+
+.panelHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── 구독 정보 ── */
+.activeBadge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.planCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 16px 14px;
+  padding: 14px 16px;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
+}
+
+.planText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.planName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.planMeta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.planAmount {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.storageHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 16px 8px;
+}
+
+.storageHeadLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.storageHeadDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* 매장별 구독 블록: 매장명·요금 / 용량 / 결제 카드 — 클릭 시 매장 상세로 이동 */
+.storeSub {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-border);
+  transition: background 0.1s;
+}
+
+.storeSub:hover {
+  background: var(--color-bg);
+}
+
+.storeSubHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 화살표만 우측 끝으로 — 결제 실패 뱃지는 매장명 바로 옆에 붙인다 */
+.storeSubHead .historyChevron {
+  margin-left: auto;
+}
+
+.storeSubName {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.storeSubCode {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.feeBadge {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.storageLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.storageUsage {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.cardLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardLineIcon {
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.cardLineValue {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gaugeTrack {
+  flex: 1;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.gaugeFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--color-primary);
+}
+
+.gaugeWarning {
+  background: var(--color-warning);
+}
+
+.gaugeDanger {
+  background: var(--color-danger);
+}
+
+/* ── 결제 내역 ── */
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  transition: background 0.1s;
+}
+
+.historyRow:hover {
+  background: var(--color-bg);
+}
+
+.historyText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.historyLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.historyDate {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.historyRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.historyAmount {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.paidBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.historyChevron {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.moreRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: background 0.1s, color 0.1s;
+}
+
+.moreRow:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  padding: 6px 10px 6px 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.backBtn:hover {
+  background: var(--color-bg);
+}
+
+.monthFilterRow {
+  width: min(280px, 100%);
+}
+
+.emptyText {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* ── 매장 상세: 기본 정보 수정 / 구독 관리 ── */
+.editRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px 16px 8px;
+}
+
+.editLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.editInput {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.1s;
+}
+
+.editInput:focus {
+  border-color: var(--color-primary);
+}
+
+.editFoot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 16px 14px;
+}
+
+.subRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── 결제 실패 상태 표시 ── */
+.failBadge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-danger);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.failedBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.subIssue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-danger-light);
+  border-radius: var(--radius-sm);
+}
+
+.subIssueText {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-danger);
+}
+
+.subIssueDetail {
+  margin: 4px 16px 12px;
+}
+
+@media (min-width: 768px) {
+  .body {
+    padding: 20px var(--page-x);
+  }
+}
+
+/* 데스크탑: 좌(내 정보) / 우(구독·결제) 2단 전체 화면 */
+@media (min-width: 1024px) {
+  .bodyGrid {
+    display: grid;
+    grid-template-columns: minmax(320px, 400px) 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+}

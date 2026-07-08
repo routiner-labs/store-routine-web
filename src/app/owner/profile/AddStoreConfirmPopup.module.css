@@ -1,0 +1,50 @@
+.warnHead {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+
+.noticeList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+}
+
+.noticeItem {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.noticeItem strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.phraseSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phraseGuide {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.phraseBox {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  user-select: none;
+}

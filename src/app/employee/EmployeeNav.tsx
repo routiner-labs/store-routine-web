@@ -95,7 +95,7 @@ export default function EmployeeNav() {
         ))}
 
         <div className={styles.userSection}>
-          <UserMenu initial="이" name="이지은" />
+          <UserMenu initial="이" name="이지은" profileHref="/employee/profile" />
         </div>
       </nav>
 

@@ -11,8 +11,8 @@ const DIAL_VISIBLE_ROWS = 5
 const DIAL_PAD = ((DIAL_VISIBLE_ROWS - 1) / 2) * DIAL_ITEM_HEIGHT
 
 // 위아래로 쓸어서(스크롤) 고르는 다이얼. 네이티브 스크롤 스냅으로 물리감을 주고,
-// scrollend에서 가운데 온 값을 읽어 선택값으로 반영한다.
-function DialColumn({
+// scrollend에서 가운데 온 값을 읽어 선택값으로 반영한다. (MonthRangeFilter에서도 재사용)
+export function DialColumn({
   values,
   selected,
   onSelect,

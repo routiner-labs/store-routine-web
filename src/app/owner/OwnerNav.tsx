@@ -116,7 +116,7 @@ export default function OwnerNav() {
         ))}
 
         <div className={styles.userSection}>
-          <UserMenu initial="사" name="사장님">
+          <UserMenu initial="사" name="사장님" profileHref="/owner/profile">
             <NotificationBell />
           </UserMenu>
         </div>

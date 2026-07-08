@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { LiaUserSolid, LiaCogSolid } from 'react-icons/lia'
 import SystemSettings from '@/components/SystemSettings'
 import styles from './UserMenu.module.css'
@@ -9,12 +10,15 @@ import styles from './UserMenu.module.css'
 export default function UserMenu({
   initial,
   name,
+  profileHref,
   children,
 }: {
   initial: string
   name: string
+  profileHref: string
   children?: React.ReactNode
 }) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -32,7 +36,13 @@ export default function UserMenu({
     <div ref={wrapRef} className={styles.wrap}>
       <div className={`${styles.expand} ${open ? styles.expandOpen : ''}`}>
         <div className={styles.menuInner}>
-          <button className={styles.menuItem} onClick={() => setOpen(false)}>
+          <button
+            className={styles.menuItem}
+            onClick={() => {
+              setOpen(false)
+              router.push(profileHref)
+            }}
+          >
             <LiaUserSolid className={styles.menuIcon} />
             <span className={styles.menuLabel}>프로필</span>
           </button>

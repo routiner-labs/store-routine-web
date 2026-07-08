@@ -1,0 +1,244 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-bottom: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  padding: 6px 10px 6px 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.backBtn:hover {
+  background: var(--color-bg);
+}
+
+.notFound {
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px var(--page-x);
+  width: 100%;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 14px 16px 10px;
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── 결제 요약 ── */
+.summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+}
+
+.paidBadge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.failedBadge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.summaryAmount {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.summaryLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.summaryDate {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ── 결제 수단 / 항목 ── */
+.methodRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.cardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cardName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cardNumber {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.detailLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  font-size: 13px;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.detailValue {
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.failReason {
+  color: var(--color-danger);
+}
+
+.totalRow {
+  background: var(--color-bg);
+}
+
+.totalLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.totalValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ── 하단 액션 ── */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 12px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.1s;
+}
+
+.actionBtn:hover {
+  background: var(--color-bg);
+}
+
+@media (min-width: 768px) {
+  .body {
+    padding: 20px var(--page-x);
+  }
+}
+
+/* 데스크탑: 좌(요약·결제 수단) / 우(결제 항목·액션) 2단 전체 화면 */
+@media (min-width: 1024px) {
+  .bodyGrid {
+    display: grid;
+    grid-template-columns: minmax(320px, 400px) 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+}

@@ -1,0 +1,52 @@
+.footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 8px;
+}
+
+.link {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color 0.1s;
+}
+
+.link:hover {
+  color: var(--color-text);
+}
+
+/* ── 팝업 본문 ── */
+.policy {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 18px;
+}
+
+.item {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}

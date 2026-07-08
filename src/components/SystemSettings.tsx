@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { LiaCogSolid, LiaTimesSolid, LiaPaletteSolid } from 'react-icons/lia'
+import { LiaTimesSolid, LiaPaletteSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { useTheme } from '@/context/ThemeContext'
 import styles from './SystemSettings.module.css'
@@ -13,7 +13,8 @@ const SECTIONS: Array<{ id: SettingsSection; label: string; icon: React.ReactNod
   { id: 'theme', label: '테마', icon: <LiaPaletteSolid /> },
 ]
 
-function SettingsPopup({ onClose }: { onClose: () => void }) {
+// 시스템 설정 팝업 (사이드바 하단 사용자 메뉴의 "설정"에서 열림)
+export default function SystemSettings({ onClose }: { onClose: () => void }) {
   const [section, setSection] = useState<SettingsSection>('theme')
   const { theme, setTheme } = useTheme()
 
@@ -80,24 +81,5 @@ function SettingsPopup({ onClose }: { onClose: () => void }) {
       </div>
     </div>,
     document.body
-  )
-}
-
-// 사이드바 하단(종 모양 왼쪽)에 놓는 톱니바퀴 버튼 + 시스템 설정 팝업
-export default function SystemSettings() {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <>
-      <button
-        type="button"
-        className={styles.gearBtn}
-        onClick={() => setOpen(true)}
-        aria-label="시스템 설정"
-      >
-        <LiaCogSolid className={styles.gearIcon} />
-      </button>
-      {open && <SettingsPopup onClose={() => setOpen(false)} />}
-    </>
   )
 }

@@ -25,7 +25,7 @@ import { useNotification } from '@/context/NotificationContext'
 import type { NotificationType } from '@/context/NotificationContext'
 import StoreSwitcher from './StoreSwitcher'
 import NotificationBell from '@/components/NotificationBell'
-import SystemSettings from '@/components/SystemSettings'
+import UserMenu from '@/components/UserMenu'
 import styles from './OwnerNav.module.css'
 
 type NavItem = { href: string; label: string; icon: IconType }
@@ -116,9 +116,7 @@ export default function OwnerNav() {
         ))}
 
         <div className={styles.userSection}>
-          <span className={styles.userAvatar}>사</span>
-          <span className={styles.userName}>사장님</span>
-          <SystemSettings />
+          <UserMenu initial="사" name="사장님" />
           <NotificationBell />
         </div>
       </nav>

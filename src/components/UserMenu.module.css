@@ -1,4 +1,19 @@
-/* ── 트리거: 아바타 + 이름 (태블릿: 아바타만, 데스크탑: 이름 포함) ── */
+/* ── 래퍼: 위 = 펼쳐지는 메뉴, 아래 = 이름+벨 줄(제자리 고정) ── */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ── 이름+벨 줄 (태블릿: 세로 스택, 데스크탑: 가로) ── */
+.row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
 .trigger {
   display: flex;
   align-items: center;
@@ -32,7 +47,72 @@
   display: none;
 }
 
+/* ── 펼쳐지는 메뉴: 이름+벨 줄 위쪽으로 높이가 늘어나며 열림 ── */
+.expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.expandOpen {
+  grid-template-rows: 1fr;
+}
+
+.menuInner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.expandOpen .menuInner {
+  opacity: 1;
+}
+
+.menuInner > :last-child {
+  margin-bottom: 6px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background 0.1s;
+}
+
+.menuItem:hover {
+  background: var(--color-bg);
+}
+
+.menuIcon {
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* 태블릿(아이콘 레일)에서는 라벨 숨김 */
+.menuLabel {
+  display: none;
+}
+
 @media (min-width: 1024px) {
+  .row {
+    flex-direction: row;
+    gap: 6px;
+  }
+
   .trigger {
     flex: 1;
     justify-content: flex-start;
@@ -51,57 +131,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-}
 
-/* ── 바깥 클릭 오버레이 (body로 포탈) ── */
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1199;
-}
+  .menuItem {
+    justify-content: flex-start;
+  }
 
-/* ── 메뉴 팝업 (body로 포탈, 트리거 위로 올라옴 · left/bottom 은 인라인 지정) ── */
-.menu {
-  position: fixed;
-  min-width: 160px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  z-index: 1200;
-  display: flex;
-  flex-direction: column;
-  padding: 6px;
-  transform-origin: bottom left;
-  animation: menuIn 0.18s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-@keyframes menuIn {
-  from { opacity: 0; transform: translateY(8px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)  scale(1); }
-}
-
-.menuItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text);
-  text-align: left;
-  transition: background 0.1s;
-}
-
-.menuItem:hover {
-  background: var(--color-bg);
-}
-
-.menuIcon {
-  display: flex;
-  align-items: center;
-  font-size: 17px;
-  color: var(--color-text-secondary);
+  .menuLabel {
+    display: inline;
+  }
 }

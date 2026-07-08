@@ -383,7 +383,7 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 - 테마는 `documentElement`의 `data-theme` 속성(`light`/`dark`)으로 전환된다. 모든 토큰이 `globals.css`의 `:root[data-theme='dark']`에서 어두운 값으로 재정의되므로, **토큰만 쓰면 컴포넌트는 아무 것도 안 해도 다크 모드가 된다.**
 - 상태 관리: `src/context/ThemeContext.tsx`(`useTheme()` — `theme`/`setTheme`). localStorage `theme` 키로 유지되고, `src/app/layout.tsx`의 인라인 스크립트가 첫 페인트 전에 적용해 깜빡임을 막는다.
-- 설정 UI: 사이드바 좌측 하단 이름/아바타 클릭(`src/components/UserMenu.tsx`) → "설정" → "시스템 설정" 팝업(`src/components/SystemSettings.tsx`, 좌측 설정 항목 / 우측 상세 조정) → 테마 → 다크 모드 활성화/비활성화.
+- 설정 UI: 사이드바 좌측 하단 이름/아바타 클릭(`src/components/UserMenu.tsx`) → 위로 펼쳐지는 메뉴의 "시스템 설정" → "시스템 설정" 팝업(`src/components/SystemSettings.tsx`, 좌측 설정 항목 / 우측 상세 조정) → 테마 → 다크 모드 활성화/비활성화.
 - 테마 전환 시 급격한 색 변화를 막기 위해 globals.css에서 전역 `background-color/color/border-color 0.25s` 트랜지션을 건다. 개별 컴포넌트가 자체 `transition`을 선언하면 그쪽이 우선(빠른 hover 유지)이므로 신경쓸 필요 없다.
 
 ### 토큰 이중 정의 (globals.css)

@@ -226,32 +226,38 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
             {storePayments.length === 0 ? (
               <p className={styles.emptyText}>결제 내역이 없습니다.</p>
             ) : (
-              storePayments.map((record) => (
-                <Link
-                  key={record.id}
-                  href={`/owner/profile/payments/${record.id}`}
-                  className={styles.historyRow}
-                >
-                  <div className={styles.historyText}>
-                    <span className={styles.historyLabel}>{record.label}</span>
-                    <span className={styles.historyDate}>
-                      {record.date} · {record.cardName}
-                      {record.status === 'FAILED' && record.failReason
-                        ? ` · ${record.failReason}`
-                        : ''}
-                    </span>
-                  </div>
-                  <div className={styles.historyRight}>
-                    <span className={styles.historyAmount}>{formatWon(record.amount)}</span>
-                    <span
-                      className={record.status === 'PAID' ? styles.paidBadge : styles.failedBadge}
-                    >
-                      {record.status === 'PAID' ? '결제 완료' : '결제 실패'}
-                    </span>
-                  </div>
-                  <LiaAngleRightSolid className={styles.historyChevron} />
-                </Link>
-              ))
+              storePayments.map((record) => {
+                // 여러 매장이 묶여 결제된 건이라도 이 매장 청구분만 표시
+                const storeAmount = record.items
+                  .filter((item) => item.storeId === id)
+                  .reduce((sum, item) => sum + item.amount, 0)
+                return (
+                  <Link
+                    key={record.id}
+                    href={`/owner/profile/payments/${record.id}`}
+                    className={styles.historyRow}
+                  >
+                    <div className={styles.historyText}>
+                      <span className={styles.historyLabel}>{record.label}</span>
+                      <span className={styles.historyDate}>
+                        {record.date} · {record.cardName}
+                        {record.status === 'FAILED' && record.failReason
+                          ? ` · ${record.failReason}`
+                          : ''}
+                      </span>
+                    </div>
+                    <div className={styles.historyRight}>
+                      <span className={styles.historyAmount}>{formatWon(storeAmount)}</span>
+                      <span
+                        className={record.status === 'PAID' ? styles.paidBadge : styles.failedBadge}
+                      >
+                        {record.status === 'PAID' ? '결제 완료' : '결제 실패'}
+                      </span>
+                    </div>
+                    <LiaAngleRightSolid className={styles.historyChevron} />
+                  </Link>
+                )
+              })
             )}
           </section>
         </div>

@@ -123,6 +123,7 @@ export function cardById(id: string): RegisteredCard | undefined {
 export type PaymentStatus = 'PAID' | 'FAILED'
 
 export interface PaymentItem {
+  storeId: string // 이 항목이 청구된 매장
   label: string
   amount: number
 }
@@ -160,7 +161,7 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-07-01 ~ 2026-07-31',
     storeIds: ['3'],
     failReason: '카드 한도 초과',
-    items: [{ label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
+    items: [{ storeId: '3', label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
   },
   {
     id: 'pay5b',
@@ -174,7 +175,7 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-07-01 ~ 2026-07-31',
     storeIds: ['3'],
     failReason: '카드 한도 초과',
-    items: [{ label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
+    items: [{ storeId: '3', label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
   },
   {
     id: 'pay6',
@@ -188,8 +189,8 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-07-01 ~ 2026-07-31',
     storeIds: ['1', '2'],
     items: [
-      { label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
-      { label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
+      { storeId: '1', label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
+      { storeId: '2', label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
     ],
   },
   {
@@ -204,7 +205,7 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-07-01 ~ 2026-07-31',
     storeIds: ['3'],
     failReason: '카드 한도 초과',
-    items: [{ label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
+    items: [{ storeId: '3', label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
   },
   {
     id: 'pay4',
@@ -218,8 +219,8 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-06-01 ~ 2026-06-30',
     storeIds: ['1', '2'],
     items: [
-      { label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
-      { label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
+      { storeId: '1', label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
+      { storeId: '2', label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
     ],
   },
   {
@@ -233,7 +234,7 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     approvalNo: '29984107',
     period: '2026-06-01 ~ 2026-06-30',
     storeIds: ['3'],
-    items: [{ label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
+    items: [{ storeId: '3', label: '추가 매장 - 스타벅스 신촌점', amount: 8800 }],
   },
   {
     id: 'pay2',
@@ -246,7 +247,7 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     approvalNo: '29610344',
     period: '2026-05-12 ~ 2026-05-31',
     storeIds: ['3'],
-    items: [{ label: '추가 매장 - 스타벅스 신촌점 (5/12~5/31 일할계산)', amount: 5680 }],
+    items: [{ storeId: '3', label: '추가 매장 - 스타벅스 신촌점 (5/12~5/31 일할계산)', amount: 5680 }],
   },
   {
     id: 'pay1',
@@ -260,8 +261,8 @@ export const PAYMENT_HISTORY: PaymentRecord[] = [
     period: '2026-05-01 ~ 2026-05-31',
     storeIds: ['1', '2'],
     items: [
-      { label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
-      { label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
+      { storeId: '1', label: '기본 매장 - 스타벅스 강남점', amount: 9900 },
+      { storeId: '2', label: '추가 매장 - 스타벅스 홍대점', amount: 8800 },
     ],
   },
 ]

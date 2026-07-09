@@ -315,6 +315,68 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 ---
 
+### 체크박스 (Checkbox)
+
+목록에서 항목을 다중 선택할 때 쓰는 표준 체크박스. 참조 문서 선택 팝업(`owner/checklists`)이 레퍼런스. 새로 체크박스가 필요하면 네이티브 `<input type="checkbox">`나 임의 디자인 대신 이 스펙을 재사용한다.
+
+#### 형태 / 크기
+
+| 속성 | 값 |
+|---|---|
+| width / height | `22px` |
+| border-radius | `6px` (둥근 사각형, pill 아님) |
+| border | `1.5px solid --color-border` (기본) |
+| 체크 표시 | `react-icons/lia`의 `LiaCheckSolid`, `font-size: 13px`, 흰색 |
+| transition | `background 0.12s, border-color 0.12s` |
+
+#### 상태별 색상
+
+| 상태 | background | border | 아이콘 |
+|---|---|---|---|
+| 미선택 (off) | 없음(투명) | `1.5px solid --color-border` | 없음 |
+| 선택 (on) | `--color-primary` | `--color-primary` | 흰색 체크 표시 |
+
+#### CSS 패턴
+
+```css
+.checkbox {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;              /* 체크 아이콘 색 */
+  font-size: 13px;
+  transition: background 0.12s, border-color 0.12s;
+}
+.checkboxOn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+```
+
+```tsx
+<button
+  type="button"
+  className={`${styles.checkbox} ${on ? styles.checkboxOn : ''}`}
+  onClick={() => toggle(id)}
+  aria-label={on ? '선택 해제' : '선택'}
+>
+  {on && <LiaCheckSolid />}
+</button>
+```
+
+#### 규칙
+
+- 색은 토큰만 사용(`--color-primary`, `--color-border`) — 다크 모드 자동 대응. 체크 아이콘의 `#fff`만 예외(파란 배경 위 흰색).
+- 목록 행에서는 체크박스를 **제목(라벨) 왼쪽**에 둔다.
+- 체크는 즉시 반영하지 않는다 — 초안 선택만 표시하고 '추가/등록/적용' 확정 버튼을 눌러야 실제 반영(`MultiSelectFilter`와 동일 원칙, `good-bad.md` 참고).
+
+---
+
 ### 헤더 레이아웃
 
 모든 페이지 헤더는 아래 규칙을 따른다.

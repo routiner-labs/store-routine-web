@@ -142,8 +142,13 @@ function TimeRangeSlider({
           onChange={(e) => onChange(start, e.target.value)}
         />
         {active && (
-          <button type="button" className={styles.trsClear} onClick={() => onChange('', '')}>
-            상시로
+          <button
+            type="button"
+            className={styles.trsClear}
+            onClick={() => onChange('', '')}
+            aria-label="상시로 변경"
+          >
+            <LiaTimesSolid />
           </button>
         )}
       </div>
@@ -429,9 +434,11 @@ export default function OwnerChecklists() {
   const [dragItem, setDragItem] = useState<DragItem | null>(null)
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null)
   const [dragOverSection, setDragOverSection] = useState<TaskKind | null>(null)
+  const [trashDragOver, setTrashDragOver] = useState(false)
   const [catalogQuery, setCatalogQuery] = useState('')
   const [taskQuery, setTaskQuery] = useState<Record<TaskKind, string>>({ COMMON: '', EXTRA: '' })
   const [empQuery, setEmpQuery] = useState('')
+  const [hideOffDuty, setHideOffDuty] = useState(false)
   const [catalog, setCatalog] = useState<TaskTemplate[]>(TASK_CATALOG)
   const [fabOpen, setFabOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
@@ -501,6 +508,8 @@ export default function OwnerChecklists() {
   const [newDocRefs, setNewDocRefs] = useState<string[]>([])
   const [docPickerOpen, setDocPickerOpen] = useState(false)
   const [docPickerQuery, setDocPickerQuery] = useState('')
+  const [docPreviewId, setDocPreviewId] = useState<string | null>(null)
+  const [docDraftRefs, setDocDraftRefs] = useState<string[]>([])
   const [viewDocId, setViewDocId] = useState<string | null>(null)
   const [viewRequestId, setViewRequestId] = useState<string | null>(null)
   const seqRef = useRef(0)
@@ -514,11 +523,38 @@ export default function OwnerChecklists() {
     const doc = DOCUMENT_CATALOG.find((d) => d.id === id)
     return DOCUMENT_CATEGORIES.find((c) => c.id === doc?.category)?.name ?? '기타'
   }
+  const docCategoryColor = (id: string) => {
+    const doc = DOCUMENT_CATALOG.find((d) => d.id === id)
+    return DOCUMENT_CATEGORIES.find((c) => c.id === doc?.category)?.color
+  }
 
   function toggleDocRef(docId: string) {
     setNewDocRefs((prev) =>
       prev.includes(docId) ? prev.filter((x) => x !== docId) : [...prev, docId],
     )
+  }
+
+  function toggleDocDraft(docId: string) {
+    setDocDraftRefs((prev) =>
+      prev.includes(docId) ? prev.filter((x) => x !== docId) : [...prev, docId],
+    )
+  }
+
+  function openDocPicker() {
+    setDocDraftRefs(newDocRefs)
+    setDocPreviewId(DOCUMENT_CATALOG[0]?.id ?? null)
+    setDocPickerOpen(true)
+  }
+
+  function closeDocPicker() {
+    setDocPickerOpen(false)
+    setDocPickerQuery('')
+  }
+
+  function applyDocPicker() {
+    setNewDocRefs(docDraftRefs)
+    closeDocPicker()
+    showToast(`참조 문서 ${docDraftRefs.length}건이 적용되었습니다`)
   }
 
   const tasks = tasksByDate[selectedDate] ?? []
@@ -583,6 +619,23 @@ export default function OwnerChecklists() {
     setDragItem(null)
     setDragOverTaskId(null)
     setDragOverSection(null)
+    setTrashDragOver(false)
+  }
+
+  function deactivateTask(id: string) {
+    const tpl = catalog.find((t) => t.id === id)
+    if (!tpl) return
+    setCatalog((prev) => prev.map((t) => (t.id === id ? { ...t, active: false } : t)))
+    showToast(`'${tpl.title}' 테스크가 비활성화되었습니다`)
+  }
+
+  function toggleTaskActive(id: string) {
+    const tpl = catalog.find((t) => t.id === id)
+    if (!tpl) return
+    const next = tpl.active === false
+    setCatalog((prev) => prev.map((t) => (t.id === id ? { ...t, active: next } : t)))
+    if (editingId === id) setNewActive(next)
+    showToast(next ? `'${tpl.title}' 테스크가 활성화되었습니다` : `'${tpl.title}' 테스크가 비활성화되었습니다`)
   }
 
   function openDatePicker() {
@@ -607,6 +660,22 @@ export default function OwnerChecklists() {
           : t,
       ),
     }))
+  }
+
+  async function assignEmployee(taskId: string, empId: string) {
+    const isOffDuty = !attByEmp[empId]
+    if (isOffDuty) {
+      const emp = empById[empId]
+      const ok = await confirm({
+        title: '휴무자를 배정할까요?',
+        message: `${emp?.name ?? '이 직원'}님은 ${formatHeaderDate(selectedDate)} 휴무입니다. 그래도 배정하시겠어요?`,
+        confirmText: '네',
+        cancelText: '아니오',
+        danger: false,
+      })
+      if (!ok) return
+    }
+    assign(taskId, empId)
   }
 
   function unassign(taskId: string, empId: string) {
@@ -971,7 +1040,7 @@ export default function OwnerChecklists() {
               <button
                 type="button"
                 className={styles.dutyAdd}
-                onClick={() => setDocPickerOpen(true)}
+                onClick={openDocPicker}
               >
                 <LiaPlusSolid />
                 문서 추가하기
@@ -1034,7 +1103,7 @@ export default function OwnerChecklists() {
           if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverTaskId(null)
         }}
         onDrop={() => {
-          if (dragItem?.type === 'EMP') assign(task.id, dragItem.id)
+          if (dragItem?.type === 'EMP') assignEmployee(task.id, dragItem.id)
           clearDrag()
         }}
       >
@@ -1090,28 +1159,16 @@ export default function OwnerChecklists() {
             </span>
           )}
 
-          {task.assigneeIds.length === 1 &&
-            (() => {
-              const emp = empById[task.assigneeIds[0]]
-              if (!emp) return null
-              return (
-                <span className={styles.assigneeChip}>
-                  <span className={styles.assigneeAvatar}>{emp.name[0]}</span>
-                  <EmployeeName name={emp.name} />
-                  <button
-                    className={styles.assigneeRemove}
-                    onClick={() => unassign(task.id, task.assigneeIds[0])}
-                    aria-label={`${emp.name} 배정 해제`}
-                  >
-                    <LiaTimesSolid />
-                  </button>
-                </span>
-              )
-            })()}
-
-          {task.assigneeIds.length >= 2 && (
+          {task.assigneeIds.length >= 1 && (
             <span className={styles.assigneeMore}>
-              <span className={styles.assigneeCount}>{task.assigneeIds.length}명 배정</span>
+              <span className={styles.assigneeCount}>
+                {(() => {
+                  const firstName = empById[task.assigneeIds[0]]?.name ?? '알 수 없음'
+                  return task.assigneeIds.length === 1
+                    ? firstName
+                    : `${firstName} 외 ${task.assigneeIds.length - 1}`
+                })()}
+              </span>
               <span className={styles.assigneeTooltip}>
                 <span className={styles.assigneeTooltipCard}>
                   {task.assigneeIds.map((empId) => {
@@ -1309,6 +1366,19 @@ export default function OwnerChecklists() {
           <h2 className={styles.panelTitle}>
             직원
             <InfoTip text="직원을 업무로 끌어다 놓아 배정합니다" />
+            <span className={styles.offDutyToggle}>
+              <button
+                type="button"
+                className={`${styles.activeSwitch} ${hideOffDuty ? styles.activeSwitchOn : ''}`}
+                onClick={() => setHideOffDuty((v) => !v)}
+                aria-label="휴무자 제외"
+              >
+                <span className={styles.activeSwitchKnob} />
+              </button>
+              <span className={`${styles.infoTooltip} ${styles.infoTooltipRight}`}>
+                휴무자를 목록에서 제외합니다
+              </span>
+            </span>
           </h2>
           <div className={styles.panelSearch}>
             <LiaSearchSolid className={styles.panelSearchIcon} />
@@ -1331,17 +1401,21 @@ export default function OwnerChecklists() {
           </div>
           <div className={styles.empList}>
             {filteredEmployees.length === 0 ? (
-              <p className={styles.panelEmpty}>검색 결과가 없습니다</p>
+              <p className={styles.panelEmpty}>
+                {empQ ? '검색 결과가 없습니다' : '표시할 직원이 없습니다'}
+              </p>
             ) : (
               filteredEmployees.map((emp) => {
               const status = attByEmp[emp.id]
+              const hidden = hideOffDuty && !status
               return (
                 <div
                   key={emp.id}
                   className={`${styles.empCard} ${
                     dragItem?.type === 'EMP' && dragItem.id === emp.id ? styles.dragging : ''
-                  }`}
-                  draggable
+                  } ${hidden ? styles.empCardHidden : ''}`}
+                  draggable={!hidden}
+                  aria-hidden={hidden}
                   onDragStart={() => setDragItem({ type: 'EMP', id: emp.id })}
                   onDragEnd={clearDrag}
                 >
@@ -1373,6 +1447,29 @@ export default function OwnerChecklists() {
           <h2 className={styles.panelTitle}>
             테스크 목록
             <InfoTip text="테스크를 공통·추가 리스트로 끌어다 놓아 추가합니다" align="right" />
+            <span
+              className={`${styles.catalogTrash} ${
+                dragItem?.type === 'CATALOG' ? styles.catalogTrashReady : ''
+              } ${trashDragOver ? styles.catalogTrashOver : ''}`}
+              onDragOver={(e) => {
+                if (dragItem?.type !== 'CATALOG') return
+                e.preventDefault()
+                if (!trashDragOver) setTrashDragOver(true)
+              }}
+              onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setTrashDragOver(false)
+              }}
+              onDrop={() => {
+                if (dragItem?.type === 'CATALOG') deactivateTask(dragItem.id)
+                clearDrag()
+              }}
+              aria-label="휴지통 — 테스크를 끌어다 놓으면 비활성화"
+            >
+              <LiaTrashAltSolid className={styles.catalogTrashIcon} />
+              <span className={`${styles.infoTooltip} ${styles.infoTooltipRight}`}>
+                휴지통 — 테스크를 끌어다 놓으면 비활성화됩니다
+              </span>
+            </span>
           </h2>
           <div className={styles.panelSearch}>
             <LiaSearchSolid className={styles.panelSearchIcon} />
@@ -1619,7 +1716,7 @@ export default function OwnerChecklists() {
                   {manageFiltered.map((tpl) => {
                     const inactive = tpl.active === false
                     return (
-                      <button
+                      <div
                         key={tpl.id}
                         className={`${styles.manageListItem} ${
                           editingId === tpl.id ? styles.manageListItemActive : ''
@@ -1629,9 +1726,19 @@ export default function OwnerChecklists() {
                         <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(tpl.category ?? 'ETC'))}>
                           {categoryName(tpl.category ?? 'ETC')}
                         </span>
-                        <span className={styles.manageListName}>{tpl.title}</span>
-                        {inactive && <span className={styles.offBadge}>비활성</span>}
-                      </button>
+                        <span className={styles.manageListName} title={tpl.title}>{tpl.title}</span>
+                        <button
+                          type="button"
+                          className={`${styles.activeSwitch} ${!inactive ? styles.activeSwitchOn : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleTaskActive(tpl.id)
+                          }}
+                          aria-label={inactive ? `${tpl.title} 활성화` : `${tpl.title} 비활성화`}
+                        >
+                          <span className={styles.activeSwitchKnob} />
+                        </button>
+                      </div>
                     )
                   })}
                   {editingId === null && (
@@ -1779,52 +1886,133 @@ export default function OwnerChecklists() {
         </div>
       )}
 
-      {/* 참조 문서 선택 팝업 */}
-      {docPickerOpen && (
-        <div className={styles.dutyPopOverlay} onClick={() => { setDocPickerOpen(false); setDocPickerQuery('') }}>
-          <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.dutyPopHead}>
-              <span className={styles.dutyPopTitle}>참조 문서 선택</span>
-              <button
-                className={styles.modalClose}
-                onClick={() => { setDocPickerOpen(false); setDocPickerQuery('') }}
-                aria-label="닫기"
-              >
-                <LiaTimesSolid />
-              </button>
-            </div>
-            <div className={styles.docPickerSearch}>
-              <LiaSearchSolid className={styles.panelSearchIcon} />
-              <input
-                className={styles.panelSearchInput}
-                type="text"
-                placeholder="문서 제목 검색"
-                value={docPickerQuery}
-                onChange={(e) => setDocPickerQuery(e.target.value)}
-              />
-            </div>
-            <div className={styles.dutyPopList}>
-              {DOCUMENT_CATALOG
-                .filter((d) => !docPickerQuery.trim() || d.title.toLowerCase().includes(docPickerQuery.trim().toLowerCase()))
-                .map((d) => {
-                  const on = newDocRefs.includes(d.id)
-                  return (
-                    <button
-                      key={d.id}
-                      type="button"
-                      className={styles.dutyPopRow}
-                      onClick={() => toggleDocRef(d.id)}
-                    >
-                      <span className={styles.docRefBadge}>{docCategoryName(d.id)}</span>
-                      <span className={styles.dutyPopName}>{d.title}</span>
-                      {on && <LiaCheckSolid className={styles.dutyPopCheck} />}
-                    </button>
-                  )
-                })}
+      {/* 참조 문서 선택 팝업 (좌: 목록 / 우: 뷰어) */}
+      {docPickerOpen && (() => {
+        const q = docPickerQuery.trim().toLowerCase()
+        const filteredDocs = q
+          ? DOCUMENT_CATALOG.filter(
+              (d) =>
+                d.title.toLowerCase().includes(q) ||
+                docCategoryName(d.id).toLowerCase().includes(q),
+            )
+          : DOCUMENT_CATALOG
+        const previewDoc = DOCUMENT_CATALOG.find((d) => d.id === docPreviewId)
+        return (
+          <div className={styles.dutyPopOverlay} onClick={closeDocPicker}>
+            <div className={styles.docPickerCard} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.dutyPopHead}>
+                <span className={styles.dutyPopTitle}>참조 문서 선택</span>
+                <button className={styles.modalClose} onClick={closeDocPicker} aria-label="닫기">
+                  <LiaTimesSolid />
+                </button>
+              </div>
+              <div className={styles.docPickerBody}>
+                {/* 좌: 목록 */}
+                <div className={styles.docPickerListPane}>
+                  <div className={styles.manageSearch}>
+                    <LiaSearchSolid className={styles.manageSearchIcon} />
+                    <input
+                      className={styles.manageSearchInput}
+                      type="text"
+                      placeholder="이름·카테고리 검색"
+                      value={docPickerQuery}
+                      onChange={(e) => setDocPickerQuery(e.target.value)}
+                    />
+                    {docPickerQuery && (
+                      <button
+                        className={styles.manageSearchClear}
+                        onClick={() => setDocPickerQuery('')}
+                        aria-label="검색어 지우기"
+                      >
+                        <LiaTimesSolid />
+                      </button>
+                    )}
+                  </div>
+                  <div className={styles.docPickerList}>
+                    {filteredDocs.length === 0 ? (
+                      <p className={styles.manageEmpty}>검색 결과가 없습니다</p>
+                    ) : (
+                      filteredDocs.map((d) => {
+                        const on = docDraftRefs.includes(d.id)
+                        const active = docPreviewId === d.id
+                        return (
+                          <div
+                            key={d.id}
+                            className={`${styles.docPickerRow} ${active ? styles.docPickerRowActive : ''}`}
+                          >
+                            <button
+                              type="button"
+                              className={`${styles.docPickerCheck} ${on ? styles.docPickerCheckOn : ''}`}
+                              onClick={() => toggleDocDraft(d.id)}
+                              aria-label={on ? `${d.title} 선택 해제` : `${d.title} 선택`}
+                            >
+                              {on && <LiaCheckSolid />}
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.docPickerRowMain}
+                              onClick={() => setDocPreviewId(d.id)}
+                            >
+                              <span className={styles.docRefBadge}>{docCategoryName(d.id)}</span>
+                              <span className={styles.docPickerRowName} title={d.title}>
+                                {d.title}
+                              </span>
+                            </button>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+                {/* 우: 뷰어 */}
+                <div className={styles.docPickerViewer}>
+                  {previewDoc ? (
+                    <article>
+                      <div className={styles.docPickerViewerHead}>
+                        <span
+                          className={styles.catBadge}
+                          style={categoryBadgeStyle(docCategoryColor(previewDoc.id))}
+                        >
+                          {docCategoryName(previewDoc.id)}
+                        </span>
+                        <h3 className={styles.docPickerViewerTitle}>{previewDoc.title}</h3>
+                        <p className={styles.docPickerViewerMeta}>
+                          <EmployeeName name={previewDoc.authorName} />
+                          <span>
+                            작성 {previewDoc.createdAt}
+                            {previewDoc.updatedAt !== previewDoc.createdAt &&
+                              ` · 수정 ${previewDoc.updatedAt}`}
+                          </span>
+                        </p>
+                      </div>
+                      <div
+                        className={styles.docPickerViewerContent}
+                        dangerouslySetInnerHTML={{ __html: previewDoc.content }}
+                      />
+                    </article>
+                  ) : (
+                    <div className={styles.docPickerViewerEmpty}>
+                      <LiaBookSolid />
+                      <p>왼쪽에서 문서를 선택하면 내용을 볼 수 있습니다</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className={styles.docPickerFoot}>
+                <span className={styles.docPickerFootCount}>{docDraftRefs.length}건 선택됨</span>
+                <div className={styles.docPickerFootBtns}>
+                  <button type="button" className={styles.btnCancel} onClick={closeDocPicker}>
+                    취소
+                  </button>
+                  <button type="button" className={styles.btnCreate} onClick={applyDocPicker}>
+                    추가
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* 참조 문서 보기 (문서함 상세와 동일) */}
       {viewDocId && (

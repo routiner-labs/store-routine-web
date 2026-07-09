@@ -524,6 +524,7 @@
 }
 
 .catalogItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -537,9 +538,16 @@
   transition: border-color 0.12s, box-shadow 0.12s;
 }
 
-.catalogItem:hover {
+.catalogItem:hover,
+.catalogItemActive {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-sm);
+}
+
+/* 테스크 목록 드롭다운은 항목과 같은 가로폭으로 맞춘다 */
+.catalogMenu {
+  width: 100%;
+  min-width: 0;
 }
 
 .catalogItem:active {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   LiaTimesSolid,
   LiaPlusSolid,
@@ -16,6 +16,7 @@ import {
   LiaBarsSolid,
   LiaClockSolid,
   LiaPaintBrushSolid,
+  LiaBanSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { getAttendanceForDate } from '@/mock/calendar'
@@ -502,6 +503,7 @@ export default function OwnerChecklists() {
     showToast('카테고리가 삭제되었습니다')
   }
   const [menuTaskId, setMenuTaskId] = useState<string | null>(null)
+  const [catalogMenuId, setCatalogMenuId] = useState<string | null>(null)
   const [methodTask, setMethodTask] = useState<StoreTask | null>(null)
   const [timingTask, setTimingTask] = useState<StoreTask | null>(null)
   const [timingDraft, setTimingDraft] = useState<TaskTiming>(DEFAULT_TIMING)
@@ -517,6 +519,17 @@ export default function OwnerChecklists() {
 
   // 팝업이 열리면 배경 스크롤 잠금
   useScrollLock(manageOpen || methodTask !== null || timingTask !== null || dutyPickerOpen || catManageOpen || docPickerOpen || viewDocId !== null || viewRequestId !== null)
+
+  // 테스크 목록 드롭다운: 바깥 클릭 시 닫기 (sticky 패널의 stacking context 때문에 오버레이 대신 사용)
+  useEffect(() => {
+    if (!catalogMenuId) return
+    function onPointerDown(e: PointerEvent) {
+      const target = e.target as HTMLElement
+      if (!target.closest(`.${styles.catalogItem}`)) setCatalogMenuId(null)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [catalogMenuId])
 
   const docTitle = (id: string) => DOCUMENT_CATALOG.find((d) => d.id === id)?.title ?? '삭제된 문서'
   const docCategoryName = (id: string) => {
@@ -627,6 +640,19 @@ export default function OwnerChecklists() {
     if (!tpl) return
     setCatalog((prev) => prev.map((t) => (t.id === id ? { ...t, active: false } : t)))
     showToast(`'${tpl.title}' 테스크가 비활성화되었습니다`)
+  }
+
+  async function confirmDeactivate(tpl: TaskTemplate) {
+    setCatalogMenuId(null)
+    const ok = await confirm({
+      title: '테스크를 비활성화할까요?',
+      message: `'${tpl.title}' 테스크가 목록에서 숨겨집니다. 테스크 관리에서 다시 켤 수 있어요.`,
+      confirmText: '비활성화',
+      cancelText: '취소',
+      danger: false,
+    })
+    if (!ok) return
+    deactivateTask(tpl.id)
   }
 
   function toggleTaskActive(id: string) {
@@ -767,6 +793,13 @@ export default function OwnerChecklists() {
     setFabOpen(false)
     if (catalog.length > 0) selectTask(catalog[0])
     else selectNew()
+    setManageOpen(true)
+  }
+
+  function openManageFor(tpl: TaskTemplate) {
+    setFabOpen(false)
+    setCatalogMenuId(null)
+    selectTask(tpl)
     setManageOpen(true)
   }
 
@@ -1511,13 +1544,35 @@ export default function OwnerChecklists() {
                   key={tpl.id}
                   className={`${styles.catalogItem} ${
                     dragItem?.type === 'CATALOG' && dragItem.id === tpl.id ? styles.dragging : ''
-                  }`}
+                  } ${catalogMenuId === tpl.id ? styles.catalogItemActive : ''}`}
                   draggable
-                  onDragStart={() => setDragItem({ type: 'CATALOG', id: tpl.id })}
+                  onDragStart={() => {
+                    setDragItem({ type: 'CATALOG', id: tpl.id })
+                    setCatalogMenuId(null)
+                  }}
                   onDragEnd={clearDrag}
+                  onClick={() => setCatalogMenuId((cur) => (cur === tpl.id ? null : tpl.id))}
                 >
                   <LiaGripVerticalSolid className={styles.catalogGrip} />
                   <span className={styles.catalogTitle}>{tpl.title}</span>
+                  {catalogMenuId === tpl.id && (
+                    <div
+                      className={`${styles.taskMenu} ${styles.catalogMenu}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button className={styles.taskMenuItem} onClick={() => openManageFor(tpl)}>
+                        <LiaCogSolid className={styles.taskMenuIcon} />
+                        관리
+                      </button>
+                      <button
+                        className={styles.taskMenuItem}
+                        onClick={() => confirmDeactivate(tpl)}
+                      >
+                        <LiaBanSolid className={styles.taskMenuIcon} />
+                        비활성화
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

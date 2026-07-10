@@ -394,6 +394,7 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 - 네이티브 화살표는 박스 맨 끝에 붙어 셀렉트가 넓을 때 텍스트와 멀어진다 → 커스텀 화살표를 안쪽에 두는 것이 표준.
 - **크기(폭)는 페이지마다 달라도 된다** — `wrapClassName`으로 제어(`flex:1`, `width:100%` 등). 기본은 내용 폭(shrink-to-fit).
+- **열린 목록은 네이티브가 아니라 커스텀 드롭다운**이다. `SelectBox`는 트리거 클릭 시 옵션 목록을 `createPortal`로 body에 fixed 배치(둥근 카드, `--radius-md` + `--shadow-md`, 선택 항목은 primary-light + 체크). 트리거 폭에 맞추고, 뷰포트 아래 남은 공간만큼 `max-height` + 스크롤. 바깥 클릭/스크롤/리사이즈/ESC로 닫힘(모달 안에서 열려도 ESC는 드롭다운만 닫음). `<option value>라벨</option>` children을 그대로 받아 내부에서 파싱하므로 호출부 API는 네이티브 select와 동일.
 
 ```tsx
 <SelectBox value={category} onChange={setCategory} wrapClassName={styles.catSelectWrap} ariaLabel="카테고리 선택">

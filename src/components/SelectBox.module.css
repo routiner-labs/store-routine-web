@@ -4,9 +4,11 @@
   max-width: 100%;
 }
 
-.select {
+/* 트리거(닫힌 모습) — 네이티브 select와 동일한 룩 */
+.trigger {
+  display: flex;
+  align-items: center;
   width: 100%;
-  appearance: none;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 8px 36px 8px 10px;
@@ -16,10 +18,19 @@
   cursor: pointer;
   outline: none;
   font-family: inherit;
+  text-align: left;
 }
 
-.select:focus {
+.trigger:focus-visible {
   border-color: var(--color-primary);
+}
+
+.triggerLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .arrow {
@@ -30,4 +41,74 @@
   font-size: 13px;
   color: var(--color-text-secondary);
   pointer-events: none;
+  transition: transform 0.15s ease;
+}
+
+.arrowOpen {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* 열린 목록(포털 + fixed) — 둥근 카드 */
+.menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+  animation: selectMenuIn 0.12s ease-out;
+}
+
+@keyframes selectMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text);
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.option:hover {
+  background: var(--color-bg);
+}
+
+.optionSelected,
+.optionSelected:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.optionLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.optionCheck {
+  font-size: 15px;
+  color: var(--color-primary);
+  flex-shrink: 0;
 }

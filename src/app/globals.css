@@ -114,3 +114,16 @@ select {
   font-family: inherit;
   font-size: inherit;
 }
+
+/* 가운데/오른쪽 정렬된 리스트 항목은 마커(숫자·불릿)도 텍스트와 함께 정렬되도록.
+   기본 list-style-position:outside면 마커가 왼쪽 여백에 남아 텍스트만 정렬됨.
+   에디터·모든 문서 뷰어의 인라인 style="text-align:…"에 공통 적용. */
+li[style*='text-align: center'],
+li[style*='text-align:center'] {
+  list-style-position: inside;
+}
+
+li[style*='text-align: right'],
+li[style*='text-align:right'] {
+  list-style-position: inside;
+}

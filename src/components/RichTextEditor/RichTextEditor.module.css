@@ -163,7 +163,8 @@
   outline-offset: 2px;
 }
 
-.imgWrapResizing {
+.imgWrapResizing,
+.imgWrapSelected {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }

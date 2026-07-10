@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ChangeEvent, JSX } from 'react'
+import type { ChangeEvent, JSX, PointerEvent as ReactPointerEvent } from 'react'
 import {
   LiaImageSolid,
   LiaBoldSolid,
@@ -32,6 +32,7 @@ import {
 import { $setBlocksType } from '@lexical/selection'
 import {
   $createParagraphNode,
+  $getNodeByKey,
   $getRoot,
   $getSelection,
   $insertNodes,
@@ -45,33 +46,46 @@ import {
   type DOMExportOutput,
   type EditorState,
   type LexicalEditor,
+  type LexicalNode,
   type NodeKey,
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
 import styles from './RichTextEditor.module.css'
 
-/* ── 이미지 노드 (게시글 인라인/블록 이미지) ── */
-type SerializedImageNode = Spread<{ src: string }, SerializedLexicalNode>
+/* ── 이미지 노드 (게시글 인라인/블록 이미지, 드래그로 가로 크기 조절) ── */
+type SerializedImageNode = Spread<{ src: string; width?: number }, SerializedLexicalNode>
+
+// style/attribute의 폭 문자열에서 px 값만 안전하게 파싱 ("400px" | "400" → 400, "50%" → undefined)
+function parseImgWidth(raw: string): number | undefined {
+  const m = raw.trim().match(/^(\d+(?:\.\d+)?)(?:px)?$/)
+  return m ? Number(m[1]) : undefined
+}
 
 class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string
+  __width?: number // 저장된 가로 폭(px). 없으면 원본 크기(최대 100%)
 
   static getType(): string {
     return 'image'
   }
 
   static clone(node: ImageNode): ImageNode {
-    return new ImageNode(node.__src, node.__key)
+    return new ImageNode(node.__src, node.__width, node.__key)
   }
 
-  constructor(src: string, key?: NodeKey) {
+  constructor(src: string, width?: number, key?: NodeKey) {
     super(key)
     this.__src = src
+    this.__width = width
   }
 
   isInline(): boolean {
     return false
+  }
+
+  setWidth(width: number): void {
+    this.getWritable().__width = width
   }
 
   createDOM(): HTMLElement {
@@ -87,9 +101,11 @@ class ImageNode extends DecoratorNode<JSX.Element> {
   static importDOM(): DOMConversionMap | null {
     return {
       img: () => ({
-        conversion: (element: HTMLElement): DOMConversionOutput => ({
-          node: new ImageNode(element.getAttribute('src') ?? ''),
-        }),
+        conversion: (element: HTMLElement): DOMConversionOutput => {
+          const img = element as HTMLImageElement
+          const width = parseImgWidth(img.style.width || img.getAttribute('width') || '')
+          return { node: new ImageNode(img.getAttribute('src') ?? '', width) }
+        },
         priority: 0,
       }),
     }
@@ -98,25 +114,83 @@ class ImageNode extends DecoratorNode<JSX.Element> {
   exportDOM(): DOMExportOutput {
     const img = document.createElement('img')
     img.setAttribute('src', this.__src)
+    if (this.__width) img.style.width = `${this.__width}px`
     return { element: img }
   }
 
   static importJSON(json: SerializedImageNode): ImageNode {
-    return new ImageNode(json.src)
+    return new ImageNode(json.src, json.width)
   }
 
   exportJSON(): SerializedImageNode {
-    return { ...super.exportJSON(), src: this.__src }
+    return { ...super.exportJSON(), src: this.__src, width: this.__width }
   }
 
   decorate(): JSX.Element {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={this.__src} alt="" />
+    return <ResizableImage nodeKey={this.getKey()} src={this.__src} width={this.__width} />
   }
 }
 
 function $createImageNode(src: string): ImageNode {
   return new ImageNode(src)
+}
+
+function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {
+  return node instanceof ImageNode
+}
+
+/* 드래그 핸들로 가로 폭을 조절하는 이미지.
+   드래그 중엔 리렌더 없이 DOM을 직접 조작(라이브 프리뷰)하고, pointerup에서만 노드에 폭을 커밋한다.
+   커밋 후 width prop이 같은 값으로 갱신되므로 React 재조정은 무변화(스냅백 없음). */
+function ResizableImage({ nodeKey, src, width }: { nodeKey: NodeKey; src: string; width?: number }) {
+  const [editor] = useLexicalComposerContext()
+  const wrapRef = useRef<HTMLSpanElement>(null)
+
+  function startResize(e: ReactPointerEvent) {
+    e.preventDefault()
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const left = wrap.getBoundingClientRect().left
+    const maxWidth = wrap.parentElement?.getBoundingClientRect().width ?? 9999
+    let finalWidth: number | null = null
+    wrap.classList.add(styles.imgWrapResizing)
+
+    function onMove(ev: PointerEvent) {
+      const w = Math.round(Math.min(maxWidth, Math.max(48, ev.clientX - left)))
+      finalWidth = w
+      wrap!.style.width = `${w}px`
+    }
+    function onUp() {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      wrap!.classList.remove(styles.imgWrapResizing)
+      if (finalWidth != null) {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey)
+          if ($isImageNode(node)) node.setWidth(finalWidth as number)
+        })
+      }
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+
+  return (
+    <span
+      ref={wrapRef}
+      className={styles.imgWrap}
+      style={width ? { width: `${width}px` } : undefined}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" draggable={false} />
+      <span
+        className={styles.imgHandle}
+        onPointerDown={startResize}
+        role="separator"
+        aria-label="이미지 크기 조절"
+      />
+    </span>
+  )
 }
 
 /* ── 변경 시 HTML 직렬화 ── */

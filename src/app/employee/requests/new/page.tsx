@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import Link from 'next/link'
+import { LiaAngleLeftSolid } from 'react-icons/lia'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useToast } from '@/context/ToastContext'
 import styles from './page.module.css'
@@ -36,7 +37,9 @@ function NewRequestForm() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/employee/requests" className={styles.backBtn}>‹ 뒤로</Link>
+        <Link href="/employee/requests" className={styles.backBtn}>
+          <LiaAngleLeftSolid /> 요청함
+        </Link>
         <h1 className={styles.title}>요청하기</h1>
       </header>
 

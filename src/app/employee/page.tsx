@@ -188,7 +188,7 @@ export default function EmployeeHome() {
       {/* 특별 지시 상세 팝업 */}
       {openInstruction && (
         <div className={styles.popupOverlay}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.popup}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>특별 지시</span>
               <button className={styles.popupClose} onClick={() => setOpenInstruction(null)}>닫기</button>

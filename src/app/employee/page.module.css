@@ -4,9 +4,10 @@
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
@@ -28,12 +29,12 @@
   background: var(--color-primary-light);
   padding: 4px 10px;
   border-radius: 99px;
-  font-weight: 500;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .shiftSection {
-  margin: 16px 16px 0;
+  margin: 16px var(--page-x) 0;
   background: var(--color-primary);
   border-radius: var(--radius-lg);
   padding: 20px;
@@ -58,7 +59,7 @@
 }
 
 .clockInBtn {
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-primary);
   font-weight: 700;
   font-size: 14px;
@@ -87,7 +88,7 @@
 }
 
 .section {
-  padding: 20px 16px 0;
+  padding: 20px var(--page-x) 0;
 }
 
 .sectionTitle {
@@ -140,7 +141,7 @@
 
 .progressBar {
   flex: 1;
-  height: 5px;
+  height: 6px;
   background: var(--color-border);
   border-radius: 99px;
   overflow: hidden;
@@ -150,6 +151,7 @@
   height: 100%;
   background: var(--color-primary);
   border-radius: 99px;
+  transition: width 0.3s ease;
 }
 
 .progressText {
@@ -190,7 +192,7 @@
 .instructionStatus {
   font-size: 12px;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 99px;
   flex-shrink: 0;
 }
@@ -268,7 +270,7 @@
 .myRequestStatus {
   font-size: 12px;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 99px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -302,10 +304,10 @@
 .popup {
   background: var(--color-surface);
   border: 1px solid var(--surface-outline);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 340px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   animation: popupIn 0.18s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
 }
@@ -411,10 +413,13 @@
     margin: 0 auto;
   }
 
+  /* 사장 홈과 동일한 데스크탑 헤더 카드화 (owner/page.module.css 442-449) */
   .header {
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
     margin-bottom: 20px;
+    height: auto;
+    padding: 18px 24px;
   }
 
   .shiftSection {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { LiaCheckSolid, LiaAngleLeftSolid } from 'react-icons/lia'
 import type { Checklist, ChecklistItem, TaskStatus } from '@/types'
 import styles from './ChecklistView.module.css'
 
@@ -26,8 +27,9 @@ function ItemInput({
       <button
         className={`${styles.checkBtn} ${isDone ? styles.checked : ''}`}
         onClick={() => !isDone && onComplete(item.id)}
+        aria-label={isDone ? '완료됨' : '완료 처리'}
       >
-        {isDone ? '✓' : ''}
+        {isDone && <LiaCheckSolid />}
       </button>
     )
   }
@@ -117,7 +119,9 @@ export default function ChecklistView({ checklist }: { checklist: Checklist }) {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/employee" className={styles.backBtn}>‹ 뒤로</Link>
+        <Link href="/employee" className={styles.backBtn}>
+          <LiaAngleLeftSolid /> 홈
+        </Link>
         <h1 className={styles.title}>{checklist.title}</h1>
       </header>
 

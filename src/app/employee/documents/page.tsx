@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LiaSearchSolid, LiaAngleRightSolid, LiaPlusSolid } from 'react-icons/lia'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import EmployeeName from '@/components/EmployeeName'
 import styles from './page.module.css'
 
@@ -25,6 +26,7 @@ export default function EmployeeDocumentsPage() {
     .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
 
   const categoryName = (id: string) => DOCUMENT_CATEGORIES.find((c) => c.id === id)?.name ?? '기타'
+  const categoryColor = (id: string) => DOCUMENT_CATEGORIES.find((c) => c.id === id)?.color
 
   return (
     <div className={styles.page}>
@@ -72,7 +74,7 @@ export default function EmployeeDocumentsPage() {
           filtered.map((doc) => (
             <Link key={doc.id} href={`/employee/documents/${doc.id}`} className={styles.row}>
               <div className={styles.rowTop}>
-                <span className={`${styles.catBadge} ${styles[`cat_${doc.category}`]}`}>
+                <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(doc.category))}>
                   {categoryName(doc.category)}
                 </span>
                 <span className={styles.rowTitle}>{doc.title}</span>

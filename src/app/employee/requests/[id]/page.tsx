@@ -3,7 +3,8 @@
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid, LiaLockSolid, LiaUsersSolid, LiaPaperPlaneSolid, LiaPencilAltSolid, LiaTrashAltSolid } from 'react-icons/lia'
-import { mockRequests, mockReplies } from '@/mock/data'
+import { mockRequests, mockReplies, REQUEST_CATEGORIES } from '@/mock/data'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import EmployeeName from '@/components/EmployeeName'
@@ -121,7 +122,10 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
 
         <article className={styles.post}>
           <div className={styles.postTopRow}>
-            <span className={`${styles.typeTag} ${styles[`type_${request.type}`]}`}>
+            <span
+              className={styles.typeTag}
+              style={categoryBadgeStyle(REQUEST_CATEGORIES.find((c) => c.name === request.type)?.color)}
+            >
               {request.type}
             </span>
             {request.visibility === 'OWNER_ONLY' ? (

@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LiaPlusSolid, LiaAngleRightSolid, LiaLockSolid, LiaUsersSolid, LiaCameraSolid, LiaSearchSolid } from 'react-icons/lia'
-import { mockRequests } from '@/mock/data'
+import { mockRequests, REQUEST_CATEGORIES } from '@/mock/data'
+import { categoryBadgeStyle } from '@/lib/categoryColors'
 import type { RequestStatus } from '@/types'
 import styles from './page.module.css'
 
@@ -39,6 +40,10 @@ export default function EmployeeRequestsPage() {
 
   const countOf = (s: RequestStatus | 'ALL') =>
     s === 'ALL' ? myRequests.length : myRequests.filter((r) => r.status === s).length
+
+  // 유형 뱃지 색 — 사장 요청함과 동일하게 카테고리 데이터 색을 inline으로 적용
+  const typeStyleOf = (typeName: string) =>
+    categoryBadgeStyle(REQUEST_CATEGORIES.find((c) => c.name === typeName)?.color)
 
   return (
     <div className={styles.page}>
@@ -85,7 +90,7 @@ export default function EmployeeRequestsPage() {
             return (
               <Link key={req.id} href={`/employee/requests/${req.id}`} className={styles.row}>
                 <div className={styles.rowTop}>
-                  <span className={`${styles.typeTag} ${styles[`type_${req.type}`]}`}>{req.type}</span>
+                  <span className={styles.typeTag} style={typeStyleOf(req.type)}>{req.type}</span>
                   <span className={`${styles.statusBadge} ${styles[`status_${req.status}`]}`}>
                     {statusLabel[req.status]}
                   </span>

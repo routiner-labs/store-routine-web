@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { Employee } from '@/types'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { useEscClose } from '@/lib/useEscClose'
 import styles from './EmployeeProfilePopup.module.css'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
@@ -18,20 +18,14 @@ export default function EmployeeProfilePopup({
   onClose: () => void
 }) {
   useScrollLock(true)
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  // 뷰어형 팝업 — ESC로 바로 닫힘(최상위일 때만)
+  useEscClose(true, onClose)
 
   // 어떤 중첩 위치(sticky/transform 등 스태킹 컨텍스트 내부)에서 열려도
   // 항상 최상위에 뜨도록 body에 portal로 렌더링한다.
   return createPortal(
-    <div className={styles.popupOverlay} onClick={onClose}>
-      <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.popupOverlay}>
+      <div className={styles.popup}>
         <div className={styles.popupHeader}>
           <span className={styles.popupTitle}>직원 프로필</span>
           <button className={styles.popupClose} onClick={onClose}>닫기</button>

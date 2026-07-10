@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiaTimesSolid, LiaPaletteSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { useTheme } from '@/context/ThemeContext'
 import styles from './SystemSettings.module.css'
 
@@ -19,10 +20,12 @@ export default function SystemSettings({ onClose }: { onClose: () => void }) {
   const { theme, setTheme } = useTheme()
 
   useScrollLock(true)
+  // 설정 팝업 — 뷰어형(설정은 즉시 반영, ESC 바로 닫힘)
+  usePopupEsc(true, 'viewer', onClose)
 
   return createPortal(
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.card} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.overlay}>
+      <div className={styles.card}>
         <div className={styles.head}>
           <span className={styles.title}>시스템 설정</span>
           <button className={styles.close} onClick={onClose} aria-label="닫기">

@@ -1,15 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import Link from 'next/link'
-import { LiaUserPlusSolid, LiaAngleRightSolid } from 'react-icons/lia'
+import { LiaUserPlusSolid, LiaAngleRightSolid, LiaTrashAltSolid, LiaCheckSolid, LiaSearchSolid, LiaTimesSolid, LiaBookSolid } from 'react-icons/lia'
 import { useStore } from '@/context/StoreContext'
+import { useToast } from '@/context/ToastContext'
+import { useConfirm } from '@/context/ConfirmContext'
 import { mockAttendance, mockRequests } from '@/mock/data'
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
-import { createTasksForDate } from '@/mock/tasks'
+import { createTasksForDate, type StoreTask, type TaskTiming } from '@/mock/tasks'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES, type StoreDocument } from '@/mock/documents'
 import type { EmployeeRequest, Employee } from '@/types'
 import Modal from '@/components/Modal'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
 import EmployeeName from '@/components/EmployeeName'
 import RequestDetailView from './requests/RequestDetailView'
@@ -31,6 +34,17 @@ function categoryName(id: string) {
   return DOCUMENT_CATEGORIES.find((c) => c.id === id)?.name ?? id
 }
 
+function hasTiming(t: TaskTiming): boolean {
+  return Boolean(t.start || t.end)
+}
+
+function describeTiming(t: TaskTiming): string {
+  if (t.start && t.end) return `${t.start}~${t.end}`
+  if (t.start) return `${t.start}부터`
+  if (t.end) return `${t.end}까지`
+  return '상시'
+}
+
 type RequestFilter = 'pending' | 'confirmed' | 'inProgress'
 
 type HomeModal =
@@ -38,21 +52,38 @@ type HomeModal =
   | { kind: 'document'; doc: StoreDocument }
   | { kind: 'employee'; employee: Employee }
   | { kind: 'joins' }
+  | { kind: 'quickAssign'; taskId: string }
+  | { kind: 'method'; taskId: string }
 
 export default function OwnerHome() {
   const { currentStore } = useStore()
+  const { showToast } = useToast()
+  const confirm = useConfirm()
   const [requestFilter, setRequestFilter] = useState<RequestFilter | null>('pending')
   const [openTaskLists, setOpenTaskLists] = useState<Set<'COMMON' | 'EXTRA' | 'UNASSIGNED'>>(new Set())
   const [modal, setModal] = useState<HomeModal | null>(null)
+  // 담당자 이름 클릭 시 뜨는 액션 메뉴(퀵지정/삭제)의 앵커 위치
+  const [assignMenu, setAssignMenu] = useState<{ taskId: string; x: number; y: number } | null>(null)
+  // 퀵지정 팝업에서 선택 중인 담당자 초안 (적용을 눌러야 실제 반영)
+  const [assignDraft, setAssignDraft] = useState<string[]>([])
+  // 퀵지정 팝업 직원 검색어
+  const [assignSearch, setAssignSearch] = useState('')
 
-  // 업무리스트 페이지와 동일한 오늘자 업무 데이터
-  const todayTasks = createTasksForDate('2026-06-30')
+  // 업무리스트 페이지와 동일한 오늘자 업무 데이터 (홈에서 완료·담당 변경이 가능하도록 로컬 상태로 보관)
+  const [todayTasks, setTodayTasks] = useState<StoreTask[]>(() => createTasksForDate('2026-06-30'))
+  const employees = mockEmployees.filter((e) => e.status === 'ACTIVE')
+  // 출퇴근 현황은 이름으로 매핑(출근 현황 섹션과 동일 방식). 기록이 없으면 휴무로 본다.
+  const attByName = Object.fromEntries(mockAttendance.map((r) => [r.employeeName, r]))
+
+  // 업무명 클릭 시 뜨는 액션 메뉴 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(assignMenu !== null, 'viewer', () => setAssignMenu(null))
   const commonTasks = todayTasks.filter((t) => t.kind === 'COMMON')
   const extraTasks = todayTasks.filter((t) => t.kind === 'EXTRA')
   const commonDone = commonTasks.filter((t) => t.done).length
   const extraDone = extraTasks.filter((t) => t.done).length
   const unassignedTasks = todayTasks.filter((t) => t.assigneeIds.length === 0)
   const unassignedCount = unassignedTasks.length
+  const unassignedDone = unassignedTasks.filter((t) => t.done).length
 
   const empNameById = (empId: string) => mockEmployees.find((e) => e.id === empId)?.name ?? ''
 
@@ -72,6 +103,88 @@ export default function OwnerHome() {
       }
       return next
     })
+  }
+
+  // 완료 체크 토글 — 게이지바(progressFill)는 done 수에 따라 자동으로 다시 채워진다
+  function toggleTaskDone(taskId: string) {
+    setTodayTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)))
+  }
+
+  function openAssignMenu(e: MouseEvent, taskId: string) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setAssignMenu({ taskId, x: rect.left, y: rect.bottom + 4 })
+  }
+
+  function openQuickAssign(taskId: string) {
+    const task = todayTasks.find((t) => t.id === taskId)
+    setAssignDraft(task ? [...task.assigneeIds] : [])
+    setAssignSearch('')
+    setAssignMenu(null)
+    setModal({ kind: 'quickAssign', taskId })
+  }
+
+  function openMethod(taskId: string) {
+    setAssignMenu(null)
+    setModal({ kind: 'method', taskId })
+  }
+
+  function toggleAssignDraft(empId: string) {
+    setAssignDraft((prev) => (prev.includes(empId) ? prev.filter((id) => id !== empId) : [...prev, empId]))
+  }
+
+  function applyQuickAssign(taskId: string) {
+    setTodayTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, assigneeIds: [...assignDraft] } : t)))
+    setModal(null)
+    showToast('담당자가 지정되었습니다')
+  }
+
+  async function requestDeleteTask(taskId: string) {
+    const task = todayTasks.find((t) => t.id === taskId)
+    setAssignMenu(null)
+    const ok = await confirm({
+      title: '이 업무를 삭제할까요?',
+      message: task ? `'${task.title}' 업무를 오늘 업무리스트에서 삭제합니다.` : undefined,
+    })
+    if (!ok) return
+    setTodayTasks((prev) => prev.filter((t) => t.id !== taskId))
+    showToast('업무가 삭제되었습니다')
+  }
+
+  // inUnassignedList: 미할당 업무 리스트에서는 모두 미할당이므로 '미할당' 뱃지를 빼고 공통/추가 구분만 보여준다
+  function renderTaskSubRow(task: StoreTask, inUnassignedList = false) {
+    const unassigned = task.assigneeIds.length === 0
+    return (
+      <div key={task.id} className={styles.taskSubRow}>
+        <button
+          type="button"
+          className={`${styles.taskSubCheck} ${task.done ? styles.taskSubCheckDone : ''}`}
+          onClick={() => toggleTaskDone(task.id)}
+          aria-label={task.done ? '완료 취소' : '완료 표시'}
+        >
+          {task.done ? '✓' : ''}
+        </button>
+        <div className={styles.taskSubMain}>
+          <button
+            type="button"
+            className={styles.taskSubTitle}
+            title={task.title}
+            onClick={(e) => openAssignMenu(e, task.id)}
+          >
+            {task.title}
+          </button>
+          {hasTiming(task.timing) && (
+            <span className={styles.taskSubTiming}>{describeTiming(task.timing)}</span>
+          )}
+        </div>
+        {inUnassignedList ? (
+          <span className={styles.taskSubKind}>{task.kind === 'COMMON' ? '공통' : '추가'}</span>
+        ) : (
+          <span className={unassigned ? styles.taskSubUnassigned : styles.taskSubAssignee}>
+            {unassigned ? '미할당' : assigneeLabel(task.assigneeIds)}
+          </span>
+        )}
+      </div>
+    )
   }
 
   const pendingRequests = mockRequests.filter((r) => r.status === 'REQUESTED')
@@ -200,19 +313,7 @@ export default function OwnerHome() {
                     {tasks.length === 0 ? (
                       <p className={styles.emptyText}>업무가 없습니다.</p>
                     ) : (
-                      tasks.map((task) => (
-                        <div key={task.id} className={styles.taskSubRow}>
-                          <span className={`${styles.taskSubCheck} ${task.done ? styles.taskSubCheckDone : ''}`}>
-                            {task.done ? '✓' : ''}
-                          </span>
-                          <span className={styles.taskSubTitle} title={task.title}>{task.title}</span>
-                          {task.assigneeIds.length === 0 ? (
-                            <span className={styles.taskSubUnassigned}>미할당</span>
-                          ) : (
-                            <span className={styles.taskSubAssignee}>{assigneeLabel(task.assigneeIds)}</span>
-                          )}
-                        </div>
-                      ))
+                      tasks.map((task) => renderTaskSubRow(task))
                     )}
                   </div>
                 </div>
@@ -228,8 +329,14 @@ export default function OwnerHome() {
                   미할당 업무
                   <span className={`${styles.taskChevron} ${openTaskLists.has('UNASSIGNED') ? styles.taskChevronOpen : ''}`}>›</span>
                 </span>
-                <span className={unassignedCount > 0 ? styles.unassignedAlert : styles.waitingText}>
-                  {unassignedCount > 0 ? `${unassignedCount}건` : '없음'}
+                <span className={styles.taskRight}>
+                  <span className={styles.progressBar}>
+                    <span
+                      className={styles.progressFill}
+                      style={{ width: `${unassignedCount ? (unassignedDone / unassignedCount) * 100 : 0}%` }}
+                    />
+                  </span>
+                  <span className={`${styles.progressText} ${unassignedCount > 0 ? styles.unassignedAlert : ''}`}>{unassignedDone}/{unassignedCount}</span>
                 </span>
               </button>
               <div className={`${styles.taskSubWrap} ${openTaskLists.has('UNASSIGNED') ? styles.taskSubWrapOpen : ''}`}>
@@ -237,15 +344,7 @@ export default function OwnerHome() {
                   {unassignedTasks.length === 0 ? (
                     <p className={styles.emptyText}>업무가 없습니다.</p>
                   ) : (
-                    unassignedTasks.map((task) => (
-                      <div key={task.id} className={styles.taskSubRow}>
-                        <span className={`${styles.taskSubCheck} ${task.done ? styles.taskSubCheckDone : ''}`}>
-                          {task.done ? '✓' : ''}
-                        </span>
-                        <span className={styles.taskSubTitle} title={task.title}>{task.title}</span>
-                        <span className={styles.taskSubAssignee}>{task.kind === 'COMMON' ? '공통' : '추가'}</span>
-                      </div>
-                    ))
+                    unassignedTasks.map((task) => renderTaskSubRow(task, true))
                   )}
                 </div>
               </div>
@@ -372,6 +471,126 @@ export default function OwnerHome() {
           )}
         </Modal>
       )}
+
+      {/* 담당자 이름 클릭 → 퀵지정 / 삭제 액션 메뉴 */}
+      {assignMenu && (
+        <>
+          <div className={styles.assignMenuOverlay} onClick={() => setAssignMenu(null)} />
+          <div className={styles.assignMenu} style={{ top: assignMenu.y, left: assignMenu.x }}>
+            <button
+              type="button"
+              className={styles.assignMenuItem}
+              onClick={() => openQuickAssign(assignMenu.taskId)}
+            >
+              <LiaUserPlusSolid />
+              퀵지정
+            </button>
+            <button
+              type="button"
+              className={styles.assignMenuItem}
+              onClick={() => openMethod(assignMenu.taskId)}
+            >
+              <LiaBookSolid />
+              수행방법
+            </button>
+            <button
+              type="button"
+              className={`${styles.assignMenuItem} ${styles.assignMenuItemDanger}`}
+              onClick={() => requestDeleteTask(assignMenu.taskId)}
+            >
+              <LiaTrashAltSolid />
+              삭제
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* 퀵 지정 팝업 — 담당 직원 선택(초안) 후 적용 */}
+      {modal?.kind === 'quickAssign' && (() => {
+        const task = todayTasks.find((t) => t.id === modal.taskId)
+        if (!task) return null
+        const q = assignSearch.trim().toLowerCase()
+        const filtered = q ? employees.filter((e) => e.name.toLowerCase().includes(q)) : employees
+        return (
+          <Modal title="퀵 지정" size="small" dismiss="guard" onClose={() => setModal(null)}>
+            <div className={styles.quickAssign}>
+              <p className={styles.quickAssignTask}>{task.title}</p>
+              <div className={styles.quickAssignSearch}>
+                <LiaSearchSolid className={styles.quickAssignSearchIcon} />
+                <input
+                  className={styles.quickAssignSearchInput}
+                  type="text"
+                  placeholder="직원 이름 검색"
+                  value={assignSearch}
+                  onChange={(e) => setAssignSearch(e.target.value)}
+                />
+                {assignSearch && (
+                  <button
+                    type="button"
+                    className={styles.quickAssignSearchClear}
+                    onClick={() => setAssignSearch('')}
+                    aria-label="검색어 지우기"
+                  >
+                    <LiaTimesSolid />
+                  </button>
+                )}
+              </div>
+              <div className={styles.quickAssignList}>
+                {filtered.length === 0 ? (
+                  <p className={styles.emptyText}>검색 결과가 없습니다.</p>
+                ) : (
+                  filtered.map((emp) => {
+                    const on = assignDraft.includes(emp.id)
+                    const att = attByName[emp.name]
+                    return (
+                      <div
+                        key={emp.id}
+                        className={styles.quickAssignRow}
+                        onClick={() => toggleAssignDraft(emp.id)}
+                      >
+                        <span
+                          className={`${styles.checkbox} ${on ? styles.checkboxOn : ''}`}
+                          aria-hidden="true"
+                        >
+                          {on && <LiaCheckSolid />}
+                        </span>
+                        <span className={styles.quickAssignAvatar}>{emp.name[0]}</span>
+                        {/* 이름 클릭 시 프로필 팝업 (EmployeeName이 stopPropagation 처리 → 선택 토글과 분리) */}
+                        <EmployeeName name={emp.name} className={styles.quickAssignName} />
+                        <span className={`${styles.quickAssignStatus} ${att ? styles[`status_${att.status}`] : styles.status_OFF}`}>
+                          {att ? attendanceLabel(att.status) : '휴무'}
+                        </span>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+              <button type="button" className={styles.quickAssignApply} onClick={() => applyQuickAssign(task.id)}>
+                적용
+              </button>
+            </div>
+          </Modal>
+        )
+      })()}
+
+      {/* 수행 방법 보기 팝업 */}
+      {modal?.kind === 'method' && (() => {
+        const task = todayTasks.find((t) => t.id === modal.taskId)
+        if (!task) return null
+        return (
+          <Modal title="수행 방법" size="small" onClose={() => setModal(null)}>
+            <div className={styles.methodView}>
+              <p className={styles.methodViewName}>{task.title}</p>
+              <p className={styles.methodViewMeta}>{describeTiming(task.timing)}</p>
+              {task.method ? (
+                <div className={styles.methodContent} dangerouslySetInnerHTML={{ __html: task.method }} />
+              ) : (
+                <p className={styles.emptyText}>등록된 수행 방법이 없습니다.</p>
+              )}
+            </div>
+          </Modal>
+        )
+      })()}
     </div>
   )
 }

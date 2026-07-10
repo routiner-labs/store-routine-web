@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiaAngleDownSolid, LiaSearchSolid, LiaTimesSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { useHoverTooltip } from '@/lib/useHoverTooltip'
 import styles from './MultiSelectFilter.module.css'
 
@@ -39,6 +40,8 @@ export default function MultiSelectFilter({
   const { anchorRef, rect, anchorHandlers, tooltipHandlers } = useHoverTooltip()
 
   useScrollLock(open)
+  // 필터 팝업 — 뷰어형(ESC 바로 닫힘, 최상위일 때만)
+  usePopupEsc(open, 'viewer', () => setOpen(false))
 
   function openPopup() {
     setDraft(selectedIds)
@@ -118,7 +121,7 @@ export default function MultiSelectFilter({
       )}
 
       {open && createPortal(
-        <div className={styles.popupOverlay} onClick={() => setOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popupCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHead}>
               <span className={styles.popupTitle}>{title} 선택</span>

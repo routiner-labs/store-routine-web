@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiaTimesSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { hexToRgb, rgbToHex, categoryBadgeStyle } from '@/lib/categoryColors'
 import styles from './CategoryColorPicker.module.css'
 
@@ -79,6 +80,8 @@ export default function CategoryColorPicker({
   const hueRef = useRef<HTMLDivElement>(null)
 
   useScrollLock(true)
+  // 색상 선택 팝업 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(true, 'viewer', onClose)
 
   const rgb = hsvToRgb(hsv)
   const hex = rgbToHex(rgb.r, rgb.g, rgb.b)
@@ -123,8 +126,8 @@ export default function CategoryColorPicker({
   const hueColor = `hsl(${hsv.h}, 100%, 50%)`
 
   return createPortal(
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.card} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.overlay}>
+      <div className={styles.card}>
         <div className={styles.head}>
           <span className={styles.title}>뱃지 색상</span>
           <button className={styles.close} onClick={onClose} aria-label="닫기">

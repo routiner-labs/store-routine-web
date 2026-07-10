@@ -23,7 +23,7 @@ export default function CardSelectPopup({
   const [cardId, setCardId] = useState(selectedCardId)
 
   return (
-    <Modal title={`결제 카드 변경 - ${storeName}`} onClose={onClose}>
+    <Modal title={`결제 카드 변경 - ${storeName}`} dismiss="guard" onClose={onClose}>
       <div className={styles.form}>
         <div className={styles.section}>
           {REGISTERED_CARDS.map((card) => (

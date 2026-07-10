@@ -9,6 +9,7 @@ import {
   LiaTimesSolid,
 } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { DialColumn } from './DateRangeFilter'
 import drf from './DateRangeFilter.module.css'
 import styles from './MonthRangeFilter.module.css'
@@ -51,6 +52,8 @@ export default function MonthRangeFilter({
   const [yearDialOpen, setYearDialOpen] = useState(false)
 
   useScrollLock(open)
+  // 월 범위 필터 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(open, 'viewer', () => setOpen(false))
 
   function openPopup() {
     setDraftStart(startMonth)
@@ -115,7 +118,7 @@ export default function MonthRangeFilter({
 
       {open &&
         createPortal(
-          <div className={drf.popupOverlay} onClick={() => setOpen(false)}>
+          <div className={drf.popupOverlay}>
             <div className={drf.popupCard} onClick={(e) => e.stopPropagation()}>
               <div className={drf.popupHead}>
                 <span className={drf.popupTitle}>{title} 선택</span>

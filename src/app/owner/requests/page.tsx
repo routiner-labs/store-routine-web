@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation'
 import {
   LiaThLargeSolid, LiaListSolid, LiaLockSolid, LiaUsersSolid,
   LiaSearchSolid, LiaSlidersHSolid, LiaTimesSolid, LiaInfoCircleSolid,
-  LiaPlusSolid, LiaCogSolid, LiaFileAltSolid, LiaTrashAltSolid, LiaPaintBrushSolid,
+  LiaPlusSolid, LiaCogSolid, LiaFileAltSolid,
 } from 'react-icons/lia'
 import { mockRequests, REQUEST_CATEGORIES } from '@/mock/data'
 import type { RequestCategory } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { useHoverTooltip } from '@/lib/useHoverTooltip'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
 import { useConfirm } from '@/context/ConfirmContext'
@@ -20,6 +21,7 @@ import EmployeeName from '@/components/EmployeeName'
 import MultiSelectFilter from '@/components/MultiSelectFilter'
 import DateRangeFilter from '@/components/DateRangeFilter'
 import CategoryColorPicker from '@/components/CategoryColorPicker'
+import CategoryManagePopup from '@/components/CategoryManagePopup'
 import type { EmployeeRequest, RequestType, RequestStatus, RequestVisibility } from '@/types'
 import styles from './page.module.css'
 
@@ -182,6 +184,8 @@ export default function OwnerRequests() {
   const { showToast } = useToast()
 
   useScrollLock(catManageOpen)
+  // 카테고리 관리 팝업 — 뷰어형(변경 즉시 반영, ESC 바로 닫힘)
+  usePopupEsc(catManageOpen, 'viewer', () => setCatManageOpen(false))
   const {
     anchorRef: authorAnchorRef,
     rect: authorTooltipRect,
@@ -635,75 +639,18 @@ export default function OwnerRequests() {
 
       {/* 카테고리 관리 팝업 */}
       {catManageOpen && (
-        <div className={styles.catPopOverlay} onClick={() => setCatManageOpen(false)}>
-          <div className={styles.catPopCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.catPopHead}>
-              <span className={styles.catPopTitle}>카테고리 관리</span>
-              <button
-                className={styles.modalClose}
-                onClick={() => setCatManageOpen(false)}
-                aria-label="닫기"
-              >
-                <LiaTimesSolid />
-              </button>
-            </div>
-            <div className={styles.catManageBody}>
-              {categories.map((c) => (
-                <div key={c.id} className={styles.catManageRow}>
-                  <button
-                    type="button"
-                    className={styles.catColorBtn}
-                    style={categoryBadgeStyle(c.color)}
-                    onClick={() => setCatColorPickingId(c.id)}
-                    aria-label={`${c.name} 뱃지 색상 변경`}
-                  >
-                    <LiaPaintBrushSolid />
-                  </button>
-                  <input
-                    className={styles.catManageInput}
-                    value={c.name}
-                    onChange={(e) => renameCategory(c.id, e.target.value)}
-                  />
-                  <button
-                    className={styles.catManageDel}
-                    onClick={() => deleteCategory(c.id)}
-                    aria-label={`${c.name} 삭제`}
-                  >
-                    <LiaTrashAltSolid />
-                  </button>
-                </div>
-              ))}
-              <div className={styles.catAddRow}>
-                <button
-                  type="button"
-                  className={styles.catColorBtn}
-                  style={categoryBadgeStyle(catDraftColor)}
-                  onClick={() => setCatColorPickingId('NEW')}
-                  aria-label="새 카테고리 뱃지 색상 선택"
-                >
-                  <LiaPaintBrushSolid />
-                </button>
-                <input
-                  className={styles.catManageInput}
-                  value={catDraft}
-                  onChange={(e) => setCatDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addCategory()
-                  }}
-                  placeholder="새 카테고리 이름"
-                />
-                <button
-                  className={styles.catAddBtn}
-                  onClick={addCategory}
-                  disabled={!catDraft.trim()}
-                  aria-label="카테고리 추가"
-                >
-                  <LiaPlusSolid />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CategoryManagePopup
+          categories={categories}
+          getCount={(c) => mockRequests.filter((r) => r.type === c.name).length}
+          draftName={catDraft}
+          onDraftNameChange={setCatDraft}
+          draftColor={catDraftColor}
+          onAdd={addCategory}
+          onRename={renameCategory}
+          onDelete={deleteCategory}
+          onPickColor={setCatColorPickingId}
+          onClose={() => setCatManageOpen(false)}
+        />
       )}
 
       {/* 뱃지 색상 선택 팝업 (스펙트럼 + RGB) */}

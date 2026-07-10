@@ -26,7 +26,7 @@ export default function PasswordChangePopup({ onClose }: { onClose: () => void }
   }
 
   return (
-    <Modal title="비밀번호 변경" onClose={onClose}>
+    <Modal title="비밀번호 변경" dismiss="guard" onClose={onClose}>
       <div className={styles.form}>
         <label className={styles.field}>
           <span className={styles.label}>현재 비밀번호</span>

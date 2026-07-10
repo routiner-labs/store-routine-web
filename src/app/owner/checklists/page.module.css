@@ -563,7 +563,11 @@
 .catalogTitle {
   font-size: 13px;
   font-weight: 500;
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .catalogTrash {
@@ -2196,11 +2200,6 @@
     margin-bottom: 0;
     padding-top: 0;
     padding-bottom: 0;
-  }
-
-  .catalogTitle {
-    flex: 1;
-    white-space: normal;
   }
 
   .taskArea {

@@ -15,7 +15,6 @@ import {
   LiaBookSolid,
   LiaBarsSolid,
   LiaClockSolid,
-  LiaPaintBrushSolid,
   LiaBanSolid,
 } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
@@ -50,9 +49,11 @@ import { LiaInboxSolid } from 'react-icons/lia'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
 import EmployeeName from '@/components/EmployeeName'
 import CategoryColorPicker from '@/components/CategoryColorPicker'
+import CategoryManagePopup from '@/components/CategoryManagePopup'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -519,6 +520,15 @@ export default function OwnerChecklists() {
 
   // 팝업이 열리면 배경 스크롤 잠금
   useScrollLock(manageOpen || methodTask !== null || timingTask !== null || dutyPickerOpen || catManageOpen || docPickerOpen || viewDocId !== null || viewRequestId !== null)
+
+  // ESC 닫기: 미저장 초안이 있는 폼은 guard(컨펌 후), 뷰어·즉시반영 선택은 viewer(바로 닫힘).
+  // 최상위 팝업에만 적용되므로 서브 팝업이 위에 떠 있으면 그 서브 팝업만 닫힌다.
+  usePopupEsc(manageOpen, 'guard', closeManage)
+  usePopupEsc(timingTask !== null, 'guard', () => setTimingTask(null))
+  usePopupEsc(docPickerOpen, 'guard', () => setDocPickerOpen(false))
+  usePopupEsc(methodTask !== null, 'viewer', () => setMethodTask(null))
+  usePopupEsc(dutyPickerOpen, 'viewer', () => setDutyPickerOpen(false))
+  usePopupEsc(catManageOpen, 'viewer', () => setCatManageOpen(false))
 
   // 테스크 목록 드롭다운: 바깥 클릭 시 닫기 (sticky 패널의 stacking context 때문에 오버레이 대신 사용)
   useEffect(() => {
@@ -1554,7 +1564,7 @@ export default function OwnerChecklists() {
                   onClick={() => setCatalogMenuId((cur) => (cur === tpl.id ? null : tpl.id))}
                 >
                   <LiaGripVerticalSolid className={styles.catalogGrip} />
-                  <span className={styles.catalogTitle}>{tpl.title}</span>
+                  <span className={styles.catalogTitle} title={tpl.title}>{tpl.title}</span>
                   {catalogMenuId === tpl.id && (
                     <div
                       className={`${styles.taskMenu} ${styles.catalogMenu}`}
@@ -1609,75 +1619,18 @@ export default function OwnerChecklists() {
 
       {/* 카테고리 관리 팝업 */}
       {catManageOpen && (
-        <div className={styles.dutyPopOverlay} onClick={() => setCatManageOpen(false)}>
-          <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.dutyPopHead}>
-              <span className={styles.dutyPopTitle}>카테고리 관리</span>
-              <button
-                className={styles.modalClose}
-                onClick={() => setCatManageOpen(false)}
-                aria-label="닫기"
-              >
-                <LiaTimesSolid />
-              </button>
-            </div>
-            <div className={styles.catManageBody}>
-              {categories.map((c) => (
-                <div key={c.id} className={styles.catManageRow}>
-                  <button
-                    type="button"
-                    className={styles.catColorBtn}
-                    style={categoryBadgeStyle(c.color)}
-                    onClick={() => setCatColorPickingId(c.id)}
-                    aria-label={`${c.name} 뱃지 색상 변경`}
-                  >
-                    <LiaPaintBrushSolid />
-                  </button>
-                  <input
-                    className={styles.catManageInput}
-                    value={c.name}
-                    onChange={(e) => renameCategory(c.id, e.target.value)}
-                  />
-                  <button
-                    className={styles.catManageDel}
-                    onClick={() => deleteCategory(c.id)}
-                    aria-label={`${c.name} 삭제`}
-                  >
-                    <LiaTrashAltSolid />
-                  </button>
-                </div>
-              ))}
-              <div className={styles.catAddRow}>
-                <button
-                  type="button"
-                  className={styles.catColorBtn}
-                  style={categoryBadgeStyle(catDraftColor)}
-                  onClick={() => setCatColorPickingId('NEW')}
-                  aria-label="새 카테고리 뱃지 색상 선택"
-                >
-                  <LiaPaintBrushSolid />
-                </button>
-                <input
-                  className={styles.catManageInput}
-                  value={catDraft}
-                  onChange={(e) => setCatDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addCategory()
-                  }}
-                  placeholder="새 카테고리 이름"
-                />
-                <button
-                  className={styles.catAddBtn}
-                  onClick={addCategory}
-                  disabled={!catDraft.trim()}
-                  aria-label="카테고리 추가"
-                >
-                  <LiaPlusSolid />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CategoryManagePopup
+          categories={categories}
+          getCount={(c) => catalog.filter((t) => (t.category ?? 'ETC') === c.id).length}
+          draftName={catDraft}
+          onDraftNameChange={setCatDraft}
+          draftColor={catDraftColor}
+          onAdd={addCategory}
+          onRename={renameCategory}
+          onDelete={deleteCategory}
+          onPickColor={setCatColorPickingId}
+          onClose={() => setCatManageOpen(false)}
+        />
       )}
 
       {/* 뱃지 색상 선택 팝업 (스펙트럼 + RGB) */}
@@ -1700,7 +1653,7 @@ export default function OwnerChecklists() {
 
       {/* 담당자 선택 팝업 */}
       {dutyPickerOpen && (
-        <div className={styles.dutyPopOverlay} onClick={() => setDutyPickerOpen(false)}>
+        <div className={styles.dutyPopOverlay}>
           <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.dutyPopHead}>
               <span className={styles.dutyPopTitle}>담당자 선택</span>
@@ -1735,7 +1688,7 @@ export default function OwnerChecklists() {
 
       {/* 테스크 관리 (리스트 | 상세) */}
       {manageOpen && (
-        <div className={styles.modalOverlay} onClick={closeManage}>
+        <div className={styles.modalOverlay}>
           <div className={styles.manageModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHead}>
               <h2 className={styles.modalTitle}>테스크 관리</h2>
@@ -1834,7 +1787,7 @@ export default function OwnerChecklists() {
 
       {/* 수행 시간 지정 팝업 (이 날짜의 해당 업무에만 적용) */}
       {timingTask && (
-        <div className={styles.dutyPopOverlay} onClick={() => setTimingTask(null)}>
+        <div className={styles.dutyPopOverlay}>
           <div className={styles.dutyPopCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.dutyPopHead}>
               <span className={styles.dutyPopTitle}>수행 시간 지정</span>
@@ -1868,7 +1821,7 @@ export default function OwnerChecklists() {
 
       {/* 수행 방법 팝업 */}
       {methodTask && (
-        <div className={styles.modalOverlay} onClick={() => setMethodTask(null)}>
+        <div className={styles.modalOverlay}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHead}>
               <h2 className={styles.modalTitle}>수행 방법</h2>
@@ -1953,7 +1906,7 @@ export default function OwnerChecklists() {
           : DOCUMENT_CATALOG
         const previewDoc = DOCUMENT_CATALOG.find((d) => d.id === docPreviewId)
         return (
-          <div className={styles.dutyPopOverlay} onClick={closeDocPicker}>
+          <div className={styles.dutyPopOverlay}>
             <div className={styles.docPickerCard} onClick={(e) => e.stopPropagation()}>
               <div className={styles.dutyPopHead}>
                 <span className={styles.dutyPopTitle}>참조 문서 선택</span>

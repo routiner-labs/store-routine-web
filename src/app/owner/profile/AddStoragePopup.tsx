@@ -33,7 +33,7 @@ export default function AddStoragePopup({
   const proration = prorateMonthly(monthly)
 
   return (
-    <Modal title={`용량 추가 - ${storeName}`} onClose={onClose}>
+    <Modal title={`용량 추가 - ${storeName}`} dismiss="guard" onClose={onClose}>
       <div className={styles.form}>
         <div className={styles.section}>
           <span className={styles.sectionTitle}>추가 용량</span>

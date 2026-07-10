@@ -28,6 +28,7 @@ import type { RequestStatus, RequestType, RequestVisibility, RequestReply, Activ
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
 import EmployeeName from '@/components/EmployeeName'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
 import styles from './RequestDetailView.module.css'
 
@@ -108,6 +109,13 @@ export default function RequestDetailView({
 
   // 인라인 팝업(상태/유형/공개범위)이 열리면 뒤 페이지 스크롤 잠금
   useScrollLock(statusPopupOpen || typePopupOpen || visibilityPopupOpen || taskAddOpen || taskDocPickerOpen)
+
+  // ESC 닫기(최상위 팝업만). 테스크 추가는 입력 폼이라 guard, 선택형 팝업은 viewer.
+  usePopupEsc(taskAddOpen, 'guard', () => setTaskAddOpen(false))
+  usePopupEsc(statusPopupOpen, 'viewer', () => setStatusPopupOpen(false))
+  usePopupEsc(typePopupOpen, 'viewer', () => setTypePopupOpen(false))
+  usePopupEsc(visibilityPopupOpen, 'viewer', () => setVisibilityPopupOpen(false))
+  usePopupEsc(taskDocPickerOpen, 'viewer', () => { setTaskDocPickerOpen(false); setTaskDocQuery('') })
 
   const docTitle = (docId: string) => DOCUMENT_CATALOG.find((d) => d.id === docId)?.title ?? '삭제된 문서'
   const docCategoryName = (docId: string) => {
@@ -528,7 +536,7 @@ export default function RequestDetailView({
 
       {/* 상태 변경 팝업 */}
       {statusPopupOpen && (
-        <div className={styles.popupOverlay} onClick={() => setStatusPopupOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>상태 변경</span>
@@ -553,7 +561,7 @@ export default function RequestDetailView({
 
       {/* 유형 변경 팝업 */}
       {typePopupOpen && (
-        <div className={styles.popupOverlay} onClick={() => setTypePopupOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>유형 변경</span>
@@ -578,7 +586,7 @@ export default function RequestDetailView({
 
       {/* 공개범위 변경 팝업 */}
       {visibilityPopupOpen && (
-        <div className={styles.popupOverlay} onClick={() => setVisibilityPopupOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>공개범위 변경</span>
@@ -602,7 +610,7 @@ export default function RequestDetailView({
 
       {/* 업무리스트에 추가 팝업 */}
       {taskAddOpen && (
-        <div className={styles.popupOverlay} onClick={() => setTaskAddOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={`${styles.popup} ${styles.popupWide}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>업무리스트에 추가</span>
@@ -708,7 +716,7 @@ export default function RequestDetailView({
 
       {/* 참조 문서 선택 팝업: 좌측 검색+리스트 고정, 우측 문서 내용 뷰어 */}
       {taskDocPickerOpen && (
-        <div className={styles.popupOverlay} onClick={() => { setTaskDocPickerOpen(false); setTaskDocQuery('') }}>
+        <div className={styles.popupOverlay}>
           <div className={`${styles.popup} ${styles.taskDocPopup}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>참조 문서 선택</span>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import {
   LiaHomeSolid,
   LiaInboxSolid,
@@ -58,6 +59,10 @@ export default function EmployeeNav() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotification()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+
+  // 모바일 메뉴/알림 드로어 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(mobileMenuOpen, 'viewer', () => setMobileMenuOpen(false))
+  usePopupEsc(notifOpen, 'viewer', () => setNotifOpen(false))
 
   return (
     <>

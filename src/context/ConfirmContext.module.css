@@ -1,7 +1,9 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  /* 컨펌창은 어떤 팝업(모달 500·요청 상세 팝업 600·프로필 700·알림 1200 등) 위에서도
+     맨 앞에 떠야 한다. 토스트(9999)만 위에 둔다. */
+  z-index: 9000;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;

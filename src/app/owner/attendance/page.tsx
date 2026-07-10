@@ -7,6 +7,7 @@ import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import EmployeeName from '@/components/EmployeeName'
 import type { AttendanceStatus, CalendarRecord, WeeklySchedule } from '@/types'
 import styles from './page.module.css'
@@ -373,6 +374,12 @@ export default function AttendancePage() {
   // 팝업/바텀시트가 열리면 배경 스크롤 잠금
   useScrollLock(schedOpen || (viewMode !== 'day' && selectedDate !== null))
 
+  // ESC 닫기(최상위 팝업만). 근무 편성은 폼이라 guard, 나머지(날짜상세·기간선택·보기메뉴)는 viewer.
+  usePopupEsc(schedOpen, 'guard', () => setSchedOpen(false))
+  usePopupEsc(viewMode !== 'day' && selectedDate !== null, 'viewer', () => setSelectedDate(null))
+  usePopupEsc(pickerOpen, 'viewer', () => setPickerOpen(false))
+  usePopupEsc(viewMenuOpen, 'viewer', () => setViewMenuOpen(false))
+
   const selectedRecords = selectedDate ? getAttendanceForDate(selectedDate) : []
   const dayRecords = getAttendanceForDate(formatDate(baseYear, baseMonth, baseDay))
 
@@ -584,7 +591,7 @@ export default function AttendancePage() {
 
       {/* 날짜 상세 — 달력/주간에서 날짜 선택 시 바텀시트로 표시 (레이아웃 시프팅 없음) */}
       {viewMode !== 'day' && selectedDate && (
-        <div className={styles.sheetOverlay} onClick={() => setSelectedDate(null)}>
+        <div className={styles.sheetOverlay}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHandle} />
             <div className={styles.sheetHead}>
@@ -616,7 +623,7 @@ export default function AttendancePage() {
 
       {/* 직원 스케줄 관리 팝업: 기본 근무 패턴 + 일자별 조정 */}
       {schedOpen && (
-        <div className={styles.schedOverlay} onClick={() => setSchedOpen(false)}>
+        <div className={styles.schedOverlay}>
           <div className={styles.schedModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.schedHead}>
               <span className={styles.schedTitle}>직원 스케줄 관리</span>

@@ -140,6 +140,7 @@
 .status_LATE { color: var(--color-warning); background: var(--color-warning-light); }
 .status_ABSENT { color: var(--color-danger); background: var(--color-danger-light); }
 .status_CLOCKED_OUT { color: var(--color-text-secondary); background: var(--color-border); }
+.status_OFF { color: var(--color-text-secondary); background: var(--color-border); }
 
 /* ─── 업무 현황 ─── */
 
@@ -610,14 +611,31 @@
   border-color: var(--color-success);
 }
 
-.taskSubTitle {
+/* 제목 + 수행시간을 이름 옆에 묶는 래퍼 (남은 폭을 차지해 담당자/미할당을 우측으로 민다) */
+.taskSubMain {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.taskSubTitle {
+  flex: 0 1 auto;
   min-width: 0;
   font-size: 13px;
   color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
+}
+
+.taskSubTiming {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 .taskSubAssignee {
@@ -636,4 +654,274 @@
   border-radius: 99px;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* 업무명(제목) 클릭으로 액션 메뉴를 연다 — 호버로 클릭 가능함을 알린다 */
+.taskSubTitle:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* 미할당 리스트에서 공통/추가 구분 라벨 (클릭 불가) */
+.taskSubKind {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── 담당자 이름 클릭 시 뜨는 액션 메뉴 (퀵지정 / 삭제) ─── */
+.assignMenuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 340;
+}
+
+.assignMenu {
+  position: fixed;
+  z-index: 341;
+  min-width: 128px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.assignMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.assignMenuItem:hover {
+  background: var(--color-bg);
+}
+
+.assignMenuItem svg {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.assignMenuItemDanger {
+  color: var(--color-danger);
+}
+
+.assignMenuItemDanger svg {
+  color: var(--color-danger);
+}
+
+/* ─── 퀵 지정 팝업 ─── */
+.quickAssign {
+  display: flex;
+  flex-direction: column;
+}
+
+.quickAssignTask {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quickAssignSearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 12px 0 4px;
+}
+
+.quickAssignSearchIcon {
+  position: absolute;
+  left: 10px;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.quickAssignSearchInput {
+  width: 100%;
+  padding: 9px 32px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.quickAssignSearchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.quickAssignSearchInput::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.quickAssignSearchClear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.quickAssignList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-top: 6px;
+}
+
+.quickAssignStatus {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 표준 체크박스(22px 둥근 사각형) — design-agent 스펙 재사용 */
+.checkbox {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.checkboxOn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.quickAssignRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.quickAssignRow:hover {
+  background: var(--color-bg);
+}
+
+.quickAssignAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quickAssignName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.quickAssignApply {
+  margin-top: 14px;
+  width: 100%;
+  padding: 11px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ─── 수행 방법 보기 팝업 ─── */
+.methodView {
+  display: flex;
+  flex-direction: column;
+}
+
+.methodViewName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.methodViewMeta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.methodContent {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.methodContent p {
+  margin: 0 0 12px;
+}
+
+.methodContent p:last-child {
+  margin-bottom: 0;
+}
+
+.methodContent ul,
+.methodContent ol {
+  padding-left: 22px;
+  margin: 8px 0 14px;
+}
+
+.methodContent li {
+  margin: 0 0 6px;
+}
+
+.methodContent li::marker {
+  color: var(--color-text-secondary);
+}
+
+.methodContent strong {
+  font-weight: 700;
+}
+
+.methodContent img {
+  max-width: 100%;
+  display: block;
+  margin: 8px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }

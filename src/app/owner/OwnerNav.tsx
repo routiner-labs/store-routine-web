@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import {
@@ -70,6 +71,10 @@ export default function OwnerNav() {
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+
+  // 모바일 메뉴/알림 드로어 — 뷰어형(ESC 바로 닫힘). 매장 선택 시트는 StoreSwitcher가 자체 처리.
+  usePopupEsc(mobileMenuOpen, 'viewer', () => setMobileMenuOpen(false))
+  usePopupEsc(notifOpen, 'viewer', () => setNotifOpen(false))
 
   function handleNotifItem(id: string, href?: string) {
     markAsRead(id)

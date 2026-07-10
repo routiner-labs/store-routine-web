@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiaAngleDownSolid, LiaAngleLeftSolid, LiaAngleRightSolid, LiaTimesSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import styles from './DateRangeFilter.module.css'
 
 const DIAL_ITEM_HEIGHT = 36
@@ -186,6 +187,9 @@ export default function DateRangeFilter({
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
 
   useScrollLock(open)
+  // 달력/연월 다이얼 — 뷰어형. 다이얼(위)이 열려 있으면 ESC로 다이얼만 닫힌다.
+  usePopupEsc(open, 'viewer', () => setOpen(false))
+  usePopupEsc(monthPickerOpen, 'viewer', () => setMonthPickerOpen(false))
 
   function openPopup() {
     setDraftStart(startDate)
@@ -250,7 +254,7 @@ export default function DateRangeFilter({
       )}
 
       {open && createPortal(
-        <div className={styles.popupOverlay} onClick={() => setOpen(false)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popupCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHead}>
               <span className={styles.popupTitle}>{title} 선택</span>

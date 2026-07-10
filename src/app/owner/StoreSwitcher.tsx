@@ -1,10 +1,14 @@
 'use client'
 
 import { useStore } from '@/context/StoreContext'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import styles from './StoreSwitcher.module.css'
 
 export default function StoreSwitcher({ onClose }: { onClose: () => void }) {
   const { currentStore, stores, switchStore } = useStore()
+
+  // 매장 선택 시트 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(true, 'viewer', onClose)
 
   return (
     <div className={styles.overlay} onClick={onClose}>

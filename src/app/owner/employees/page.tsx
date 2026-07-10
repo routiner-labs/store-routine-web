@@ -7,6 +7,7 @@ import { LiaUserPlusSolid, LiaAngleRightSolid, LiaSearchSolid, LiaSlidersHSolid,
 import { mockEmployees, mockJoinRequests } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import type { EmploymentStatus } from '@/types'
 import styles from './page.module.css'
 
@@ -24,6 +25,8 @@ export default function EmployeesPage() {
   const { showToast } = useToast()
 
   useScrollLock(inviteOpen)
+  // 직원 초대 시트 — 입력 폼이라 guard(ESC 시 컨펌 후 닫힘)
+  usePopupEsc(inviteOpen, 'guard', closeInvite)
 
   const advActiveCount =
     (filterStatus !== 'ALL' ? 1 : 0) +
@@ -199,7 +202,7 @@ export default function EmployeesPage() {
       </button>
 
       {inviteOpen && (
-        <div className={styles.sheetOverlay} onClick={closeInvite}>
+        <div className={styles.sheetOverlay}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHandle} />
             <div className={styles.sheetHead}>

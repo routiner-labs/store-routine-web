@@ -6,6 +6,7 @@ import { LiaAngleRightSolid } from 'react-icons/lia'
 import { mockChecklists, mockSpecialInstructions, mockRequests } from '@/mock/data'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import EmployeeName from '@/components/EmployeeName'
 import type { SpecialInstruction } from '@/types'
 import styles from './page.module.css'
@@ -31,6 +32,8 @@ export default function EmployeeHome() {
   const [openInstruction, setOpenInstruction] = useState<SpecialInstruction | null>(null)
 
   useScrollLock(openInstruction !== null)
+  // 특이사항 상세 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(openInstruction !== null, 'viewer', () => setOpenInstruction(null))
 
   const myChecklists = mockChecklists.filter((c) => c.id === '1' || c.id === '3')
   const myInstruction = instructions.find((i) => i.assignedTo === ME)
@@ -184,7 +187,7 @@ export default function EmployeeHome() {
 
       {/* 특별 지시 상세 팝업 */}
       {openInstruction && (
-        <div className={styles.popupOverlay} onClick={() => setOpenInstruction(null)}>
+        <div className={styles.popupOverlay}>
           <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
             <div className={styles.popupHeader}>
               <span className={styles.popupTitle}>특별 지시</span>

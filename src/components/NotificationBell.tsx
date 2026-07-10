@@ -13,6 +13,7 @@ import {
 } from 'react-icons/lia'
 import { useNotification } from '@/context/NotificationContext'
 import type { NotificationType } from '@/context/NotificationContext'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import styles from './NotificationBell.module.css'
 
 const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
@@ -28,6 +29,9 @@ export default function NotificationBell({ diamond }: { diamond?: boolean }) {
   const bellRef = useRef<HTMLButtonElement>(null)
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotification()
   const router = useRouter()
+
+  // 알림 드롭다운 — 뷰어형(ESC 바로 닫힘)
+  usePopupEsc(open, 'viewer', () => setOpen(false))
 
   function toggle() {
     if (!open && bellRef.current) {

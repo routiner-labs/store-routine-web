@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useState } from 'react'
+import { useEscClose } from '@/lib/useEscClose'
 import styles from './ConfirmContext.module.css'
 
 export interface ConfirmOptions {
@@ -32,6 +33,9 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
       return null
     })
   }
+
+  // 컨펌창도 팝업이므로 ESC로 취소된다. 스택 최상위라 다른 팝업 위에 떠도 이 창만 닫힘.
+  useEscClose(state !== null, () => close(false))
 
   return (
     <ConfirmContext.Provider value={confirm}>

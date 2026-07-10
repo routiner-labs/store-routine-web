@@ -14,6 +14,7 @@ import {
 import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { usePopupEsc } from '@/lib/usePopupEsc'
 import styles from './page.module.css'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
@@ -42,6 +43,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [terminateChecked, setTerminateChecked] = useState(false)
 
   useScrollLock(terminateOpen)
+  // 퇴직 처리 팝업 — 수정/처리 폼이라 guard(ESC 시 컨펌 후 닫힘)
+  usePopupEsc(terminateOpen, 'guard', () => setTerminateOpen(false))
 
   if (!emp) {
     return (
@@ -263,7 +266,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
       {/* 퇴직 처리 절차 팝업 */}
       {terminateOpen && (
-        <div className={styles.termOverlay} onClick={() => setTerminateOpen(false)}>
+        <div className={styles.termOverlay}>
           <div className={styles.termPopup} onClick={(e) => e.stopPropagation()}>
             <div className={styles.termHead}>
               <span className={styles.termTitle}>정말로 {name}님을 퇴직 처리할까요?</span>

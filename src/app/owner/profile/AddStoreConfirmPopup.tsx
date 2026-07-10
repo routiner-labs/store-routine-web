@@ -30,7 +30,7 @@ export default function AddStoreConfirmPopup({
   const matched = phrase.trim() === ADD_STORE_CONFIRM_PHRASE
 
   return (
-    <Modal title="매장 추가 안내" onClose={onClose}>
+    <Modal title="매장 추가 안내" dismiss="guard" onClose={onClose}>
       <div className={formStyles.form}>
         <p className={styles.warnHead}>
           매장을 추가하면 정기 결제 금액이 늘어납니다. 아래 내용을 반드시 확인해주세요.

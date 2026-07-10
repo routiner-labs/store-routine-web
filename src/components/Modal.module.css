@@ -34,6 +34,13 @@
   height: 90dvh;
 }
 
+/* 퀵 액션용 작은 팝업 — 내용 높이에 맞춰 컴팩트하게 */
+.dialogSmall {
+  width: min(360px, 92vw);
+  height: auto;
+  max-height: min(560px, 82dvh);
+}
+
 @keyframes modalPop {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }

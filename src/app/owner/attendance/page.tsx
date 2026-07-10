@@ -1,15 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { LiaAngleDownSolid, LiaPlusSolid, LiaCalendarWeekSolid, LiaCalendarDaySolid, LiaTimesSolid, LiaCheckSolid } from 'react-icons/lia'
+import { useRouter } from 'next/navigation'
+import { LiaAngleDownSolid, LiaPlusSolid, LiaCalendarWeekSolid, LiaCalendarDaySolid } from 'react-icons/lia'
 import { getAttendanceForDate } from '@/mock/calendar'
-import { mockEmployees } from '@/mock/employees'
-import { useToast } from '@/context/ToastContext'
-import { useConfirm } from '@/context/ConfirmContext'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { usePopupEsc } from '@/lib/usePopupEsc'
 import EmployeeName from '@/components/EmployeeName'
-import type { AttendanceStatus, CalendarRecord, WeeklySchedule } from '@/types'
+import type { AttendanceStatus, CalendarRecord } from '@/types'
 import styles from './page.module.css'
 
 type ViewMode = 'day' | 'week' | 'month'
@@ -256,100 +254,12 @@ export default function AttendancePage() {
   const [pickerNavMonth, setPickerNavMonth] = useState(6)
   const [viewMenuOpen, setViewMenuOpen] = useState(false)
   const [fabOpen, setFabOpen] = useState(false)
-  const [schedOpen, setSchedOpen] = useState(false)
-  const [schedTab, setSchedTab] = useState<'BASE' | 'DATE'>('BASE')
-  const [schedDate, setSchedDate] = useState(TODAY)
-  // 스케줄은 사장이 생성해야 존재한다. 생성 전에는 null(스케줄 없음).
-  const [schedules, setSchedules] = useState<Record<string, WeeklySchedule | null>>(() =>
-    Object.fromEntries(
-      mockEmployees
-        .filter((e) => e.status === 'ACTIVE')
-        .map((e) => [e.id, e.schedule ?? null])
-    )
-  )
-  // 일자별 조정: 날짜 -> 직원 -> { off | 근무시간 }
-  type DayOverride = { off: boolean; startTime: string; endTime: string }
-  const [overrides, setOverrides] = useState<Record<string, Record<string, DayOverride>>>({})
-  const { showToast } = useToast()
-  const confirm = useConfirm()
+  const router = useRouter()
 
-  const activeEmployees = mockEmployees.filter((e) => e.status === 'ACTIVE')
-
-  function dowOf(ds: string) {
-    const [y, m, d] = ds.split('-').map(Number)
-    return (new Date(y, m - 1, d).getDay() + 6) % 7
-  }
-
-  // 해당 날짜의 실제 근무 정보(일자별 조정 > 기본 패턴 순)
-  function effectiveDay(empId: string, ds: string): { working: boolean; startTime: string; endTime: string; adjusted: boolean } {
-    const ov = overrides[ds]?.[empId]
-    if (ov) return { working: !ov.off, startTime: ov.startTime, endTime: ov.endTime, adjusted: true }
-    const base = schedules[empId]
-    if (base && base.days.includes(dowOf(ds))) {
-      return { working: true, startTime: base.startTime, endTime: base.endTime, adjusted: false }
-    }
-    return { working: false, startTime: '09:00', endTime: '18:00', adjusted: false }
-  }
-
-  function createSchedule(empId: string) {
-    setSchedules((prev) => ({ ...prev, [empId]: { days: [], startTime: '09:00', endTime: '18:00' } }))
-  }
-
-  async function removeSchedule(empId: string, name: string) {
-    const ok = await confirm({
-      title: '스케줄을 삭제할까요?',
-      message: `${name}님의 기본 스케줄이 삭제됩니다.`,
-    })
-    if (!ok) return
-    setSchedules((prev) => ({ ...prev, [empId]: null }))
-    showToast('스케줄이 삭제되었습니다', 'error')
-  }
-
-  function toggleSchedDay(empId: string, day: number) {
-    setSchedules((prev) => {
-      const cur = prev[empId]
-      if (!cur) return prev
-      const days = cur.days.includes(day)
-        ? cur.days.filter((d) => d !== day)
-        : [...cur.days, day].sort((a, b) => a - b)
-      return { ...prev, [empId]: { ...cur, days } }
-    })
-  }
-
-  function setSchedTime(empId: string, key: 'startTime' | 'endTime', value: string) {
-    setSchedules((prev) => {
-      const cur = prev[empId]
-      if (!cur) return prev
-      return { ...prev, [empId]: { ...cur, [key]: value } }
-    })
-  }
-
-  function setDayOverride(empId: string, patch: Partial<DayOverride>) {
-    setOverrides((prev) => {
-      const eff = effectiveDay(empId, schedDate)
-      const cur = prev[schedDate]?.[empId] ?? { off: !eff.working, startTime: eff.startTime, endTime: eff.endTime }
-      return { ...prev, [schedDate]: { ...prev[schedDate], [empId]: { ...cur, ...patch } } }
-    })
-  }
-
-  function resetDayOverride(empId: string) {
-    setOverrides((prev) => {
-      const day = { ...prev[schedDate] }
-      delete day[empId]
-      return { ...prev, [schedDate]: day }
-    })
-  }
-
-  function saveSchedules() {
-    setSchedOpen(false)
-    showToast('직원 스케줄이 저장되었습니다')
-  }
-
-  // FAB 메뉴에서 해당 탭으로 스케줄 관리 팝업 열기
-  function openSchedule(tab: 'BASE' | 'DATE') {
-    setSchedTab(tab)
-    setSchedOpen(true)
+  // FAB 메뉴에서 스케줄 관리 페이지로 이동
+  function goSchedule(path: string) {
     setFabOpen(false)
+    router.push(path)
   }
 
   function openPicker() {
@@ -379,11 +289,10 @@ export default function AttendancePage() {
       )
     : null
 
-  // 팝업/바텀시트가 열리면 배경 스크롤 잠금
-  useScrollLock(schedOpen || (viewMode !== 'day' && selectedDate !== null))
+  // 바텀시트(날짜 상세)가 열리면 배경 스크롤 잠금
+  useScrollLock(viewMode !== 'day' && selectedDate !== null)
 
-  // ESC 닫기(최상위 팝업만). 근무 편성은 폼이라 guard, 나머지(날짜상세·기간선택·보기메뉴)는 viewer.
-  usePopupEsc(schedOpen, 'guard', () => setSchedOpen(false))
+  // ESC 닫기(최상위 팝업만). 날짜상세·기간선택·보기메뉴는 viewer.
   usePopupEsc(viewMode !== 'day' && selectedDate !== null, 'viewer', () => setSelectedDate(null))
   usePopupEsc(pickerOpen, 'viewer', () => setPickerOpen(false))
   usePopupEsc(viewMenuOpen, 'viewer', () => setViewMenuOpen(false))
@@ -624,11 +533,11 @@ export default function AttendancePage() {
       <div className={styles.fabWrap}>
         {fabOpen && (
           <div className={styles.fabMenu}>
-            <button className={styles.fabMenuItem} onClick={() => openSchedule('BASE')}>
+            <button className={styles.fabMenuItem} onClick={() => goSchedule('/owner/attendance/schedule')}>
               <LiaCalendarWeekSolid className={styles.fabMenuIcon} />
               기본 스케줄
             </button>
-            <button className={styles.fabMenuItem} onClick={() => openSchedule('DATE')}>
+            <button className={styles.fabMenuItem} onClick={() => goSchedule('/owner/attendance/adjust')}>
               <LiaCalendarDaySolid className={styles.fabMenuIcon} />
               일자별 조정
             </button>
@@ -642,181 +551,6 @@ export default function AttendancePage() {
           <LiaPlusSolid />
         </button>
       </div>
-
-      {/* 직원 스케줄 관리 팝업: 기본 근무 패턴 + 일자별 조정 */}
-      {schedOpen && (
-        <div className={styles.schedOverlay}>
-          <div className={styles.schedModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.schedHead}>
-              <span className={styles.schedTitle}>직원 스케줄 관리</span>
-              <button className={styles.schedClose} onClick={() => setSchedOpen(false)} aria-label="닫기">
-                <LiaTimesSolid />
-              </button>
-            </div>
-
-            <div className={styles.schedTabs}>
-              <button
-                className={`${styles.schedTabBtn} ${schedTab === 'BASE' ? styles.schedTabActive : ''}`}
-                onClick={() => setSchedTab('BASE')}
-              >
-                기본 스케줄
-              </button>
-              <button
-                className={`${styles.schedTabBtn} ${schedTab === 'DATE' ? styles.schedTabActive : ''}`}
-                onClick={() => setSchedTab('DATE')}
-              >
-                일자별 조정
-              </button>
-            </div>
-
-            {schedTab === 'BASE' ? (
-              <div className={styles.schedBody}>
-                <p className={styles.schedGuide}>
-                  스케줄을 생성해야 근무 일정이 만들어집니다. 반복되는 기본 근무 패턴을 설정하세요.
-                </p>
-                {activeEmployees.map((emp) => {
-                  const sched = schedules[emp.id]
-                  return (
-                    <div key={emp.id} className={styles.schedRow}>
-                      <div className={styles.schedEmp}>
-                        <span className={styles.schedAvatar}>{emp.name[0]}</span>
-                        <EmployeeName name={emp.name} className={styles.schedName} />
-                      </div>
-                      {sched === null ? (
-                        <div className={styles.schedNone}>
-                          <span className={styles.schedNoneText}>등록된 스케줄이 없습니다</span>
-                          <button
-                            type="button"
-                            className={styles.schedCreateBtn}
-                            onClick={() => createSchedule(emp.id)}
-                          >
-                            스케줄 만들기
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <div className={styles.schedDays}>
-                            {WEEKDAY_LABELS.map((d, i) => (
-                              <button
-                                key={i}
-                                type="button"
-                                className={`${styles.schedDay} ${sched.days.includes(i) ? styles.schedDayOn : ''}`}
-                                onClick={() => toggleSchedDay(emp.id, i)}
-                              >
-                                {d}
-                              </button>
-                            ))}
-                          </div>
-                          <div className={styles.schedTimes}>
-                            <input
-                              type="time"
-                              className={styles.schedTimeInput}
-                              value={sched.startTime}
-                              onChange={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
-                            />
-                            <span className={styles.schedTimeSep}>~</span>
-                            <input
-                              type="time"
-                              className={styles.schedTimeInput}
-                              value={sched.endTime}
-                              onChange={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
-                            />
-                            <button
-                              type="button"
-                              className={styles.schedRemoveBtn}
-                              onClick={() => removeSchedule(emp.id, emp.name)}
-                            >
-                              삭제
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className={styles.schedBody}>
-                <div className={styles.schedDateRow}>
-                  <input
-                    type="date"
-                    className={styles.schedDateInput}
-                    value={schedDate}
-                    onChange={(e) => e.target.value && setSchedDate(e.target.value)}
-                  />
-                  <span className={styles.schedGuideInline}>
-                    선택한 날짜만 근무·휴무·시간을 조정합니다. 기본 스케줄은 바뀌지 않습니다.
-                  </span>
-                </div>
-                {activeEmployees.map((emp) => {
-                  const eff = effectiveDay(emp.id, schedDate)
-                  return (
-                    <div key={emp.id} className={styles.schedRow}>
-                      <div className={styles.schedEmp}>
-                        <span className={styles.schedAvatar}>{emp.name[0]}</span>
-                        <EmployeeName name={emp.name} className={styles.schedName} />
-                        {eff.adjusted && <span className={styles.schedAdjBadge}>조정됨</span>}
-                      </div>
-                      <div className={styles.schedDaySeg}>
-                        <button
-                          type="button"
-                          className={`${styles.schedSegBtn} ${eff.working ? styles.schedSegOn : ''}`}
-                          onClick={() => setDayOverride(emp.id, { off: false })}
-                        >
-                          근무
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.schedSegBtn} ${!eff.working ? styles.schedSegOff : ''}`}
-                          onClick={() => setDayOverride(emp.id, { off: true })}
-                        >
-                          휴무
-                        </button>
-                      </div>
-                      <div className={styles.schedTimes}>
-                        {eff.working ? (
-                          <>
-                            <input
-                              type="time"
-                              className={styles.schedTimeInput}
-                              value={eff.startTime}
-                              onChange={(e) => setDayOverride(emp.id, { startTime: e.target.value })}
-                            />
-                            <span className={styles.schedTimeSep}>~</span>
-                            <input
-                              type="time"
-                              className={styles.schedTimeInput}
-                              value={eff.endTime}
-                              onChange={(e) => setDayOverride(emp.id, { endTime: e.target.value })}
-                            />
-                          </>
-                        ) : (
-                          <span className={styles.schedOffText}>휴무</span>
-                        )}
-                        {eff.adjusted && (
-                          <button
-                            type="button"
-                            className={styles.schedRemoveBtn}
-                            onClick={() => resetDayOverride(emp.id)}
-                          >
-                            기본으로
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-            <div className={styles.schedFoot}>
-              <button className={styles.schedSave} onClick={saveSchedules}>
-                <LiaCheckSolid /> 저장
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

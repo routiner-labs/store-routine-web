@@ -1,0 +1,297 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--color-bg);
+}
+
+/* 헤더 (요청/문서 상세와 동일한 뒤로가기 패턴) */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 0 var(--page-x);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--appbar-height);
+  z-index: 10;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 6px 8px 6px 4px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.backBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.backBtn svg {
+  font-size: 16px;
+  transition: transform 0.18s ease;
+}
+
+.backBtn:hover svg {
+  transform: translateX(-3px);
+}
+
+.heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* 뒤로가기로 페이지를 떠날 때 종료 애니메이션 */
+.leaving {
+  animation: pageLeave 0.26s ease forwards;
+}
+
+@keyframes pageLeave {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(16px); }
+}
+
+.body {
+  flex: 1;
+  width: 100%;
+  max-width: 860px;
+  padding: 8px var(--page-x) 24px;
+}
+
+.foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px var(--page-x);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.save {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.save:hover {
+  opacity: 0.92;
+}
+
+/* 안내 문구 */
+.guide {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin: 8px 0 4px;
+}
+
+.guideInline {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* 직원 행 */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.emp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.days {
+  display: flex;
+  gap: 4px;
+}
+
+.day {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dayOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.times {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.timeSep {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.removeBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.removeBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.none {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  grid-column: 2 / -1;
+}
+
+.noneText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.createBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
+.dateInput {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.adjBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.daySeg {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.segBtn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+}
+
+.segOn {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.segOff {
+  background: var(--color-text-secondary);
+  color: #fff;
+}
+
+.offText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .row {
+    display: grid;
+    grid-template-columns: 130px 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+}

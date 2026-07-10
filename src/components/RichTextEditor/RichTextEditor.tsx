@@ -449,6 +449,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${fmt.bold ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
         aria-label="굵게"
+        title="굵게"
       >
         <LiaBoldSolid />
       </button>
@@ -457,6 +458,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${fmt.italic ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
         aria-label="기울임"
+        title="기울임"
       >
         <LiaItalicSolid />
       </button>
@@ -465,6 +467,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${fmt.underline ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
         aria-label="밑줄"
+        title="밑줄"
       >
         <LiaUnderlineSolid />
       </button>
@@ -476,6 +479,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${block === 'h2' ? styles.toolActive : ''}`}
         onClick={toggleHeading}
         aria-label="제목"
+        title="제목"
       >
         <LiaHeadingSolid />
       </button>
@@ -484,6 +488,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${block === 'bullet' ? styles.toolActive : ''}`}
         onClick={() => toggleList('bullet')}
         aria-label="글머리 목록"
+        title="글머리 목록"
       >
         <LiaListUlSolid />
       </button>
@@ -492,6 +497,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${block === 'number' ? styles.toolActive : ''}`}
         onClick={() => toggleList('number')}
         aria-label="번호 목록"
+        title="번호 목록"
       >
         <LiaListOlSolid />
       </button>
@@ -503,6 +509,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${align === '' || align === 'left' || align === 'start' ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
         aria-label="왼쪽 정렬"
+        title="왼쪽 정렬"
       >
         <LiaAlignLeftSolid />
       </button>
@@ -511,6 +518,7 @@ function Toolbar() {
         className={`${styles.toolBtn} ${align === 'center' ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
         aria-label="가운데 정렬"
+        title="가운데 정렬"
       >
         <LiaAlignCenterSolid />
       </button>
@@ -519,13 +527,20 @@ function Toolbar() {
         className={`${styles.toolBtn} ${align === 'right' || align === 'end' ? styles.toolActive : ''}`}
         onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
         aria-label="오른쪽 정렬"
+        title="오른쪽 정렬"
       >
         <LiaAlignRightSolid />
       </button>
 
       <span className={styles.toolDivider} />
 
-      <button type="button" className={styles.toolImg} onClick={() => fileRef.current?.click()}>
+      <button
+        type="button"
+        className={styles.toolImg}
+        onClick={() => fileRef.current?.click()}
+        aria-label="사진 넣기"
+        title="사진 넣기"
+      >
         <LiaImageSolid />
         사진
       </button>

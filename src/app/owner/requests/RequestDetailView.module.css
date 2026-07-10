@@ -1093,166 +1093,366 @@
   color: var(--color-danger);
 }
 
-/* 문서 선택 팝업: 좌측 검색+리스트 고정, 우측 내용 뷰어 */
-.taskDocPopup {
-  max-width: 860px;
+/* ── 참조 문서 선택 팝업 — 업무리스트(owner/checklists)의 문서 선택 팝업과 동일 디자인 ── */
+
+.docPickerCard {
   width: 94vw;
-  max-height: 88dvh;
+  max-width: 1040px;
+  height: 84vh;
+  max-height: 760px;
+  background: var(--color-surface);
+  border: 1px solid var(--surface-outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.taskDocSplit {
+.docPickerHead {
   display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
-.taskDocListPane {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
-.taskDocViewerPane {
-  flex: 1;
-  min-height: 200px;
-  overflow-y: auto;
-  padding: 20px;
+.docPickerHeadTitle {
+  font-size: 15px;
+  font-weight: 700;
 }
 
-.taskDocViewerHint {
+.docPickerClose {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 160px;
-  margin: 0;
-  padding: 20px;
+  font-size: 18px;
   color: var(--color-text-secondary);
-  font-size: 13px;
-  text-align: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
 }
 
-@media (min-width: 640px) {
-  .taskDocSplit {
-    flex-direction: row;
-  }
-
-  .taskDocListPane {
-    width: 260px;
-    flex-shrink: 0;
-    border-bottom: none;
-    border-right: 1px solid var(--color-border);
-  }
-
-  .taskDocViewerPane {
-    min-height: 0;
-  }
+.docPickerClose:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-.taskDocSearch {
-  position: relative;
-  padding: 12px 16px 10px;
+.docPickerBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.docPickerListPane {
+  width: 320px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--color-border);
 }
 
-.taskDocSearchIcon {
-  position: absolute;
-  left: 26px;
-  top: 50%;
-  transform: translateY(-42%);
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  pointer-events: none;
-}
-
-.taskDocSearchInput {
-  width: 100%;
-  padding: 8px 10px 8px 32px;
+.docPickerSearch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 10px 8px;
+  padding: 7px 10px;
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.docPickerSearchIcon {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.docPickerSearchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
   font-size: 13px;
-  background: var(--color-bg);
-  box-sizing: border-box;
-}
-
-.taskDocSearchInput:focus {
+  color: var(--color-text);
   outline: none;
-  border-color: var(--color-primary);
 }
 
-.taskDocList {
+.docPickerSearchInput::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.docPickerSearchClear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  padding: 1px;
+  border-radius: 50%;
+}
+
+.docPickerSearchClear:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.docPickerEmpty {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding: 12px 10px;
+}
+
+.docPickerList {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 6px 10px 16px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.taskDocEmpty {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  padding: 24px 12px;
-  text-align: center;
-}
-
-.taskDocRow {
+.docPickerRow {
   display: flex;
   align-items: center;
-  gap: 4px;
-  width: 100%;
   border-radius: var(--radius-sm);
+  transition: background 0.1s;
 }
 
-.taskDocRowActive {
-  background: var(--color-primary-light);
-}
-
-.taskDocRowMain {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-  padding: 9px 8px;
-  border-radius: var(--radius-sm);
-  text-align: left;
-}
-
-.taskDocRow:not(.taskDocRowActive):hover .taskDocRowMain {
+.docPickerRow:hover {
   background: var(--color-bg);
 }
 
-.taskDocToggle {
+.docPickerRowActive,
+.docPickerRowActive:hover {
+  background: var(--color-primary-light);
+}
+
+.docPickerRowMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px 9px 8px;
+  text-align: left;
+}
+
+.docPickerRowName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docPickerCheck {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-left: 10px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  margin-right: 4px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: 12px;
+  color: #fff;
+  font-size: 13px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.docPickerCheckOn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.docRefBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-.taskDocToggle:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.docPickerViewer {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 32px;
 }
 
-.taskDocToggleActive {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+.docPickerViewerHead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* 뷰어 헤더 카테고리 뱃지 — 색은 categoryBadgeStyle inline */
+.docPickerCatBadge {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.docPickerViewerTitle {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+.docPickerViewerMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.docPickerViewerContent {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.docPickerViewerContent p {
+  margin: 0 0 12px;
+}
+
+.docPickerViewerContent p:last-child {
+  margin-bottom: 0;
+}
+
+.docPickerViewerContent ul,
+.docPickerViewerContent ol {
+  padding-left: 22px;
+  margin: 8px 0 14px;
+}
+
+.docPickerViewerContent li {
+  margin: 0 0 6px;
+}
+
+.docPickerViewerContent li::marker {
+  color: var(--color-text-secondary);
+}
+
+.docPickerViewerContent img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  margin: 8px 0;
+  display: block;
+  border: 1px solid var(--color-border);
+}
+
+.docPickerViewerEmpty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.docPickerViewerEmpty svg {
+  font-size: 32px;
+  opacity: 0.45;
+}
+
+.docPickerFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.docPickerFootCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.docPickerFootBtns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.docPickerBtnCancel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.docPickerBtnCancel:hover {
+  background: var(--color-bg);
+}
+
+.docPickerBtnApply {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
   color: #fff;
+  background: var(--color-primary);
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.docPickerBtnApply:hover {
+  opacity: 0.92;
+}
+
+@media (max-width: 640px) {
+  .docPickerCard {
+    max-width: 100%;
+    height: 82vh;
+    max-height: none;
+  }
+
+  .docPickerBody {
+    flex-direction: column;
+  }
+
+  .docPickerListPane {
+    width: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    max-height: 42%;
+  }
 }
 
 .manageBtn:disabled {

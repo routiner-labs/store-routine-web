@@ -97,15 +97,14 @@ export default function RequestDetailView({
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(
     mockActivityLogs.filter((a) => a.requestId === id)
   )
-  // 댓글 입력/수정 — 에디터(HTML). 내용은 ref로, 등록/저장 활성화는 hasContent로.
+  // 하단 입력 에디터 하나로 새 댓글 / 답글(대댓글) / 수정을 모두 처리한다.
+  // 내용은 ref로, 등록/저장 활성화는 hasContent로. initial은 수정 진입 시 기존 내용을 주입.
   const replyContentRef = useRef('')
   const [replyHasContent, setReplyHasContent] = useState(false)
-  const [replyEditorKey, setReplyEditorKey] = useState(0) // 등록 후 에디터 초기화용 remount 키
-  const [editingReplyId, setEditingReplyId] = useState<string | null>(null)
-  const editContentRef = useRef('')
-  const [editHasContent, setEditHasContent] = useState(false)
-  // 대댓글 입력(1뎁스) — 하단 입력 에디터를 재사용. 답글 대상 댓글 id만 들고 있는다.
-  const [replyingToId, setReplyingToId] = useState<string | null>(null)
+  const [replyEditorKey, setReplyEditorKey] = useState(0) // 모드 전환/등록 시 remount 키
+  const [composerInitial, setComposerInitial] = useState('') // 수정 시 기존 내용 프리필
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null) // 수정 대상 댓글 id
+  const [replyingToId, setReplyingToId] = useState<string | null>(null) // 답글 대상 댓글 id(1뎁스)
   const commentInputRef = useRef<HTMLDivElement>(null)
   const [statusPopupOpen, setStatusPopupOpen] = useState(false)
   const [typePopupOpen, setTypePopupOpen] = useState(false)
@@ -311,18 +310,38 @@ export default function RequestDetailView({
     showToast('테스크가 생성되어 오늘 업무리스트에 추가되었습니다')
   }
 
+  // 하단 에디터를 특정 내용으로 새로 열기(remount) — 모드 전환 공통
+  function loadComposer(html: string) {
+    setComposerInitial(html)
+    replyContentRef.current = html
+    setReplyHasContent(hasHtmlContent(html))
+    setReplyEditorKey((k) => k + 1)
+    commentInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
   function startEditReply(reply: RequestReply) {
+    setReplyingToId(null)
     setEditingReplyId(reply.id)
-    editContentRef.current = reply.content
-    setEditHasContent(hasHtmlContent(reply.content))
+    loadComposer(contentToHtml(reply.content)) // 기존 내용을 하단 에디터에 프리필
   }
 
   function saveEditReply() {
-    const html = editContentRef.current
+    const html = replyContentRef.current
     if (!editingReplyId || !hasHtmlContent(html)) return
     setReplies((prev) => prev.map((r) => (r.id === editingReplyId ? { ...r, content: html } : r)))
     setEditingReplyId(null)
+    loadComposer('') // 새 댓글 모드로 초기화
     showToast('댓글이 수정되었습니다')
+  }
+
+  // 수정/답글 모드 취소 → 새 댓글 모드로. 수정 취소 시엔 프리필 내용을 비운다.
+  function cancelComposer() {
+    if (editingReplyId) {
+      setEditingReplyId(null)
+      loadComposer('')
+    } else {
+      setReplyingToId(null)
+    }
   }
 
   async function deleteReply(replyId: string) {
@@ -341,6 +360,11 @@ export default function RequestDetailView({
   }
 
   function startReplyTo(commentId: string) {
+    // 수정 모드에서 넘어오면 프리필 내용 비움. 새 댓글 초안은 유지.
+    if (editingReplyId) {
+      setEditingReplyId(null)
+      loadComposer('')
+    }
     setReplyingToId(commentId)
     // 하단 입력 에디터로 이동(별도 에디터를 띄우지 않고 재사용)
     commentInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -377,11 +401,12 @@ export default function RequestDetailView({
   // 댓글/대댓글 공통 렌더. isChild면 대댓글(답글 버튼 없음 — 중첩은 1뎁스까지).
   function renderCommentItem(reply: RequestReply, isChild: boolean) {
     const [rDate, rTime] = reply.createdAt.split(' ')
-    const isReplyTarget = !isChild && replyingToId === reply.id
+    const isEditing = editingReplyId === reply.id
+    const isActiveTarget = isEditing || (!isChild && replyingToId === reply.id)
     return (
       <div
         key={reply.id}
-        className={`${styles.comment} ${isChild ? styles.commentChild : ''} ${isReplyTarget ? styles.commentReplying : ''}`}
+        className={`${styles.comment} ${isChild ? styles.commentChild : ''} ${isActiveTarget ? styles.commentReplying : ''}`}
       >
         <div className={styles.commentAvatar}>{reply.authorName[0]}</div>
         <div className={styles.commentBody}>
@@ -389,7 +414,7 @@ export default function RequestDetailView({
             <EmployeeName name={reply.authorName} className={styles.commentAuthor} />
             {reply.authorRole === 'OWNER' && <span className={styles.ownerBadge}>사장</span>}
             <span className={styles.commentTime}>{rDate} {rTime}</span>
-            {editingReplyId !== reply.id && (
+            {!isEditing && (
               <span className={styles.commentActions}>
                 {reply.authorRole === 'OWNER' && (
                   <button
@@ -410,46 +435,18 @@ export default function RequestDetailView({
               </span>
             )}
           </div>
-          {editingReplyId === reply.id ? (
-            <div className={styles.commentEditWrap}>
-              <RichTextEditor
-                key={`edit-${reply.id}`}
-                initialHtml={contentToHtml(reply.content)}
-                minHeight={110}
-                placeholder="댓글을 수정하세요"
-                onChange={(html) => {
-                  editContentRef.current = html
-                  setEditHasContent(hasHtmlContent(html))
-                }}
-              />
-              <div className={styles.commentEditActions}>
-                <button
-                  className={styles.commentEditSave}
-                  onClick={saveEditReply}
-                  disabled={!editHasContent}
-                >
-                  저장
-                </button>
-                <button
-                  className={styles.commentEditCancel}
-                  onClick={() => setEditingReplyId(null)}
-                >
-                  취소
-                </button>
-              </div>
-            </div>
+          <div
+            className={styles.commentContent}
+            dangerouslySetInnerHTML={{ __html: contentToHtml(reply.content) }}
+          />
+          {isEditing ? (
+            <span className={styles.editingHint}>아래 입력창에서 수정 중…</span>
           ) : (
-            <>
-              <div
-                className={styles.commentContent}
-                dangerouslySetInnerHTML={{ __html: contentToHtml(reply.content) }}
-              />
-              {!isChild && (
-                <button className={styles.replyToggle} onClick={() => startReplyTo(reply.id)}>
-                  <LiaReplySolid /> 답글
-                </button>
-              )}
-            </>
+            !isChild && (
+              <button className={styles.replyToggle} onClick={() => startReplyTo(reply.id)}>
+                <LiaReplySolid /> 답글
+              </button>
+            )
           )}
         </div>
       </div>
@@ -541,16 +538,22 @@ export default function RequestDetailView({
             <div className={styles.commentInputRow} ref={commentInputRef}>
               <div className={styles.commentInputAvatar}>사</div>
               <div className={styles.commentInputWrap}>
-                {replyingToId && (
+                {(editingReplyId || replyingToId) && (
                   <div className={styles.replyingBanner}>
-                    <LiaReplySolid />
+                    {editingReplyId ? <LiaPencilAltSolid /> : <LiaReplySolid />}
                     <span>
-                      <b>{replies.find((r) => r.id === replyingToId)?.authorName}</b>님에게 답글 남기는 중
+                      {editingReplyId ? (
+                        '댓글 수정 중'
+                      ) : (
+                        <>
+                          <b>{replies.find((r) => r.id === replyingToId)?.authorName}</b>님에게 답글 남기는 중
+                        </>
+                      )}
                     </span>
                     <button
                       className={styles.replyingCancel}
-                      onClick={() => setReplyingToId(null)}
-                      aria-label="답글 취소"
+                      onClick={cancelComposer}
+                      aria-label="취소"
                     >
                       <LiaTimesSolid />
                     </button>
@@ -558,12 +561,14 @@ export default function RequestDetailView({
                 )}
                 <RichTextEditor
                   key={replyEditorKey}
-                  initialHtml=""
+                  initialHtml={composerInitial}
                   minHeight={110}
                   placeholder={
-                    replyingToId
-                      ? '답글을 입력하세요. 사진도 넣을 수 있어요.'
-                      : '댓글을 입력하세요. 사진도 넣을 수 있어요.'
+                    editingReplyId
+                      ? '댓글을 수정하세요.'
+                      : replyingToId
+                        ? '답글을 입력하세요. 사진도 넣을 수 있어요.'
+                        : '댓글을 입력하세요. 사진도 넣을 수 있어요.'
                   }
                   onChange={(html) => {
                     replyContentRef.current = html
@@ -572,10 +577,11 @@ export default function RequestDetailView({
                 />
                 <button
                   className={styles.commentSubmit}
-                  onClick={submitReply}
+                  onClick={editingReplyId ? saveEditReply : submitReply}
                   disabled={!replyHasContent}
                 >
-                  <LiaPaperPlaneSolid /> {replyingToId ? '답글 등록' : '등록'}
+                  <LiaPaperPlaneSolid />{' '}
+                  {editingReplyId ? '수정 완료' : replyingToId ? '답글 등록' : '등록'}
                 </button>
               </div>
             </div>

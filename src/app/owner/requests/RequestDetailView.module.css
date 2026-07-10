@@ -354,6 +354,15 @@
   color: var(--color-primary);
 }
 
+/* 수정 중 안내(하단 에디터로 수정) */
+.editingHint {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
 .commentAvatar {
   width: 32px;
   height: 32px;

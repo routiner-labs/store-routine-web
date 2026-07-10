@@ -27,6 +27,7 @@ import { useConfirm } from '@/context/ConfirmContext'
 import type { RequestStatus, RequestType, RequestVisibility, RequestReply, ActivityLog } from '@/types'
 import EmployeeProfilePopup from '@/components/EmployeeProfilePopup'
 import EmployeeName from '@/components/EmployeeName'
+import SelectBox from '@/components/SelectBox'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { usePopupEsc } from '@/lib/usePopupEsc'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
@@ -658,15 +659,16 @@ export default function RequestDetailView({
               </label>
               <label className={styles.taskAddField}>
                 <span className={styles.taskAddLabel}>카테고리</span>
-                <select
-                  className={styles.taskAddSelect}
+                <SelectBox
                   value={taskCategory}
-                  onChange={(e) => setTaskCategory(e.target.value)}
+                  onChange={setTaskCategory}
+                  wrapClassName={styles.taskAddSelectWrap}
+                  ariaLabel="카테고리 선택"
                 >
                   {DEFAULT_CATEGORIES.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
-                </select>
+                </SelectBox>
               </label>
               <div className={styles.taskAddField}>
                 <span className={styles.taskAddLabel}>추가할 리스트</span>

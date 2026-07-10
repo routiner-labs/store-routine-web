@@ -377,6 +377,32 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 ---
 
+### 셀렉트 박스 (SelectBox)
+
+드롭다운 선택이 필요하면 네이티브 `<select>`를 직접 스타일링하지 말고 공용 `src/components/SelectBox.tsx`를 사용한다.
+
+#### 디자인 (전 페이지 공통)
+
+| 속성 | 값 |
+|---|---|
+| border | `1px solid --color-border`, focus 시 `--color-primary` |
+| border-radius | `var(--radius-sm)` |
+| padding | `8px 36px 8px 10px` (우측은 화살표 공간) |
+| font-size | `14px` |
+| background | `var(--color-surface)` |
+| 화살표 | 네이티브 화살표 제거(`appearance:none`) 후 `LiaAngleDownSolid`를 **박스 안쪽 right 14px**에 절대배치, `--color-text-secondary`, `pointer-events:none` |
+
+- 네이티브 화살표는 박스 맨 끝에 붙어 셀렉트가 넓을 때 텍스트와 멀어진다 → 커스텀 화살표를 안쪽에 두는 것이 표준.
+- **크기(폭)는 페이지마다 달라도 된다** — `wrapClassName`으로 제어(`flex:1`, `width:100%` 등). 기본은 내용 폭(shrink-to-fit).
+
+```tsx
+<SelectBox value={category} onChange={setCategory} wrapClassName={styles.catSelectWrap} ariaLabel="카테고리 선택">
+  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+</SelectBox>
+```
+
+---
+
 ### 팝업 ESC 닫기 규칙
 
 모든 팝업(모달·시트·드롭다운·필터·상세 뷰어 등)은 ESC 닫기 규칙을 따른다. 웹 화면 기준.
@@ -386,7 +412,7 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 1. **최상위 하나만 닫힘** — ESC는 항상 가장 최근에 열린(=화면 최상위) 팝업 하나에만 전달된다. 팝업 위에 팝업이 겹쳐 있으면 위 팝업만 닫히고 아래 팝업은 유지된다.
 2. **뷰어 → 바로 닫힘** — 보기 전용(상세·프로필·안내·수행방법)과 가벼운 선택 컨트롤(필터·달력·드롭다운·색상 선택 등)은 ESC로 즉시 닫힌다.
 3. **수정·생성 폼 → 컨펌 후 닫힘** — 미저장 입력이 있는 폼(테스크 생성/편집, 비밀번호 변경, 결제·용량·카드, 매장 추가, 퀵지정, 근무 편성, 직원 초대/퇴직 처리 등)은 ESC 시 "닫을까요?" 컨펌을 먼저 띄우고, 확인해야 닫힌다.
-4. **배경 클릭으로 닫지 않는다** — 배경을 어둡게(dim) 덮는 모달은 오버레이 클릭으로 닫히지 않는다(모달 오버레이에 `onClick={onClose}` 금지). 닫기는 ESC 또는 X 버튼으로만. 배경이 투명한 클릭 캐처(메뉴·드롭다운·FAB·달력 팝오버 등)는 예외로 바깥 클릭 닫기를 유지한다. 컨펌창은 배경 클릭=취소를 유지한다.
+4. **배경 클릭으로 닫지 않는다** — 배경을 어둡게(dim) 덮는 모달은 오버레이 클릭으로 닫히지 않는다(모달 오버레이에 `onClick={onClose}` 금지). 닫기는 ESC 또는 X 버튼으로만. 배경이 투명한 클릭 캐처(메뉴·드롭다운·FAB·달력 팝오버 등)는 예외로 바깥 클릭 닫기를 유지한다. 명시 예외: 컨펌창(배경 클릭=취소), 직원 프로필 팝업(`EmployeeProfilePopup` — 가벼운 뷰어라 배경 클릭 닫기 허용).
 
 #### 구현
 

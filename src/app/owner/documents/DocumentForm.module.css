@@ -30,21 +30,6 @@
   border-color: var(--color-primary);
 }
 
-.select {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  font-size: 13px;
-  color: var(--color-text);
-  background: var(--color-surface);
-  outline: none;
-  font-family: inherit;
-}
-
-.select:focus {
-  border-color: var(--color-primary);
-}
-
 .editorWrap {
   flex: 1;
   min-height: 320px;

@@ -54,6 +54,7 @@ import { categoryBadgeStyle } from '@/lib/categoryColors'
 import EmployeeName from '@/components/EmployeeName'
 import CategoryColorPicker from '@/components/CategoryColorPicker'
 import CategoryManagePopup from '@/components/CategoryManagePopup'
+import SelectBox from '@/components/SelectBox'
 import styles from './page.module.css'
 
 const TODAY = '2026-06-30'
@@ -242,17 +243,13 @@ function RecurrenceEditor({
   return (
     <div className={styles.recurDetail}>
       <div className={styles.recurRow}>
-        <select
-          className={styles.select}
-          value={value.freq}
-          onChange={(e) => set({ freq: e.target.value as RecurrenceFreq })}
-        >
+        <SelectBox value={value.freq} onChange={(v) => set({ freq: v as RecurrenceFreq })}>
           {FREQ_OPTIONS.map((f) => (
             <option key={f.value} value={f.value}>
               {f.label}
             </option>
           ))}
-        </select>
+        </SelectBox>
         <input
           type="number"
           min={1}
@@ -287,26 +284,18 @@ function RecurrenceEditor({
       {value.freq === 'MONTHLY' && (
         <>
           <div className={styles.recurRow}>
-            <select
-              className={styles.select}
-              value={value.monthlyMode}
-              onChange={(e) => set({ monthlyMode: e.target.value as MonthlyMode })}
-            >
+            <SelectBox value={value.monthlyMode} onChange={(v) => set({ monthlyMode: v as MonthlyMode })}>
               <option value="DAY">날짜 지정</option>
               <option value="NTH_WEEKDAY">요일 지정</option>
-            </select>
+            </SelectBox>
 
             {value.monthlyMode === 'DAY' ? (
               <>
-                <select
-                  className={styles.select}
-                  value={value.monthDayKind}
-                  onChange={(e) => set({ monthDayKind: e.target.value as MonthDayKind })}
-                >
+                <SelectBox value={value.monthDayKind} onChange={(v) => set({ monthDayKind: v as MonthDayKind })}>
                   <option value="FIRST">월초</option>
                   <option value="LAST">월말</option>
                   <option value="SPECIFIC">특정일</option>
-                </select>
+                </SelectBox>
                 {value.monthDayKind === 'SPECIFIC' && (
                   <>
                     <input
@@ -324,17 +313,13 @@ function RecurrenceEditor({
                 )}
               </>
             ) : (
-              <select
-                className={styles.select}
-                value={value.nthWeek}
-                onChange={(e) => set({ nthWeek: Number(e.target.value) })}
-              >
+              <SelectBox value={value.nthWeek} onChange={(v) => set({ nthWeek: Number(v) })}>
                 {NTH_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
                 ))}
-              </select>
+              </SelectBox>
             )}
           </div>
 
@@ -953,17 +938,18 @@ export default function OwnerChecklists() {
           <div className={styles.field}>
             <span className={styles.fieldLabel}>카테고리</span>
             <div className={styles.catRow}>
-              <select
-                className={styles.select}
+              <SelectBox
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
+                onChange={setNewCategory}
+                wrapClassName={styles.catSelectWrap}
+                ariaLabel="카테고리 선택"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
                 ))}
-              </select>
+              </SelectBox>
               <button
                 type="button"
                 className={styles.catManageBtn}

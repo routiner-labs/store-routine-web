@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { LiaTrashAltSolid } from 'react-icons/lia'
 import RichTextEditor from '@/components/RichTextEditor/RichTextEditor'
+import SelectBox from '@/components/SelectBox'
 import { DOCUMENT_CATEGORIES } from '@/mock/documents'
 import styles from './DocumentForm.module.css'
 
@@ -44,17 +45,13 @@ export default function DocumentForm({
           placeholder="문서 제목을 입력하세요"
           autoFocus
         />
-        <select
-          className={styles.select}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
+        <SelectBox value={category} onChange={setCategory} ariaLabel="카테고리 선택">
           {DOCUMENT_CATEGORIES.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
-        </select>
+        </SelectBox>
       </div>
       <div className={styles.editorWrap}>
         <RichTextEditor

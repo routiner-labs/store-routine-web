@@ -1393,22 +1393,6 @@
   line-height: 1.4;
 }
 
-.select {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  font-size: 14px;
-  color: var(--color-text);
-  background: var(--color-surface);
-  cursor: pointer;
-  outline: none;
-  font-family: inherit;
-}
-
-.select:focus {
-  border-color: var(--color-primary);
-}
-
 .timeInput,
 .dateInput {
   border: 1px solid var(--color-border);
@@ -1564,7 +1548,8 @@
   gap: 8px;
 }
 
-.catRow .select {
+/* 카테고리 셀렉트(공용 SelectBox) 폭 제어 — 디자인은 SelectBox가 담당 */
+.catSelectWrap {
   flex: 1;
   min-width: 0;
 }

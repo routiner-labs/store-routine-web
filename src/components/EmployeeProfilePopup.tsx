@@ -23,9 +23,10 @@ export default function EmployeeProfilePopup({
 
   // 어떤 중첩 위치(sticky/transform 등 스태킹 컨텍스트 내부)에서 열려도
   // 항상 최상위에 뜨도록 body에 portal로 렌더링한다.
+  // 참고: 프로필은 가벼운 뷰어라 예외적으로 바깥(배경) 클릭으로도 닫힌다 (good-bad ESC/배경클릭 규칙의 명시 예외)
   return createPortal(
-    <div className={styles.popupOverlay}>
-      <div className={styles.popup}>
+    <div className={styles.popupOverlay} onClick={onClose}>
+      <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
         <div className={styles.popupHeader}>
           <span className={styles.popupTitle}>직원 프로필</span>
           <button className={styles.popupClose} onClick={onClose}>닫기</button>

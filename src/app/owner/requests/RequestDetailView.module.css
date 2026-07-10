@@ -934,18 +934,12 @@
 }
 
 .taskAddInput,
-.taskAddSelect {
+/* 카테고리 셀렉트(공용 SelectBox) 폭 제어 — 디자인은 SelectBox가 담당 */
+.taskAddSelectWrap {
   width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 9px 12px;
-  font-size: 14px;
-  background: var(--color-bg);
-  box-sizing: border-box;
 }
 
-.taskAddInput:focus,
-.taskAddSelect:focus {
+.taskAddInput:focus {
   outline: none;
   border-color: var(--color-primary);
   background: var(--color-surface);

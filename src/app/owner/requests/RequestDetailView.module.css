@@ -6,6 +6,16 @@
   padding-bottom: calc(var(--nav-height) + 16px);
 }
 
+/* 뒤로가기로 페이지를 떠날 때 종료 애니메이션 */
+.leaving {
+  animation: pageLeave 0.26s ease forwards;
+}
+
+@keyframes pageLeave {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(16px); }
+}
+
 /* ══════════════════════════════════════
    헤더
    ══════════════════════════════════════ */
@@ -25,16 +35,34 @@
 .backBtn {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-primary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 2px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 6px 8px 6px 4px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
+  animation: backBtnIn 0.3s ease both;
+}
+
+@keyframes backBtnIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.backBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.backBtn svg {
+  font-size: 16px;
+  transition: transform 0.18s ease;
+}
+
+.backBtn:hover svg {
+  transform: translateX(-3px);
 }
 
 .headerTitle {

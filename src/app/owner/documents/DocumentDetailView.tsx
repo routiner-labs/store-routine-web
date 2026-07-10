@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid, LiaPencilAltSolid, LiaTrashAltSolid } from 'react-icons/lia'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
+import { usePageLeave } from '@/lib/usePageLeave'
 import { DOCUMENT_CATALOG, DOCUMENT_CATEGORIES } from '@/mock/documents'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
 import DocumentForm from './DocumentForm'
@@ -33,6 +34,7 @@ export default function DocumentDetailView({
   const router = useRouter()
   const { showToast } = useToast()
   const confirm = useConfirm()
+  const { leaving, leave, onAnimationEnd } = usePageLeave()
 
   const original = DOCUMENT_CATALOG.find((d) => d.id === id)
   const [doc, setDoc] = useState(original)
@@ -63,10 +65,16 @@ export default function DocumentDetailView({
   }
 
   return (
-    <div className={mode === 'modal' ? styles.viewModal : styles.page}>
+    <div
+      className={mode === 'modal' ? styles.viewModal : `${styles.page} ${leaving ? styles.leaving : ''}`}
+      onAnimationEnd={mode === 'page' ? onAnimationEnd : undefined}
+    >
       {mode === 'page' ? (
         <header className={styles.header}>
-          <button className={styles.backBtn} onClick={() => router.push('/owner/documents')}>
+          <button
+            className={styles.backBtn}
+            onClick={() => leave(() => router.push('/owner/documents'))}
+          >
             <LiaAngleLeftSolid /> 문서함
           </button>
           {!editing && (
@@ -108,7 +116,7 @@ export default function DocumentDetailView({
           }}
         />
       ) : (
-        <div className={styles.body}>
+        <div className={`${styles.body} appEnter`}>
           <article className={styles.docCard}>
             <div className={styles.docHead}>
               <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(doc.category))}>

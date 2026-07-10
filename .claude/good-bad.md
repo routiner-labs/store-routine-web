@@ -35,6 +35,10 @@
 
 - 기획서(기획/검토/제안 문서)는 전부 `.claude/planning/` 폴더에 둔다. 새 기획 문서를 만들 때도 프로젝트 루트가 아니라 이 폴더에 생성한다.
 
+- 메뉴 이동/페이지 진입 시 콘텐츠가 아래에서 살짝 떠오르며 나타나는 **진입 애니메이션을 넣는다**. 전역 유틸리티 클래스 `.appEnter`(`globals.css` — `appContentIn` fade-up, `prefers-reduced-motion`도 처리)를 콘텐츠 컨테이너 className에 추가하면 된다(예: `className={`${styles.body} appEnter`}`). 새 상세/작성/목록 화면을 만들 때 기본으로 적용한다.
+  - **주의**: `position: sticky`/`fixed` 자식(고정 헤더·사이드바 등)을 감싸는 바깥 래퍼에는 걸지 않는다. transform 컨텍스트가 생겨 sticky/fixed가 깨진다 → 그 안쪽의 sticky 없는 콘텐츠 컨테이너(본문 패널/폼/카드)에만 적용한다. 요청·문서 상세/작성이 레퍼런스.
+  - 페이지를 **떠날 때**(뒤로가기 등) 종료 애니메이션이 필요하면 공용 훅 `usePageLeave()`(`src/lib/usePageLeave.ts`)를 쓴다 — `setTimeout` 없이 `animationend`로 이동. 요청·문서 상세/작성의 `<` 뒤로가기가 레퍼런스.
+
 ---
 
 ## Bad — 하지 마

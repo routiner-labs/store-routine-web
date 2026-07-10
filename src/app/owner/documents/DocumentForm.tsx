@@ -89,7 +89,7 @@ export default function DocumentForm({
   }
 
   return (
-    <div className={styles.form}>
+    <div className={`${styles.form} appEnter`}>
       <div className={styles.formHead}>
         <div className={styles.catRow}>
           <SelectBox

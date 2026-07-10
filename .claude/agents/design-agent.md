@@ -535,6 +535,17 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 ---
 
+## 화면 전환 애니메이션 (진입/이탈)
+
+메뉴 이동·페이지 진입 시 콘텐츠가 아래에서 살짝 떠오르며 나타나는 진입 애니메이션을 표준으로 넣는다.
+
+- **진입**: 전역 유틸리티 클래스 `.appEnter`(`globals.css`의 `@keyframes appContentIn` — `translateY(10px)→0` + fade, `both`, `prefers-reduced-motion: reduce`에서 비활성)를 콘텐츠 컨테이너에 추가한다. 예: `className={`${styles.body} appEnter`}`.
+- **적용 위치 주의**: `position: sticky`/`fixed` 자식(고정 헤더·사이드바)을 감싸는 바깥 래퍼에는 절대 걸지 않는다 — transform 컨텍스트가 생기면 그 안의 sticky/fixed가 깨진다. sticky가 없는 안쪽 콘텐츠 컨테이너(본문 패널·폼·카드)에만 적용한다.
+- **이탈**: 페이지를 떠날 때(뒤로가기 등) 종료 애니메이션이 필요하면 공용 훅 `usePageLeave()`(`src/lib/usePageLeave.ts`)를 쓴다. `leave(navigate)`로 `.leaving` 클래스를 붙여 종료 애니메이션을 재생하고 `onAnimationEnd`에서 이동한다(`setTimeout` 금지 규칙 준수, 자식 진입 애니메이션 버블링은 `e.target===e.currentTarget`으로 무시).
+- 레퍼런스: 요청/문서 상세·작성 페이지의 본문(`.mainPanel`/`.body`/`.form`)과 `<` 뒤로가기 버튼.
+
+---
+
 ### 향후 확장 고려사항
 
 - **알바생 전용 테마**: 현재 사장과 같은 블루 계열 사용. 구분이 필요하면 알바생은 teal 계열 검토 가능

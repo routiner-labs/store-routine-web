@@ -106,7 +106,7 @@ export default function RequestForm({
   }
 
   return (
-    <div className={styles.form}>
+    <div className={`${styles.form} appEnter`}>
       <div className={styles.fields}>
         <div className={styles.field}>
           <span className={styles.fieldLabel}>카테고리</span>

@@ -4,17 +4,25 @@ import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid } from 'react-icons/lia'
 import { addRequest } from '@/mock/data'
 import { useToast } from '@/context/ToastContext'
+import { usePageLeave } from '@/lib/usePageLeave'
 import RequestForm from '../RequestForm'
 import styles from './page.module.css'
 
 export default function NewOwnerRequestPage() {
   const router = useRouter()
   const { showToast } = useToast()
+  const { leaving, leave, onAnimationEnd } = usePageLeave()
 
   return (
-    <div className={styles.page}>
+    <div
+      className={`${styles.page} ${leaving ? styles.leaving : ''}`}
+      onAnimationEnd={onAnimationEnd}
+    >
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => router.push('/owner/requests')}>
+        <button
+          className={styles.backBtn}
+          onClick={() => leave(() => router.push('/owner/requests'))}
+        >
           <LiaAngleLeftSolid /> 요청함
         </button>
       </header>

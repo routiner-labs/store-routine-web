@@ -34,6 +34,7 @@ import EmployeeName from '@/components/EmployeeName'
 import SelectBox from '@/components/SelectBox'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { usePopupEsc } from '@/lib/usePopupEsc'
+import { usePageLeave } from '@/lib/usePageLeave'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
 import { stripHtml, contentToHtml } from '@/lib/htmlText'
 import styles from './RequestDetailView.module.css'
@@ -86,6 +87,7 @@ export default function RequestDetailView({
   onDeleted?: () => void
 }) {
   const router = useRouter()
+  const { leaving, leave, onAnimationEnd } = usePageLeave()
 
   const request = mockRequests.find((r) => r.id === id)
   const [status, setStatus] = useState<RequestStatus>(request?.status ?? 'REQUESTED')
@@ -454,10 +456,13 @@ export default function RequestDetailView({
   }
 
   return (
-    <div className={mode === 'modal' ? styles.viewModal : styles.page}>
+    <div
+      className={mode === 'modal' ? styles.viewModal : `${styles.page} ${leaving ? styles.leaving : ''}`}
+      onAnimationEnd={mode === 'page' ? onAnimationEnd : undefined}
+    >
       {mode === 'page' && (
         <header className={styles.header}>
-          <button className={styles.backBtn} onClick={() => router.back()}>
+          <button className={styles.backBtn} onClick={() => leave(() => router.back())}>
             <LiaAngleLeftSolid /> 요청함
           </button>
         </header>
@@ -465,7 +470,7 @@ export default function RequestDetailView({
 
       <div className={styles.layout}>
         {/* 메인 패널: 본문 + 댓글 */}
-        <div className={styles.mainPanel}>
+        <div className={`${styles.mainPanel} appEnter`}>
 
           {/* 게시글 */}
           <article className={styles.post}>

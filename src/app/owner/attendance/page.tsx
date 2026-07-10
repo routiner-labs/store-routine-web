@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LiaAngleDownSolid, LiaUserClockSolid, LiaTimesSolid, LiaCheckSolid } from 'react-icons/lia'
+import { LiaAngleDownSolid, LiaPlusSolid, LiaCalendarWeekSolid, LiaCalendarDaySolid, LiaTimesSolid, LiaCheckSolid } from 'react-icons/lia'
 import { getAttendanceForDate } from '@/mock/calendar'
 import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
@@ -255,6 +255,7 @@ export default function AttendancePage() {
   const [pickerNavYear, setPickerNavYear] = useState(2026)
   const [pickerNavMonth, setPickerNavMonth] = useState(6)
   const [viewMenuOpen, setViewMenuOpen] = useState(false)
+  const [fabOpen, setFabOpen] = useState(false)
   const [schedOpen, setSchedOpen] = useState(false)
   const [schedTab, setSchedTab] = useState<'BASE' | 'DATE'>('BASE')
   const [schedDate, setSchedDate] = useState(TODAY)
@@ -344,6 +345,13 @@ export default function AttendancePage() {
     showToast('직원 스케줄이 저장되었습니다')
   }
 
+  // FAB 메뉴에서 해당 탭으로 스케줄 관리 팝업 열기
+  function openSchedule(tab: 'BASE' | 'DATE') {
+    setSchedTab(tab)
+    setSchedOpen(true)
+    setFabOpen(false)
+  }
+
   function openPicker() {
     setPickerNavYear(baseYear)
     setPickerNavMonth(baseMonth)
@@ -379,6 +387,7 @@ export default function AttendancePage() {
   usePopupEsc(viewMode !== 'day' && selectedDate !== null, 'viewer', () => setSelectedDate(null))
   usePopupEsc(pickerOpen, 'viewer', () => setPickerOpen(false))
   usePopupEsc(viewMenuOpen, 'viewer', () => setViewMenuOpen(false))
+  usePopupEsc(fabOpen, 'viewer', () => setFabOpen(false))
 
   const selectedRecords = selectedDate ? getAttendanceForDate(selectedDate) : []
   const dayRecords = getAttendanceForDate(formatDate(baseYear, baseMonth, baseDay))
@@ -610,14 +619,27 @@ export default function AttendancePage() {
         </div>
       )}
 
-      {/* 스케줄 관리 FAB */}
+      {/* 스케줄 관리 FAB — + 클릭 시 기본 스케줄 / 일자별 조정으로 분기 */}
+      {fabOpen && <div className={styles.fabOverlay} onClick={() => setFabOpen(false)} />}
       <div className={styles.fabWrap}>
+        {fabOpen && (
+          <div className={styles.fabMenu}>
+            <button className={styles.fabMenuItem} onClick={() => openSchedule('BASE')}>
+              <LiaCalendarWeekSolid className={styles.fabMenuIcon} />
+              기본 스케줄
+            </button>
+            <button className={styles.fabMenuItem} onClick={() => openSchedule('DATE')}>
+              <LiaCalendarDaySolid className={styles.fabMenuIcon} />
+              일자별 조정
+            </button>
+          </div>
+        )}
         <button
-          className={styles.fab}
-          onClick={() => setSchedOpen(true)}
-          aria-label="스케줄 관리"
+          className={`${styles.fab} ${fabOpen ? styles.fabActive : ''}`}
+          onClick={() => setFabOpen((o) => !o)}
+          aria-label="스케줄 메뉴"
         >
-          <LiaUserClockSolid />
+          <LiaPlusSolid />
         </button>
       </div>
 

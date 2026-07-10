@@ -10,11 +10,15 @@ import {
   LiaExchangeAltSolid,
   LiaTrashAltSolid,
   LiaPencilAltSolid,
+  LiaReplySolid,
   LiaClipboardListSolid,
   LiaSearchSolid,
   LiaCheckSolid,
   LiaTimesSolid,
   LiaBookSolid,
+  LiaFileAltSolid,
+  LiaImageSolid,
+  LiaDownloadSolid,
 } from 'react-icons/lia'
 import { mockRequests, mockReplies, mockActivityLogs, REQUEST_CATEGORIES } from '@/mock/data'
 import { mockEmployees } from '@/mock/employees'
@@ -38,6 +42,11 @@ const REQUEST_TYPES: RequestType[] = REQUEST_CATEGORIES.map((c) => c.name)
 
 function typeBadgeStyle(type: string) {
   return categoryBadgeStyle(REQUEST_CATEGORIES.find((c) => c.name === type)?.color)
+}
+
+// 에디터 HTML에 실제 내용이 있는지 (댓글 등록/저장 활성화 판단)
+function hasHtmlContent(html: string): boolean {
+  return stripHtml(html).length > 0 || /<img/i.test(html)
 }
 
 const statusLabel: Record<string, string> = {
@@ -88,9 +97,16 @@ export default function RequestDetailView({
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(
     mockActivityLogs.filter((a) => a.requestId === id)
   )
-  const [replyText, setReplyText] = useState('')
+  // 댓글 입력/수정 — 에디터(HTML). 내용은 ref로, 등록/저장 활성화는 hasContent로.
+  const replyContentRef = useRef('')
+  const [replyHasContent, setReplyHasContent] = useState(false)
+  const [replyEditorKey, setReplyEditorKey] = useState(0) // 등록 후 에디터 초기화용 remount 키
   const [editingReplyId, setEditingReplyId] = useState<string | null>(null)
-  const [editingReplyText, setEditingReplyText] = useState('')
+  const editContentRef = useRef('')
+  const [editHasContent, setEditHasContent] = useState(false)
+  // 대댓글 입력(1뎁스) — 하단 입력 에디터를 재사용. 답글 대상 댓글 id만 들고 있는다.
+  const [replyingToId, setReplyingToId] = useState<string | null>(null)
+  const commentInputRef = useRef<HTMLDivElement>(null)
   const [statusPopupOpen, setStatusPopupOpen] = useState(false)
   const [typePopupOpen, setTypePopupOpen] = useState(false)
   const [visibilityPopupOpen, setVisibilityPopupOpen] = useState(false)
@@ -182,6 +198,13 @@ export default function RequestDetailView({
   const authorEmployee = mockEmployees.find((e) => e.name === request.employeeName)
   const [date, time] = request.createdAt.split(' ')
   const filteredTaskDocs = filterTaskDocs(taskDocQuery)
+  // 첨부파일 (목업: hasPhoto인 요청에 대표 첨부 표시)
+  const attachments = request.hasPhoto
+    ? [
+        { name: '현장_사진.jpg', size: '1.4 MB' },
+        { name: '참고자료.pdf', size: '320 KB' },
+      ]
+    : []
 
   function changeStatus(next: RequestStatus) {
     const prevLabel = statusLabel[status]
@@ -290,35 +313,48 @@ export default function RequestDetailView({
 
   function startEditReply(reply: RequestReply) {
     setEditingReplyId(reply.id)
-    setEditingReplyText(reply.content)
+    editContentRef.current = reply.content
+    setEditHasContent(hasHtmlContent(reply.content))
   }
 
   function saveEditReply() {
-    const text = editingReplyText.trim()
-    if (!text || !editingReplyId) return
-    setReplies((prev) => prev.map((r) => (r.id === editingReplyId ? { ...r, content: text } : r)))
+    const html = editContentRef.current
+    if (!editingReplyId || !hasHtmlContent(html)) return
+    setReplies((prev) => prev.map((r) => (r.id === editingReplyId ? { ...r, content: html } : r)))
     setEditingReplyId(null)
-    setEditingReplyText('')
     showToast('댓글이 수정되었습니다')
   }
 
   async function deleteReply(replyId: string) {
+    const hasChildren = replies.some((r) => r.parentId === replyId)
     const ok = await confirm({
       title: '댓글을 삭제할까요?',
-      message: '삭제된 댓글은 되돌릴 수 없습니다.',
+      message: hasChildren
+        ? '이 댓글에 달린 답글도 함께 삭제됩니다.'
+        : '삭제된 댓글은 되돌릴 수 없습니다.',
     })
     if (!ok) return
-    setReplies((prev) => prev.filter((r) => r.id !== replyId))
+    // 부모 삭제 시 대댓글도 함께 제거(1뎁스)
+    setReplies((prev) => prev.filter((r) => r.id !== replyId && r.parentId !== replyId))
+    if (replyingToId === replyId) setReplyingToId(null)
     showToast('댓글이 삭제되었습니다', 'error')
   }
 
+  function startReplyTo(commentId: string) {
+    setReplyingToId(commentId)
+    // 하단 입력 에디터로 이동(별도 에디터를 띄우지 않고 재사용)
+    commentInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
   function submitReply() {
-    const text = replyText.trim()
-    if (!text) return
+    const html = replyContentRef.current
+    if (!hasHtmlContent(html)) return
+    const parentId = replyingToId // 답글 모드면 대상 댓글, 아니면 최상위 댓글
     setReplies((prev) => [...prev, {
       id: `r${Date.now()}`,
       requestId: id,
-      content: text,
+      ...(parentId ? { parentId } : {}),
+      content: html,
       authorName: '사장',
       authorRole: 'OWNER',
       createdAt: '2026-06-30 방금',
@@ -331,15 +367,93 @@ export default function RequestDetailView({
       actorRole: 'OWNER',
       createdAt: '2026-06-30 방금',
     }])
-    setReplyText('')
-    showToast('댓글이 등록되었습니다')
+    replyContentRef.current = ''
+    setReplyHasContent(false)
+    setReplyEditorKey((k) => k + 1) // 에디터 비우기(remount)
+    setReplyingToId(null)
+    showToast(parentId ? '답글이 등록되었습니다' : '댓글이 등록되었습니다')
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      submitReply()
-    }
+  // 댓글/대댓글 공통 렌더. isChild면 대댓글(답글 버튼 없음 — 중첩은 1뎁스까지).
+  function renderCommentItem(reply: RequestReply, isChild: boolean) {
+    const [rDate, rTime] = reply.createdAt.split(' ')
+    const isReplyTarget = !isChild && replyingToId === reply.id
+    return (
+      <div
+        key={reply.id}
+        className={`${styles.comment} ${isChild ? styles.commentChild : ''} ${isReplyTarget ? styles.commentReplying : ''}`}
+      >
+        <div className={styles.commentAvatar}>{reply.authorName[0]}</div>
+        <div className={styles.commentBody}>
+          <div className={styles.commentHeader}>
+            <EmployeeName name={reply.authorName} className={styles.commentAuthor} />
+            {reply.authorRole === 'OWNER' && <span className={styles.ownerBadge}>사장</span>}
+            <span className={styles.commentTime}>{rDate} {rTime}</span>
+            {editingReplyId !== reply.id && (
+              <span className={styles.commentActions}>
+                {reply.authorRole === 'OWNER' && (
+                  <button
+                    className={styles.commentActionBtn}
+                    onClick={() => startEditReply(reply)}
+                    aria-label="댓글 수정"
+                  >
+                    <LiaPencilAltSolid />
+                  </button>
+                )}
+                <button
+                  className={`${styles.commentActionBtn} ${styles.commentActionDanger}`}
+                  onClick={() => deleteReply(reply.id)}
+                  aria-label="댓글 삭제"
+                >
+                  <LiaTrashAltSolid />
+                </button>
+              </span>
+            )}
+          </div>
+          {editingReplyId === reply.id ? (
+            <div className={styles.commentEditWrap}>
+              <RichTextEditor
+                key={`edit-${reply.id}`}
+                initialHtml={contentToHtml(reply.content)}
+                minHeight={110}
+                placeholder="댓글을 수정하세요"
+                onChange={(html) => {
+                  editContentRef.current = html
+                  setEditHasContent(hasHtmlContent(html))
+                }}
+              />
+              <div className={styles.commentEditActions}>
+                <button
+                  className={styles.commentEditSave}
+                  onClick={saveEditReply}
+                  disabled={!editHasContent}
+                >
+                  저장
+                </button>
+                <button
+                  className={styles.commentEditCancel}
+                  onClick={() => setEditingReplyId(null)}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div
+                className={styles.commentContent}
+                dangerouslySetInnerHTML={{ __html: contentToHtml(reply.content) }}
+              />
+              {!isChild && (
+                <button className={styles.replyToggle} onClick={() => startReplyTo(reply.id)}>
+                  <LiaReplySolid /> 답글
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -349,7 +463,6 @@ export default function RequestDetailView({
           <button className={styles.backBtn} onClick={() => router.back()}>
             <LiaAngleLeftSolid /> 요청함
           </button>
-          <span className={styles.headerTitle}>{type}</span>
           <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
             {statusLabel[status]}
           </span>
@@ -376,8 +489,26 @@ export default function RequestDetailView({
               className={styles.postContent}
               dangerouslySetInnerHTML={{ __html: contentToHtml(request.content) }}
             />
-            {request.hasPhoto && (
-              <div className={styles.photoPlaceholder}>사진 첨부됨</div>
+            {attachments.length > 0 && (
+              <div className={styles.attachments}>
+                <p className={styles.attachTitle}>첨부파일 {attachments.length}</p>
+                <div className={styles.attachList}>
+                  {attachments.map((f) => (
+                    <div key={f.name} className={styles.attachItem}>
+                      {/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name) ? (
+                        <LiaImageSolid className={styles.attachIcon} />
+                      ) : (
+                        <LiaFileAltSolid className={styles.attachIcon} />
+                      )}
+                      <span className={styles.attachName}>{f.name}</span>
+                      <span className={styles.attachSize}>{f.size}</span>
+                      <button className={styles.attachDownload} aria-label={`${f.name} 다운로드`}>
+                        <LiaDownloadSolid />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </article>
 
@@ -390,91 +521,61 @@ export default function RequestDetailView({
             )}
 
             <div className={styles.commentList}>
-              {replies.map((reply) => {
-                const [rDate, rTime] = reply.createdAt.split(' ')
-                return (
-                  <div key={reply.id} className={styles.comment}>
-                    <div className={styles.commentAvatar}>{reply.authorName[0]}</div>
-                    <div className={styles.commentBody}>
-                      <div className={styles.commentHeader}>
-                        <EmployeeName name={reply.authorName} className={styles.commentAuthor} />
-                        {reply.authorRole === 'OWNER' && (
-                          <span className={styles.ownerBadge}>사장</span>
-                        )}
-                        <span className={styles.commentTime}>{rDate} {rTime}</span>
-                        {editingReplyId !== reply.id && (
-                          <span className={styles.commentActions}>
-                            {/* 수정은 사장 본인 댓글만, 삭제는 직원 댓글도 가능 */}
-                            {reply.authorRole === 'OWNER' && (
-                              <button
-                                className={styles.commentActionBtn}
-                                onClick={() => startEditReply(reply)}
-                                aria-label="댓글 수정"
-                              >
-                                <LiaPencilAltSolid />
-                              </button>
-                            )}
-                            <button
-                              className={`${styles.commentActionBtn} ${styles.commentActionDanger}`}
-                              onClick={() => deleteReply(reply.id)}
-                              aria-label="댓글 삭제"
-                            >
-                              <LiaTrashAltSolid />
-                            </button>
-                          </span>
-                        )}
-                      </div>
-                      {editingReplyId === reply.id ? (
-                        <div className={styles.commentEditWrap}>
-                          <textarea
-                            className={styles.commentTextarea}
-                            value={editingReplyText}
-                            onChange={(e) => setEditingReplyText(e.target.value)}
-                            rows={2}
-                            autoFocus
-                          />
-                          <div className={styles.commentEditActions}>
-                            <button
-                              className={styles.commentEditSave}
-                              onClick={saveEditReply}
-                              disabled={!editingReplyText.trim()}
-                            >
-                              저장
-                            </button>
-                            <button
-                              className={styles.commentEditCancel}
-                              onClick={() => setEditingReplyId(null)}
-                            >
-                              취소
-                            </button>
-                          </div>
+              {replies
+                .filter((reply) => !reply.parentId)
+                .map((reply) => {
+                  const children = replies.filter((r) => r.parentId === reply.id)
+                  return (
+                    <div key={reply.id} className={styles.commentThread}>
+                      {renderCommentItem(reply, false)}
+                      {children.length > 0 && (
+                        <div className={styles.childArea}>
+                          {children.map((child) => renderCommentItem(child, true))}
                         </div>
-                      ) : (
-                        <p className={styles.commentContent}>{reply.content}</p>
                       )}
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
             </div>
 
-            <div className={styles.commentInputRow}>
+            <div className={styles.commentInputRow} ref={commentInputRef}>
               <div className={styles.commentInputAvatar}>사</div>
               <div className={styles.commentInputWrap}>
-                <textarea
-                  className={styles.commentTextarea}
-                  placeholder="댓글 입력 (Enter 전송, Shift+Enter 줄바꿈)"
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  rows={2}
+                {replyingToId && (
+                  <div className={styles.replyingBanner}>
+                    <LiaReplySolid />
+                    <span>
+                      <b>{replies.find((r) => r.id === replyingToId)?.authorName}</b>님에게 답글 남기는 중
+                    </span>
+                    <button
+                      className={styles.replyingCancel}
+                      onClick={() => setReplyingToId(null)}
+                      aria-label="답글 취소"
+                    >
+                      <LiaTimesSolid />
+                    </button>
+                  </div>
+                )}
+                <RichTextEditor
+                  key={replyEditorKey}
+                  initialHtml=""
+                  minHeight={110}
+                  placeholder={
+                    replyingToId
+                      ? '답글을 입력하세요. 사진도 넣을 수 있어요.'
+                      : '댓글을 입력하세요. 사진도 넣을 수 있어요.'
+                  }
+                  onChange={(html) => {
+                    replyContentRef.current = html
+                    setReplyHasContent(hasHtmlContent(html))
+                  }}
                 />
                 <button
                   className={styles.commentSubmit}
                   onClick={submitReply}
-                  disabled={!replyText.trim()}
+                  disabled={!replyHasContent}
                 >
-                  <LiaPaperPlaneSolid /> 등록
+                  <LiaPaperPlaneSolid /> {replyingToId ? '답글 등록' : '등록'}
                 </button>
               </div>
             </div>
@@ -507,8 +608,10 @@ export default function RequestDetailView({
                 </span>
               </div>
               <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>사진</span>
-                <span className={styles.metaValue}>{request.hasPhoto ? '있음' : '없음'}</span>
+                <span className={styles.metaLabel}>첨부</span>
+                <span className={styles.metaValue}>
+                  {attachments.length > 0 ? `${attachments.length}개` : '없음'}
+                </span>
               </div>
             </div>
           </div>

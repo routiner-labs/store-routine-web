@@ -59,6 +59,8 @@ export interface RequestReply {
   authorName: string
   authorRole: 'OWNER' | 'EMPLOYEE'
   createdAt: string
+  // 대댓글이면 부모 댓글 id. 없으면 최상위 댓글. (중첩은 1뎁스까지만)
+  parentId?: string
 }
 
 export type ActivityType = 'CREATED' | 'STATUS_CHANGED' | 'COMMENT_ADDED' | 'CONTENT_EDITED' | 'TASK_ADDED'

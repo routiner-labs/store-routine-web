@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { LiaTimesSolid } from 'react-icons/lia'
 import { useScrollLock } from '@/lib/useScrollLock'
@@ -63,12 +63,17 @@ const CHANNELS = [
 // 카테고리 관리 팝업의 페인트붓 버튼에서 연다.
 export default function CategoryColorPicker({
   initialColor,
-  previewText,
+  previewText = '',
+  title = '뱃지 색상',
+  renderPreview,
   onApply,
   onClose,
 }: {
   initialColor?: string
-  previewText: string
+  previewText?: string
+  title?: string
+  // 미리보기 커스터마이즈(예: 에디터 글자색/배경색). 없으면 기본 카테고리 뱃지로 표시.
+  renderPreview?: (hex: string) => ReactNode
   onApply: (hex: string) => void
   onClose: () => void
 }) {
@@ -129,16 +134,20 @@ export default function CategoryColorPicker({
     <div className={styles.overlay}>
       <div className={styles.card}>
         <div className={styles.head}>
-          <span className={styles.title}>뱃지 색상</span>
+          <span className={styles.title}>{title}</span>
           <button className={styles.close} onClick={onClose} aria-label="닫기">
             <LiaTimesSolid />
           </button>
         </div>
 
         <div className={styles.previewWrap}>
-          <span className={styles.previewBadge} style={categoryBadgeStyle(hex)}>
-            {previewText || '카테고리'}
-          </span>
+          {renderPreview ? (
+            renderPreview(hex)
+          ) : (
+            <span className={styles.previewBadge} style={categoryBadgeStyle(hex)}>
+              {previewText || '카테고리'}
+            </span>
+          )}
           <span className={styles.hexLabel}>{hex}</span>
         </div>
 

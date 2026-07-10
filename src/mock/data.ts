@@ -143,6 +143,15 @@ export const mockReplies: RequestReply[] = [
     createdAt: '2026-06-29 16:10',
   },
   {
+    id: 'r1-1',
+    requestId: '1',
+    parentId: 'r1',
+    content: '감사합니다! 오픈 전에 받을 수 있으면 문제없습니다.',
+    authorName: '김민수',
+    authorRole: 'EMPLOYEE',
+    createdAt: '2026-06-29 16:25',
+  },
+  {
     id: 'r3',
     requestId: '2',
     content: '금요일 마감은 제가 나갈게요. 2시간 일찍 퇴근하셔도 됩니다.',
@@ -157,6 +166,15 @@ export const mockReplies: RequestReply[] = [
     authorName: '사장',
     authorRole: 'OWNER',
     createdAt: '2026-06-30 10:20',
+  },
+  {
+    id: 'r2-1',
+    requestId: '3',
+    parentId: 'r2',
+    content: '넵, 방문 시간 확정되면 공유 부탁드려요.',
+    authorName: '김민수',
+    authorRole: 'EMPLOYEE',
+    createdAt: '2026-06-30 10:35',
   },
 ]
 

@@ -158,14 +158,74 @@
   border: 1px solid var(--color-border);
 }
 
-.photoPlaceholder {
-  background: var(--color-bg);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 28px;
-  text-align: center;
+/* 첨부파일 목록 */
+.attachments {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.attachTitle {
   font-size: 13px;
+  font-weight: 600;
   color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.attachList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.attachIcon {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.attachName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachSize {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.attachDownload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.attachDownload:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .postFooter {
@@ -228,16 +288,70 @@
   flex-direction: column;
 }
 
+/* 댓글 스레드(최상위 댓글 + 대댓글 묶음) */
+.commentThread {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.commentThread:last-child {
+  border-bottom: none;
+}
+
 /* 개별 댓글 */
 .comment {
   display: flex;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--color-border);
 }
 
-.comment:last-child {
-  border-bottom: none;
+/* 대댓글 영역 — 부모 댓글 본문 아래로 들여쓰기 */
+.childArea {
+  margin: 0 20px 12px 64px;
+  padding-left: 14px;
+  border-left: 2px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.commentChild {
+  padding: 12px 0;
+  gap: 10px;
+}
+
+.commentChild .commentAvatar {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
+/* 답글 대상 댓글 강조 */
+.commentReplying {
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+}
+
+/* 답글 달기 버튼 */
+.replyToggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.replyToggle svg {
+  font-size: 13px;
+}
+
+.replyToggle:hover {
+  background: var(--color-bg);
+  color: var(--color-primary);
 }
 
 .commentAvatar {
@@ -295,8 +409,38 @@
   font-size: 14px;
   line-height: 1.65;
   color: var(--color-text);
-  margin: 0;
-  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.commentContent p {
+  margin: 0 0 8px;
+}
+
+.commentContent p:last-child {
+  margin-bottom: 0;
+}
+
+.commentContent ul,
+.commentContent ol {
+  padding-left: 20px;
+  margin: 6px 0 10px;
+}
+
+.commentContent li {
+  margin: 0 0 4px;
+}
+
+.commentContent strong {
+  font-weight: 700;
+}
+
+.commentContent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  margin: 6px 0;
+  display: block;
+  border: 1px solid var(--color-border);
 }
 
 /* 댓글 입력 */
@@ -329,6 +473,38 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* 답글 모드 배너(하단 입력 에디터 위) */
+.replyingBanner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+.replyingBanner b {
+  font-weight: 700;
+}
+
+.replyingCancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  font-size: 13px;
+}
+
+.replyingCancel:hover {
+  background: var(--color-surface);
 }
 
 .commentTextarea {
@@ -894,8 +1070,7 @@
   .layout {
     flex-direction: row;
     align-items: flex-start;
-    max-width: 1280px;
-    margin: 0 auto;
+    max-width: none;
     width: 100%;
     padding: 28px 32px;
     box-sizing: border-box;

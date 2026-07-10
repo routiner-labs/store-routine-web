@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ChangeEvent, JSX, PointerEvent as ReactPointerEvent } from 'react'
+import type { ChangeEvent, JSX, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import {
   LiaImageSolid,
   LiaBoldSolid,
@@ -13,6 +14,9 @@ import {
   LiaAlignLeftSolid,
   LiaAlignCenterSolid,
   LiaAlignRightSolid,
+  LiaFontSolid,
+  LiaHighlighterSolid,
+  LiaPaletteSolid,
 } from 'react-icons/lia'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
@@ -33,7 +37,11 @@ import {
   ListNode,
   REMOVE_LIST_COMMAND,
 } from '@lexical/list'
-import { $setBlocksType } from '@lexical/selection'
+import {
+  $setBlocksType,
+  $patchStyleText,
+  $getSelectionStyleValueForProperty,
+} from '@lexical/selection'
 import {
   $createParagraphNode,
   $findMatchingParent,
@@ -68,6 +76,8 @@ import {
   type Spread,
 } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
+import { useEscClose } from '@/lib/useEscClose'
+import CategoryColorPicker from '@/components/CategoryColorPicker'
 import styles from './RichTextEditor.module.css'
 
 /* ── 이미지 노드 (게시글 블록 이미지, 드래그로 가로 크기 조절 + 정렬) ── */
@@ -374,6 +384,150 @@ function OnChangeHtmlPlugin({ onChange }: { onChange: (html: string) => void }) 
   return <OnChangePlugin onChange={handle} ignoreSelectionChange />
 }
 
+/* ── 글자색 / 배경색 팔레트 ── */
+const TEXT_COLORS = [
+  '#111827', '#ef4444', '#f97316', '#eab308',
+  '#16a34a', '#2563eb', '#7c3aed', '#db2777',
+]
+const HIGHLIGHT_COLORS = [
+  '#fef08a', '#fde68a', '#fecaca', '#bbf7d0',
+  '#bfdbfe', '#ddd6fe', '#fbcfe8', '#e5e7eb',
+]
+
+/* 툴바 버튼 + 팔레트(포털 드롭다운). 에디터 프레임의 overflow:hidden에 잘리지 않도록 body에 띄운다.
+   프리셋 스와치로 빠르게 고르거나, "직접 선택"으로 스펙트럼 팔레트를 열어 임의 색을 고른다. */
+function ColorMenuButton({
+  icon,
+  label,
+  colors,
+  value,
+  barColor,
+  renderPickerPreview,
+  onSelect,
+  onClear,
+}: {
+  icon: ReactNode
+  label: string
+  colors: string[]
+  value: string
+  barColor: string
+  renderPickerPreview: (hex: string) => ReactNode
+  onSelect: (color: string) => void
+  onClear: () => void
+}) {
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [open, setOpen] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
+
+  const close = () => setOpen(false)
+  useEscClose(open, close)
+
+  function toggle() {
+    if (open) {
+      close()
+      return
+    }
+    const r = triggerRef.current?.getBoundingClientRect()
+    if (r) setPos({ left: r.left, top: r.bottom + 4 })
+    setOpen(true)
+  }
+
+  useEffect(() => {
+    if (!open) return
+    function onPointerDown(e: PointerEvent) {
+      const t = e.target as Node
+      if (triggerRef.current?.contains(t) || menuRef.current?.contains(t)) return
+      close()
+    }
+    function onReposition() {
+      close()
+    }
+    window.addEventListener('pointerdown', onPointerDown, true)
+    window.addEventListener('scroll', onReposition, true)
+    window.addEventListener('resize', onReposition)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown, true)
+      window.removeEventListener('scroll', onReposition, true)
+      window.removeEventListener('resize', onReposition)
+    }
+  }, [open])
+
+  return (
+    <div className={styles.colorControl}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`${styles.toolBtn} ${styles.colorBtn} ${open ? styles.toolActive : ''}`}
+        onClick={toggle}
+        aria-label={label}
+        title={label}
+      >
+        {icon}
+        <span className={styles.colorBar} style={{ background: barColor }} />
+      </button>
+      {open &&
+        pos &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className={styles.palette}
+            role="menu"
+            style={{ left: pos.left, top: pos.top }}
+          >
+            <button
+              type="button"
+              className={styles.paletteClear}
+              onClick={() => {
+                onClear()
+                close()
+              }}
+            >
+              기본색
+            </button>
+            <div className={styles.paletteGrid}>
+              {colors.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`${styles.swatch} ${value.toLowerCase() === c.toLowerCase() ? styles.swatchActive : ''}`}
+                  style={{ background: c }}
+                  onClick={() => {
+                    onSelect(c)
+                    close()
+                  }}
+                  aria-label={`색상 ${c}`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              className={styles.paletteCustom}
+              onClick={() => {
+                close()
+                setPickerOpen(true)
+              }}
+            >
+              <LiaPaletteSolid />
+              직접 선택
+            </button>
+          </div>,
+          document.body,
+        )}
+      {pickerOpen && (
+        <CategoryColorPicker
+          title={label}
+          initialColor={value || undefined}
+          renderPreview={renderPickerPreview}
+          onApply={(hex) => onSelect(hex)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
+    </div>
+  )
+}
+
 /* ── 서식 툴바 ── */
 function Toolbar() {
   const [editor] = useLexicalComposerContext()
@@ -381,6 +535,18 @@ function Toolbar() {
   const [fmt, setFmt] = useState({ bold: false, italic: false, underline: false })
   const [block, setBlock] = useState<string>('paragraph')
   const [align, setAlign] = useState<ElementFormatType>('')
+  const [textColor, setTextColor] = useState('')
+  const [bgColor, setBgColor] = useState('')
+
+  const applyStyle = useCallback(
+    (key: string, value: string | null) => {
+      editor.update(() => {
+        const sel = $getSelection()
+        if ($isRangeSelection(sel)) $patchStyleText(sel, { [key]: value })
+      })
+    },
+    [editor],
+  )
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -398,6 +564,8 @@ function Toolbar() {
           italic: sel.hasFormat('italic'),
           underline: sel.hasFormat('underline'),
         })
+        setTextColor($getSelectionStyleValueForProperty(sel, 'color', ''))
+        setBgColor($getSelectionStyleValueForProperty(sel, 'background-color', ''))
         const anchor = sel.anchor.getNode()
         const el = anchor.getKey() === 'root' ? anchor : anchor.getTopLevelElementOrThrow()
         if ($isHeadingNode(el)) setBlock(el.getTag())
@@ -534,6 +702,37 @@ function Toolbar() {
 
       <span className={styles.toolDivider} />
 
+      <ColorMenuButton
+        icon={<LiaFontSolid />}
+        label="글자색"
+        colors={TEXT_COLORS}
+        value={textColor}
+        barColor={textColor || 'var(--color-text)'}
+        renderPickerPreview={(hex) => (
+          <span className={styles.colorPreviewText} style={{ color: hex }}>
+            가나다 ABC
+          </span>
+        )}
+        onSelect={(c) => applyStyle('color', c)}
+        onClear={() => applyStyle('color', null)}
+      />
+      <ColorMenuButton
+        icon={<LiaHighlighterSolid />}
+        label="글자 배경색"
+        colors={HIGHLIGHT_COLORS}
+        value={bgColor}
+        barColor={bgColor || 'transparent'}
+        renderPickerPreview={(hex) => (
+          <span className={styles.colorPreviewHighlight} style={{ background: hex }}>
+            가나다 ABC
+          </span>
+        )}
+        onSelect={(c) => applyStyle('background-color', c)}
+        onClear={() => applyStyle('background-color', null)}
+      />
+
+      <span className={styles.toolDivider} />
+
       <button
         type="button"
         className={styles.toolImg}
@@ -571,10 +770,13 @@ export default function RichTextEditor({
   initialHtml = '',
   onChange,
   placeholder = '내용을 작성하세요.',
+  minHeight,
 }: {
   initialHtml?: string
   onChange: (html: string) => void
   placeholder?: string
+  // 편집 영역 최소 높이(px). 댓글처럼 짧은 입력엔 작게. 기본은 CSS의 240px.
+  minHeight?: number
 }) {
   return (
     <LexicalComposer
@@ -591,7 +793,7 @@ export default function RichTextEditor({
         theme: {},
       }}
     >
-      <div className={styles.frame}>
+      <div className={styles.frame} style={minHeight != null ? { minHeight } : undefined}>
         <Toolbar />
         <div className={styles.shell}>
           <RichTextPlugin

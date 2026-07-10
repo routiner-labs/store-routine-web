@@ -460,9 +460,6 @@ export default function RequestDetailView({
           <button className={styles.backBtn} onClick={() => router.back()}>
             <LiaAngleLeftSolid /> 요청함
           </button>
-          <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
-            {statusLabel[status]}
-          </span>
         </header>
       )}
 

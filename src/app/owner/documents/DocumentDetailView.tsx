@@ -116,7 +116,7 @@ export default function DocumentDetailView({
           }}
         />
       ) : (
-        <div className={`${styles.body} appEnter`}>
+        <div className={styles.body}>
           <article className={styles.docCard}>
             <div className={styles.docHead}>
               <span className={styles.catBadge} style={categoryBadgeStyle(categoryColor(doc.category))}>

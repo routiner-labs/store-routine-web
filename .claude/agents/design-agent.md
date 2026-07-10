@@ -537,12 +537,13 @@ className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
 
 ## 화면 전환 애니메이션 (진입/이탈)
 
-메뉴 이동·페이지 진입 시 콘텐츠가 아래에서 살짝 떠오르며 나타나는 진입 애니메이션을 표준으로 넣는다.
+메뉴 이동·페이지 전환 시 콘텐츠가 아래에서 살짝 떠오르며 나타나는 진입 애니메이션을 표준으로 넣는다.
 
-- **진입**: 전역 유틸리티 클래스 `.appEnter`(`globals.css`의 `@keyframes appContentIn` — `translateY(10px)→0` + fade, `both`, `prefers-reduced-motion: reduce`에서 비활성)를 콘텐츠 컨테이너에 추가한다. 예: `className={`${styles.body} appEnter`}`.
-- **적용 위치 주의**: `position: sticky`/`fixed` 자식(고정 헤더·사이드바)을 감싸는 바깥 래퍼에는 절대 걸지 않는다 — transform 컨텍스트가 생기면 그 안의 sticky/fixed가 깨진다. sticky가 없는 안쪽 콘텐츠 컨테이너(본문 패널·폼·카드)에만 적용한다.
+- **진입(자동)**: 오너·직원 레이아웃의 `<main>`을 공용 `AnimatedMain`(`src/components/AnimatedMain.tsx`)이 `usePathname`으로 키잉 → 경로가 바뀔 때마다 `<main>`이 리마운트되어 전역 `.pageEnter`(`globals.css`의 `@keyframes appContentIn`, `translateY(10px)→0`+fade)가 재생된다. **모든 페이지가 자동 적용**되므로 새 페이지에 별도 클래스가 필요 없다.
+  - `.pageEnter`는 fill 모드를 두지 않는다 — 애니메이션이 끝나면 transform이 사라져 페이지 안의 `position: fixed`(FAB)·`sticky`가 정상 복귀한다(fill:both면 transform이 남아 고정 요소가 영구히 깨짐). `<main>`은 이미 레이아웃 높이 체인의 일부라 래퍼를 새로 감싸지 않아 `min-height:100%`/`flex:1` 페이지도 안 깨진다.
+- **개별 요소 등장(옵션)**: 페이지 전환이 아니라 한 화면 안의 특정 요소만 따로 떠오르게 하려면 전역 `.appEnter`(fill:both)를 그 요소에 붙인다. 단 fixed/sticky 자식을 품는 컨테이너에는 걸지 않는다.
 - **이탈**: 페이지를 떠날 때(뒤로가기 등) 종료 애니메이션이 필요하면 공용 훅 `usePageLeave()`(`src/lib/usePageLeave.ts`)를 쓴다. `leave(navigate)`로 `.leaving` 클래스를 붙여 종료 애니메이션을 재생하고 `onAnimationEnd`에서 이동한다(`setTimeout` 금지 규칙 준수, 자식 진입 애니메이션 버블링은 `e.target===e.currentTarget`으로 무시).
-- 레퍼런스: 요청/문서 상세·작성 페이지의 본문(`.mainPanel`/`.body`/`.form`)과 `<` 뒤로가기 버튼.
+- 레퍼런스: 전역 진입=`AnimatedMain`+`.pageEnter`, 이탈=요청/문서 상세·작성의 `<` 뒤로가기 버튼.
 
 ---
 

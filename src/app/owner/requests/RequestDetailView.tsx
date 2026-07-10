@@ -470,7 +470,7 @@ export default function RequestDetailView({
 
       <div className={styles.layout}>
         {/* 메인 패널: 본문 + 댓글 */}
-        <div className={`${styles.mainPanel} appEnter`}>
+        <div className={styles.mainPanel}>
 
           {/* 게시글 */}
           <article className={styles.post}>

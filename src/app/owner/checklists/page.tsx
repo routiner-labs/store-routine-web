@@ -441,7 +441,6 @@ export default function OwnerChecklists() {
   const [newRecurEnd, setNewRecurEnd] = useState('')
   const [newAssignees, setNewAssignees] = useState<string[]>([])
   const [dutyPickerOpen, setDutyPickerOpen] = useState(false)
-  const [recurExiting, setRecurExiting] = useState(false)
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES)
   const [catManageOpen, setCatManageOpen] = useState(false)
   const [catDraft, setCatDraft] = useState('')
@@ -774,7 +773,6 @@ export default function OwnerChecklists() {
     setNewRecurEnd('')
     setNewAssignees([])
     setNewDocRefs([])
-    setRecurExiting(false)
     methodHtmlRef.current = ''
   }
 
@@ -813,7 +811,6 @@ export default function OwnerChecklists() {
 
   function setRecurrence(value: Recurrence) {
     if (value === newRecurrence) return
-    setRecurExiting(false)
     setNewRecurrence(value)
   }
 
@@ -829,7 +826,6 @@ export default function OwnerChecklists() {
     setNewRecurEnd(tpl.recurEnd ?? '')
     setNewAssignees(tpl.defaultAssigneeIds ?? [])
     setNewDocRefs(tpl.docRefs ?? [])
-    setRecurExiting(false)
     methodHtmlRef.current = tpl.method
   }
 
@@ -982,74 +978,75 @@ export default function OwnerChecklists() {
                 </button>
               ))}
             </div>
-            {newRecurrence === 'ONCE' && !recurExiting && (
+            {newRecurrence === 'ONCE' && (
               <span className={styles.fieldHint}>이 업무는 한 번만 수행합니다.</span>
             )}
           </div>
-          {(newRecurrence === 'RECURRING' || recurExiting) && (
-            <div
-              className={`${styles.recurSection} ${recurExiting ? styles.recurExit : styles.recurEnter}`}
-            >
-              <RecurrenceEditor value={newRule} onChange={setNewRule} />
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>반복 기간</span>
-                <div className={styles.recurRow}>
-                  <input
-                    type="date"
-                    className={styles.dateInput}
-                    value={newRecurStart}
-                    onChange={(e) => setNewRecurStart(e.target.value)}
-                  />
-                  <span className={styles.recurUnit}>~</span>
-                  <input
-                    type="date"
-                    className={styles.dateInput}
-                    value={newRecurEnd}
-                    onChange={(e) => setNewRecurEnd(e.target.value)}
-                  />
+          {/* 반복 옵션 — 단건 전환 시 위로 부드럽게 접힘(grid-template-rows 트랜지션). 항상 마운트되어 값 보존 */}
+          <div className={`${styles.recurWrap} ${newRecurrence === 'RECURRING' ? styles.recurWrapOpen : ''}`}>
+            <div className={styles.recurWrapInner}>
+              <div className={styles.recurSection}>
+                <RecurrenceEditor value={newRule} onChange={setNewRule} />
+                <div className={styles.field}>
+                  <span className={styles.fieldLabel}>반복 기간</span>
+                  <div className={styles.recurRow}>
+                    <input
+                      type="date"
+                      className={styles.dateInput}
+                      value={newRecurStart}
+                      onChange={(e) => setNewRecurStart(e.target.value)}
+                    />
+                    <span className={styles.recurUnit}>~</span>
+                    <input
+                      type="date"
+                      className={styles.dateInput}
+                      value={newRecurEnd}
+                      onChange={(e) => setNewRecurEnd(e.target.value)}
+                    />
+                  </div>
+                  <span className={styles.fieldHint}>종료일을 비우면 무기한 반복됩니다.</span>
                 </div>
-                <span className={styles.fieldHint}>종료일을 비우면 무기한 반복됩니다.</span>
-              </div>
-              <div className={styles.field}>
-                <div className={styles.dutyHead}>
-                  <span className={styles.fieldLabel}>담당자</span>
-                  <button
-                    type="button"
-                    className={styles.dutyAdd}
-                    onClick={() => setDutyPickerOpen(true)}
-                  >
-                    <LiaPlusSolid />
-                    담당자 추가하기
-                  </button>
+                <div className={styles.field}>
+                  <div className={styles.dutyHead}>
+                    <span className={styles.fieldLabel}>담당자</span>
+                    <button
+                      type="button"
+                      className={styles.dutyAdd}
+                      onClick={() => setDutyPickerOpen(true)}
+                    >
+                      <LiaPlusSolid />
+                      담당자 추가하기
+                    </button>
+                  </div>
+                  <div className={styles.dutyList}>
+                    {newAssignees.length === 0 ? (
+                      <span className={styles.dutyEmpty}>지정된 담당자가 없습니다</span>
+                    ) : (
+                      newAssignees.map((id) => {
+                        const emp = empById[id]
+                        if (!emp) return null
+                        return (
+                          <div key={id} className={styles.dutyRow}>
+                            <span className={styles.dutyAvatar}>{emp.name[0]}</span>
+                            <EmployeeName name={emp.name} className={styles.dutyName} />
+                            <button
+                              type="button"
+                              className={styles.dutyRemove}
+                              onClick={() => toggleAssignee(id)}
+                              aria-label={`${emp.name} 제거`}
+                            >
+                              <LiaTimesSolid />
+                            </button>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                  <span className={styles.fieldHint}>반복 편성 시 기본으로 배정됩니다.</span>
                 </div>
-                <div className={styles.dutyList}>
-                  {newAssignees.length === 0 ? (
-                    <span className={styles.dutyEmpty}>지정된 담당자가 없습니다</span>
-                  ) : (
-                    newAssignees.map((id) => {
-                      const emp = empById[id]
-                      if (!emp) return null
-                      return (
-                        <div key={id} className={styles.dutyRow}>
-                          <span className={styles.dutyAvatar}>{emp.name[0]}</span>
-                          <EmployeeName name={emp.name} className={styles.dutyName} />
-                          <button
-                            type="button"
-                            className={styles.dutyRemove}
-                            onClick={() => toggleAssignee(id)}
-                            aria-label={`${emp.name} 제거`}
-                          >
-                            <LiaTimesSolid />
-                          </button>
-                        </div>
-                      )
-                    })
-                  )}
-                </div>
-                <span className={styles.fieldHint}>반복 편성 시 기본으로 배정됩니다.</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
         <div className={styles.formCol}>
           <div className={`${styles.field} ${styles.fieldEditor}`}>

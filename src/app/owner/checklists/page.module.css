@@ -1887,42 +1887,33 @@
   flex-shrink: 0;
 }
 
-/* 반복 섹션 등장/퇴장 애니메이션 */
-@keyframes revealDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* 반복 옵션 접힘/펼침 — 단건↔반복 전환 시 높이가 부드럽게 애니메이션(grid-template-rows 0fr↔1fr).
+   margin-top -16px로 formCol의 gap(16px)을 상쇄해, 닫혔을 때 잔여 여백이 남지 않는다. */
+.recurWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: -16px;
+  opacity: 0;
+  transition: grid-template-rows 0.26s cubic-bezier(0.32, 0.72, 0, 1),
+    margin-top 0.26s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.2s ease;
 }
 
-@keyframes collapseUp {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
+.recurWrapOpen {
+  grid-template-rows: 1fr;
+  margin-top: 0;
+  opacity: 1;
+}
+
+.recurWrapInner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .recurSection {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.recurEnter {
-  animation: revealDown 0.22s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.recurExit {
-  animation: collapseUp 0.2s ease-in forwards;
-  pointer-events: none;
 }
 
 /* 주기 상세 설정 */

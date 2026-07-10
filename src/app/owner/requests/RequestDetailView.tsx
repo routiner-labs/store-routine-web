@@ -31,6 +31,7 @@ import SelectBox from '@/components/SelectBox'
 import { useScrollLock } from '@/lib/useScrollLock'
 import { usePopupEsc } from '@/lib/usePopupEsc'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
+import { stripHtml, contentToHtml } from '@/lib/htmlText'
 import styles from './RequestDetailView.module.css'
 
 const REQUEST_TYPES: RequestType[] = REQUEST_CATEGORIES.map((c) => c.name)
@@ -252,12 +253,12 @@ export default function RequestDetailView({
 
   function openTaskAdd() {
     if (!request) return
-    const base = request.content.replace(/\s+/g, ' ').trim()
+    const base = stripHtml(request.content)
     setTaskTitle(base.length > 24 ? `${base.slice(0, 24)}…` : base)
     setTaskCategory(TYPE_TO_TASK_CATEGORY[request.type] ?? 'ETC')
     setTaskKind('EXTRA')
     setTaskDocRefs([])
-    const initialMethod = `<p>${request.content}</p>`
+    const initialMethod = contentToHtml(request.content)
     taskMethodRef.current = initialMethod
     setTaskMethodInitial(initialMethod)
     setTaskAddOpen(true)
@@ -371,7 +372,10 @@ export default function RequestDetailView({
                 <span className={styles.visibilityAll}><LiaUsersSolid /> 전체공개</span>
               )}
             </div>
-            <p className={styles.postContent}>{request.content}</p>
+            <div
+              className={styles.postContent}
+              dangerouslySetInnerHTML={{ __html: contentToHtml(request.content) }}
+            />
             {request.hasPhoto && (
               <div className={styles.photoPlaceholder}>사진 첨부됨</div>
             )}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LiaAngleLeftSolid, LiaLockSolid, LiaUsersSolid, LiaPaperPlaneSolid, LiaPencilAltSolid, LiaTrashAltSolid } from 'react-icons/lia'
 import { mockRequests, mockReplies, REQUEST_CATEGORIES } from '@/mock/data'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
+import { contentToHtml } from '@/lib/htmlText'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import EmployeeName from '@/components/EmployeeName'
@@ -135,7 +136,10 @@ export default function EmployeeRequestDetailPage({ params }: { params: Promise<
             )}
             <span className={styles.postDate}>{date} {time}</span>
           </div>
-          <p className={styles.postContent}>{request.content}</p>
+          <div
+            className={styles.postContent}
+            dangerouslySetInnerHTML={{ __html: contentToHtml(request.content) }}
+          />
           {request.hasPhoto && <div className={styles.photoPlaceholder}>사진 첨부됨</div>}
         </article>
 

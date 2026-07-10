@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { LiaPlusSolid, LiaAngleRightSolid, LiaLockSolid, LiaUsersSolid, LiaCameraSolid, LiaSearchSolid } from 'react-icons/lia'
 import { mockRequests, REQUEST_CATEGORIES } from '@/mock/data'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
+import { stripHtml } from '@/lib/htmlText'
 import type { RequestStatus } from '@/types'
 import styles from './page.module.css'
 
@@ -95,7 +96,7 @@ export default function EmployeeRequestsPage() {
                     {statusLabel[req.status]}
                   </span>
                 </div>
-                <p className={styles.rowContent}>{req.content}</p>
+                <p className={styles.rowContent}>{stripHtml(req.content)}</p>
                 <div className={styles.rowBottom}>
                   <span className={styles.rowMeta}>{date} {time}</span>
                   <span className={styles.rowIcons}>

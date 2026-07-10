@@ -15,6 +15,7 @@ import { useScrollLock } from '@/lib/useScrollLock'
 import { usePopupEsc } from '@/lib/usePopupEsc'
 import { useHoverTooltip } from '@/lib/useHoverTooltip'
 import { categoryBadgeStyle } from '@/lib/categoryColors'
+import { stripHtml } from '@/lib/htmlText'
 import { useConfirm } from '@/context/ConfirmContext'
 import { useToast } from '@/context/ToastContext'
 import EmployeeName from '@/components/EmployeeName'
@@ -86,7 +87,7 @@ function CardItem({ request, typeStyle, onClick }: { request: EmployeeRequest; t
           <StatusBadge status={request.status} />
         </div>
       </div>
-      <p className={styles.content}>{request.content}</p>
+      <p className={styles.content}>{stripHtml(request.content)}</p>
       <div className={styles.cardBottom}>
         <span className={styles.meta}>
           <EmployeeName name={request.employeeName} /> · {date} {time}
@@ -108,7 +109,7 @@ function ListItem({ request, typeStyle, onClick }: { request: EmployeeRequest; t
       <span className={styles.listTypeBadge} style={typeStyle}>
         {request.type}
       </span>
-      <p className={styles.listPreview}>{request.content}</p>
+      <p className={styles.listPreview}>{stripHtml(request.content)}</p>
       <div className={styles.listMeta}>
         <EmployeeName name={request.employeeName} />
       </div>
@@ -144,7 +145,7 @@ function KanbanCard({ request, typeStyle, onClick, onDragStart, onDragEnd, dragg
         <span className={styles.typeTag} style={typeStyle}>{request.type}</span>
         <VisibilityIcon visibility={request.visibility} />
       </div>
-      <p className={styles.kanbanCardContent}>{request.content}</p>
+      <p className={styles.kanbanCardContent}>{stripHtml(request.content)}</p>
       <div className={styles.kanbanCardMeta}>
         <EmployeeName name={request.employeeName} />
         <span>{date}</span>

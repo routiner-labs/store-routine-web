@@ -1,0 +1,231 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  padding: var(--page-x);
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.fieldControl {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 카테고리 셀렉트 + 관리 버튼 한 줄 */
+.catRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 240px;
+  max-width: 100%;
+}
+
+.catManageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.catManageBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* 공개범위 세그먼트 */
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 3px;
+}
+
+.segBtn {
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  transition: background 0.1s, color 0.1s;
+}
+
+.segBtnActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* 내용 에디터 — 남은 높이를 채움 */
+.editorWrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorBox {
+  flex: 1;
+  min-height: 260px;
+  display: flex;
+}
+
+/* 파일 첨부 */
+.attach {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* 파일 첨부 — 가로 전체 폭 드롭존(클릭 + 드래그드랍) */
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 22px 16px;
+  background: var(--color-surface);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+
+.dropZone:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.dropZoneActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.dropZone svg {
+  font-size: 22px;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.fileIcon {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.fileName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fileRemove:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* 하단 버튼 */
+.formFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.btnCancel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+}
+
+.btnCancel:hover {
+  background: var(--color-bg);
+}
+
+.btnCreate {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.1s;
+}
+
+.btnCreate:hover {
+  opacity: 0.92;
+}
+
+.btnCreate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

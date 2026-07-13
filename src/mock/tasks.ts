@@ -116,6 +116,9 @@ export const TASK_CATALOG: TaskTemplate[] = [
     method:
       '<p>첫 손님을 맞기 전 홀 상태를 정돈합니다.</p><ul><li>모든 테이블을 소독 티슈로 닦는다.</li><li>의자를 정렬하고 흔들리는 의자는 표시해 둔다.</li><li>수저통, 냅킨, 티슈 등 집기를 채운다.</li><li>창가 자리는 유리 지문까지 확인한다.</li></ul>',
     docRefs: ['doc9'],
+    category: 'CLEAN',
+    timing: { start: '16:00', end: '16:30' },
+    defaultAssigneeIds: ['emp2'],
   },
   {
     id: 't5',
@@ -125,6 +128,7 @@ export const TASK_CATALOG: TaskTemplate[] = [
     docRefs: ['doc10', 'doc12'],
     category: 'CLOSE',
     timing: { start: '22:00', end: '22:30' },
+    defaultAssigneeIds: ['emp2'],
   },
   {
     id: 't6',
@@ -142,6 +146,9 @@ export const TASK_CATALOG: TaskTemplate[] = [
       '<p>신메뉴 출시 전 전 직원이 숙지해야 합니다.</p><ul><li>공유된 신메뉴 레시피와 조리 순서를 정독한다.</li><li>알레르기 유발 재료와 안내 멘트를 확인한다.</li><li>이해가 안 되는 부분은 메모로 남겨 공유한다.</li></ul>',
     docRefs: ['doc25'],
     recurrence: 'ONCE',
+    category: 'PREP',
+    timing: { start: '17:00', end: '17:30' },
+    defaultAssigneeIds: ['emp2'],
   },
   {
     id: 't8',
@@ -149,6 +156,9 @@ export const TASK_CATALOG: TaskTemplate[] = [
     method:
       '<p>식자재 안전을 위한 필수 점검입니다.</p><ol><li>냉장고 상단 온도계를 확인한다.</li><li><strong>5도 이하</strong>인지 확인하고 수치를 기록한다.</li><li>기준 초과 시 문이 완전히 닫혔는지 먼저 확인한다.</li><li>30분 후에도 높으면 요청함에 장비 고장으로 등록한다.</li></ol>',
     docRefs: ['doc14'],
+    category: 'SAFETY',
+    timing: { start: '18:00', end: '18:10' },
+    defaultAssigneeIds: ['emp2'],
   },
   {
     id: 't9',

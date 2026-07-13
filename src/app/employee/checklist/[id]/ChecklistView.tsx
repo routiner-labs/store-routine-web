@@ -13,12 +13,8 @@ function ItemInput({
   item: ChecklistItem
   onComplete: (id: string, value?: string | number) => void
 }) {
-  const [inputValue, setInputValue] = useState<string>(
-    item.value !== undefined ? String(item.value) : ''
-  )
-  const [photoAttached, setPhotoAttached] = useState(
-    item.status === 'DONE' || item.status === 'NEEDS_REVIEW'
-  )
+  const [inputValue, setInputValue] = useState<string>(item.value !== undefined ? String(item.value) : '')
+  const [photoAttached, setPhotoAttached] = useState(item.status === 'DONE' || item.status === 'NEEDS_REVIEW')
 
   const isDone = item.status === 'DONE' || item.status === 'NEEDS_REVIEW'
 
@@ -69,10 +65,7 @@ function ItemInput({
           rows={3}
         />
         {!isDone && (
-          <button
-            className={styles.confirmBtn}
-            onClick={() => inputValue && onComplete(item.id, inputValue)}
-          >
+          <button className={styles.confirmBtn} onClick={() => inputValue && onComplete(item.id, inputValue)}>
             저장
           </button>
         )}
@@ -87,11 +80,11 @@ function ItemInput({
         onClick={() => {
           if (!photoAttached) {
             setPhotoAttached(true)
-            onComplete(item.id, '사진 첨부됨')
+            onComplete(item.id, '사진 첨부 완료')
           }
         }}
       >
-        {photoAttached ? '사진 첨부됨' : '사진 첨부하기'}
+        {photoAttached ? '사진 첨부 완료' : '사진 첨부하기'}
       </button>
     )
   }
@@ -102,16 +95,14 @@ function ItemInput({
 export default function ChecklistView({ checklist }: { checklist: Checklist }) {
   const [items, setItems] = useState<ChecklistItem[]>(checklist.items)
 
-  const done = items.filter((i) => i.status === 'DONE' || i.status === 'NEEDS_REVIEW').length
+  const done = items.filter((item) => item.status === 'DONE' || item.status === 'NEEDS_REVIEW').length
   const total = items.length
   const percent = Math.round((done / total) * 100)
 
   function completeItem(id: string, value?: string | number) {
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id
-          ? { ...item, status: 'DONE' as TaskStatus, value: value ?? item.value }
-          : item
+        item.id === id ? { ...item, status: 'DONE' as TaskStatus, value: value ?? item.value } : item
       )
     )
   }
@@ -119,8 +110,8 @@ export default function ChecklistView({ checklist }: { checklist: Checklist }) {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/employee" className={styles.backBtn}>
-          <LiaAngleLeftSolid /> 홈
+        <Link href="/employee/checklists" className={styles.backBtn}>
+          <LiaAngleLeftSolid /> 목록
         </Link>
         <h1 className={styles.title}>{checklist.title}</h1>
       </header>
@@ -131,7 +122,9 @@ export default function ChecklistView({ checklist }: { checklist: Checklist }) {
         </div>
         <div className={styles.progressMeta}>
           <span>{percent}% 완료</span>
-          <span>{done}/{total} 항목</span>
+          <span>
+            {done}/{total} 항목
+          </span>
         </div>
       </div>
 
@@ -159,8 +152,10 @@ export default function ChecklistView({ checklist }: { checklist: Checklist }) {
 
       {done === total && (
         <div className={styles.completeSection}>
-          <p className={styles.completeText}>모든 항목을 완료했습니다</p>
-          <Link href="/employee" className={styles.completeBtn}>홈으로 돌아가기</Link>
+          <p className={styles.completeText}>모든 항목이 완료되었습니다.</p>
+          <Link href="/employee/checklists" className={styles.completeBtn}>
+            업무리스트로 돌아가기
+          </Link>
         </div>
       )}
     </div>

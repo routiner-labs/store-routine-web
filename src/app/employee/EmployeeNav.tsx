@@ -31,23 +31,22 @@ const navGroups: { category: string; items: NavItem[] }[] = [
   {
     category: '업무',
     items: [
-      { href: '/employee/requests',  label: '요청함', icon: LiaInboxSolid },
+      { href: '/employee/checklists', label: '업무리스트', icon: LiaClipboardListSolid },
+      { href: '/employee/requests', label: '요청사항', icon: LiaInboxSolid },
       { href: '/employee/documents', label: '문서함', icon: LiaFolderOpenSolid },
     ],
   },
   {
-    category: '스케줄',
-    items: [
-      { href: '/employee/schedule', label: '내 스케줄', icon: LiaCalendarSolid },
-    ],
+    category: '근무',
+    items: [{ href: '/employee/schedule', label: '근무 일정', icon: LiaCalendarSolid }],
   },
 ]
 
 const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
-  REQUEST:    <LiaInboxSolid />,
+  REQUEST: <LiaInboxSolid />,
   ATTENDANCE: <LiaCalendarSolid />,
-  CHECKLIST:  <LiaClipboardListSolid />,
-  SYSTEM:     <LiaInfoCircleSolid />,
+  CHECKLIST: <LiaClipboardListSolid />,
+  SYSTEM: <LiaInfoCircleSolid />,
 }
 
 function isActive(pathname: string, item: NavItem) {
@@ -60,13 +59,11 @@ export default function EmployeeNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
 
-  // 모바일 메뉴/알림 드로어 — 뷰어형(ESC 바로 닫힘)
   usePopupEsc(mobileMenuOpen, 'viewer', () => setMobileMenuOpen(false))
   usePopupEsc(notifOpen, 'viewer', () => setNotifOpen(false))
 
   return (
     <>
-      {/* ── 태블릿+: 좌측 사이드바 ── */}
       <nav className={styles.nav}>
         <div className={styles.storeTrigger}>
           <span className={styles.storeFull}>스타벅스 강남점</span>
@@ -100,41 +97,33 @@ export default function EmployeeNav() {
         ))}
 
         <div className={styles.userSection}>
-          <UserMenu initial="이" name="이지은" profileHref="/employee/profile" />
+          <UserMenu initial="이" name="이서윤" profileHref="/employee/profile" />
         </div>
       </nav>
 
-      {/* ── 모바일: 3등분 하단 바 ── */}
       <div className={styles.mobileBar}>
         <button className={styles.mobileBtn} onClick={() => setNotifOpen(true)}>
           <span className={styles.mobileBellWrap}>
             <LiaBellSolid className={styles.mobileBtnIcon} />
             {unreadCount > 0 && (
-              <span className={styles.mobileBellBadge}>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
+              <span className={styles.mobileBellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
             )}
           </span>
           <span className={styles.mobileBtnLabel}>알림</span>
         </button>
 
         <div className={styles.mobileDiamondArea}>
-          <button
-            className={styles.menuDiamond}
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="메뉴"
-          >
+          <button className={styles.menuDiamond} onClick={() => setMobileMenuOpen(true)} aria-label="메뉴 열기">
             <LiaBarsSolid className={styles.menuDiamondIcon} />
           </button>
         </div>
 
         <button className={styles.mobileBtn}>
           <span className={styles.mobileAvatar}>이</span>
-          <span className={styles.mobileBtnLabel}>이지은</span>
+          <span className={styles.mobileBtnLabel}>내 정보</span>
         </button>
       </div>
 
-      {/* ── 모바일: 알림 전체화면 ── */}
       {notifOpen && (
         <div className={styles.notifScreen}>
           <div className={styles.notifHeader}>
@@ -154,21 +143,21 @@ export default function EmployeeNav() {
             {notifications.length === 0 ? (
               <p className={styles.notifEmpty}>새로운 알림이 없습니다.</p>
             ) : (
-              notifications.map((n) => (
+              notifications.map((notification) => (
                 <button
-                  key={n.id}
-                  className={`${styles.notifItem} ${!n.isRead ? styles.notifItemUnread : ''}`}
-                  onClick={() => markAsRead(n.id)}
+                  key={notification.id}
+                  className={`${styles.notifItem} ${!notification.isRead ? styles.notifItemUnread : ''}`}
+                  onClick={() => markAsRead(notification.id)}
                 >
-                  <span className={`${styles.notifIcon} ${styles[`notifType_${n.type}`]}`}>
-                    {TYPE_ICON[n.type]}
+                  <span className={`${styles.notifIcon} ${styles[`notifType_${notification.type}`]}`}>
+                    {TYPE_ICON[notification.type]}
                   </span>
                   <div className={styles.notifBody}>
-                    <span className={styles.notifItemTitle}>{n.title}</span>
-                    {n.body && <span className={styles.notifItemDesc}>{n.body}</span>}
-                    <span className={styles.notifItemTime}>{n.createdAt}</span>
+                    <span className={styles.notifItemTitle}>{notification.title}</span>
+                    {notification.body && <span className={styles.notifItemDesc}>{notification.body}</span>}
+                    <span className={styles.notifItemTime}>{notification.createdAt}</span>
                   </div>
-                  {!n.isRead && <span className={styles.notifDot} />}
+                  {!notification.isRead && <span className={styles.notifDot} />}
                 </button>
               ))
             )}
@@ -176,21 +165,14 @@ export default function EmployeeNav() {
         </div>
       )}
 
-      {/* ── 모바일: 메뉴 드로어 ── */}
       {mobileMenuOpen && (
         <>
-          <div
-            className={styles.drawerOverlay}
-            onClick={() => setMobileMenuOpen(false)}
-          />
+          <div className={styles.drawerOverlay} onClick={() => setMobileMenuOpen(false)} />
           <div className={styles.drawer}>
             <div className={styles.drawerHandle} />
             <div className={styles.drawerHeader}>
               <span className={styles.drawerStoreName}>스타벅스 강남점</span>
-              <button
-                className={styles.drawerClose}
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <button className={styles.drawerClose} onClick={() => setMobileMenuOpen(false)}>
                 <LiaTimesSolid />
               </button>
             </div>

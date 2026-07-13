@@ -28,18 +28,25 @@
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
-  top: 0;
+  top: var(--appbar-height);
   z-index: 10;
 }
 
 .backBtn {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-primary);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 6px 8px 6px 4px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
+}
+
+.backBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .headerActions {

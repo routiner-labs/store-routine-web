@@ -12,7 +12,7 @@ export const mockEmployees: Employee[] = [
   },
   {
     id: 'emp2',
-    name: '이지은',
+    name: '이서윤',
     phone: '010-2345-6789',
     birthDate: '2000-11-22',
     status: 'ACTIVE',
@@ -21,7 +21,7 @@ export const mockEmployees: Employee[] = [
   },
   {
     id: 'emp3',
-    name: '박서연',
+    name: '박서준',
     phone: '010-3456-7890',
     birthDate: '1999-07-08',
     status: 'ACTIVE',
@@ -29,7 +29,6 @@ export const mockEmployees: Employee[] = [
     schedule: { days: [2, 3, 5, 6], startTime: '11:00', endTime: '20:00' },
   },
   {
-    // 사장이 아직 스케줄을 생성하지 않은 직원 (schedule 없음)
     id: 'emp5',
     name: '최수아',
     phone: '010-7890-1234',
@@ -39,7 +38,7 @@ export const mockEmployees: Employee[] = [
   },
   {
     id: 'emp4',
-    name: '최준호',
+    name: '최지원',
     phone: '010-4567-8901',
     birthDate: '1997-05-30',
     status: 'INACTIVE',
@@ -59,7 +58,7 @@ export const mockJoinRequests: JoinRequest[] = [
   },
   {
     id: 'req2',
-    name: '한태양',
+    name: '윤태호',
     phone: '010-6789-0123',
     requestedAt: '2026-06-29',
   },

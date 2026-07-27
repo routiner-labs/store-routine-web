@@ -1,6 +1,6 @@
 import { test, expect } from 'playwright/test'
 const paths = { base: '/owner/attendance/schedule', adjust: '/owner/attendance/adjust' }
-const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3005'
+const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3006'
 async function open(page, path, width = 1440, height = 900) {
   await page.setViewportSize({ width, height }); await page.goto(`${baseURL}${path}`)
 }
@@ -11,6 +11,7 @@ async function applyAdvancedSearch(page) { await page.getByRole('button', { name
 async function expectNoPageOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
 }
+async function selectNextMonthDate(page) { await page.getByRole('button', { name: '조정 날짜' }).click(); await page.getByRole('button', { name: '다음 달' }).click(); await page.getByRole('button', { name: '2026년 7월 1일 선택' }).click() }
 for (const [mode, path] of Object.entries(paths)) {
   for (const width of [1024, 768, 390]) {
     test(`${mode} ${width}px에서 페이지 가로 넘침이 없다`, async ({ page }) => {
@@ -131,7 +132,7 @@ test('일자별 조정 시간 필터는 날짜 변경 시 다시 계산한다', 
   await applyAdvancedSearch(page)
   await expect(page.locator('[data-schedule-row]')).toHaveCount(1)
   await expect(page.getByText('김민수', { exact: true })).toBeVisible()
-  await page.getByLabel('조정 날짜').fill('2026-07-01')
+  await selectNextMonthDate(page)
   await expect(page.locator('[data-schedule-row]')).toHaveCount(2)
   await expect(page.getByText('김민수', { exact: true })).toBeVisible()
   await expect(page.getByText('박서준', { exact: true })).toBeVisible()
@@ -287,9 +288,8 @@ test('기본 스케줄의 접근 가능한 토글과 시간 입력이 동작한�
 })
 test('일자별 조정의 접근 가능한 날짜·상태·시간 컨트롤이 동작한다', async ({ page }) => {
   await open(page, paths.adjust)
-  const date = page.getByLabel('조정 날짜')
-  await date.fill('2026-07-01')
-  await expect(date).toHaveValue('2026-07-01')
+  await selectNextMonthDate(page)
+  await expect(page.getByRole('button', { name: '조정 날짜' })).toContainText('7월 1일 (수)')
   const start = page.getByLabel('김민수 시작 시간')
   await start.fill('10:00')
   await expect(start).toHaveValue('10:00')

@@ -128,8 +128,7 @@
   font-weight: 700;
 }
 
-.timeInput,
-.dateInput {
+.timeInput {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
@@ -139,10 +138,6 @@
 
 .timeInput {
   width: 116px;
-  padding: 7px 10px;
-}
-
-.dateInput {
   padding: 7px 10px;
 }
 

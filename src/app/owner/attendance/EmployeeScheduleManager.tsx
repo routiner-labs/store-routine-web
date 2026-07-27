@@ -10,6 +10,7 @@ import { usePageLeave } from '@/lib/usePageLeave'
 import EmployeeName from '@/components/EmployeeName'
 import type { WeeklySchedule } from '@/types'
 import EmployeeScheduleHeader from './EmployeeScheduleHeader'
+import EmployeeScheduleDatePicker from './EmployeeScheduleDatePicker'
 import EmployeeScheduleTable from './EmployeeScheduleTable'
 import { useEmployeeScheduleFilters } from './useEmployeeScheduleFilters'
 import styles from './EmployeeScheduleManager.module.css'
@@ -209,13 +210,7 @@ export default function EmployeeScheduleManager({
         ) : (
           <>
             <div className={styles.dateRow} data-schedule-context>
-              <input
-                type="date"
-                aria-label="조정 날짜"
-                className={styles.dateInput}
-                value={schedDate}
-                onChange={(e) => e.target.value && setSchedDate(e.target.value)}
-              />
+              <EmployeeScheduleDatePicker value={schedDate} today={TODAY} onChange={setSchedDate} />
               <span className={styles.guideInline}>
                 선택한 날짜만 근무·휴무·시간을 조정합니다. 기본 스케줄은 바뀌지 않습니다.
               </span>

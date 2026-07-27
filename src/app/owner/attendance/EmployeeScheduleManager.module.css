@@ -18,7 +18,10 @@
   z-index: 10;
 }
 
-.backBtn, .save, .emp, .times, .days, .none, .dateRow {
+.backBtn,
+.save,
+.days,
+.dateRow {
   display: flex;
   align-items: center;
 }
@@ -33,20 +36,49 @@
   flex-shrink: 0;
 }
 
-.backBtn:hover { background: var(--color-bg); color: var(--color-text); }
-.backBtn svg { font-size: 16px; transition: transform 0.18s ease; }
-.backBtn:hover svg { transform: translateX(-3px); }
-.heading { color: var(--color-text); font-size: 15px; font-weight: 700; }
-.leaving { animation: pageLeave 0.26s ease forwards; }
-@keyframes pageLeave { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(16px); } }
+.backBtn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.backBtn svg {
+  font-size: 16px;
+  transition: transform 0.18s ease;
+}
+
+.backBtn:hover svg {
+  transform: translateX(-3px);
+}
+
+.heading {
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.leaving {
+  animation: pageLeave 0.26s ease forwards;
+}
+
+@keyframes pageLeave {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
 
 .body {
   flex: 1;
   width: 100%;
   box-sizing: border-box;
   max-width: 860px;
-  padding: 8px var(--page-x) 24px;
   min-width: 0;
+  padding: 8px var(--page-x) 24px;
 }
 
 .foot {
@@ -68,29 +100,32 @@
   font-weight: 600;
   transition: opacity 0.1s;
 }
-.save:hover { opacity: 0.92; }
 
-.guide, .dateRow {
+.save:hover {
+  opacity: 0.92;
+}
+
+.guide {
   margin: 8px 0 4px;
+  padding: 10px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-text-secondary);
   font-size: 12px;
 }
-.guide { padding: 10px 12px; }
-.guideInline { font-size: 12px; color: var(--color-text-secondary); }
-.dateRow { gap: 10px; padding: 8px 12px; flex-wrap: wrap; }
 
-.row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
+.guideInline {
+  color: var(--color-text-secondary);
+  font-size: 12px;
 }
-.row:last-child { border-bottom: none; }
-.emp { gap: 8px; min-width: 0; }
+
+.dateRow {
+  gap: 10px;
+  padding: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
 .avatar {
   display: flex;
   align-items: center;
@@ -104,8 +139,18 @@
   font-weight: 700;
   flex-shrink: 0;
 }
-.name { min-width: 0; color: var(--color-text); font-size: 14px; font-weight: 600; }
-.days { gap: 4px; }
+
+.name {
+  min-width: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.days {
+  gap: 4px;
+}
+
 .day {
   display: flex;
   align-items: center;
@@ -119,42 +164,134 @@
   font-size: 12px;
   font-weight: 500;
 }
-.dayOn { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; }
-.times { gap: 8px; min-width: 0; }
-.timeInput, .dateInput {
+
+.dayOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.timeInput,
+.dateInput {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 13px;
 }
-.timeInput { width: 116px; padding: 7px 10px; }
-.dateInput { padding: 7px 10px; }
-.timeSep, .offText { color: var(--color-text-secondary); font-size: 13px; }
-.removeBtn { padding: 6px 10px; border-radius: var(--radius-sm); color: var(--color-text-secondary); font-size: 12px; font-weight: 500; white-space: nowrap; }
-.removeBtn:hover { background: var(--color-danger-light); color: var(--color-danger); }
-.none { justify-content: space-between; gap: 10px; min-width: 0; }
-.noneText { color: var(--color-text-secondary); font-size: 13px; }
-.createBtn { padding: 7px 14px; border-radius: var(--radius-sm); color: var(--color-primary); background: var(--color-primary-light); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.adjBadge { padding: 1px 7px; border-radius: 99px; color: var(--color-warning); background: var(--color-warning-light); font-size: 10px; font-weight: 700; }
-.daySeg { display: inline-flex; align-self: flex-start; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
-.segBtn { padding: 6px 14px; background: var(--color-surface); color: var(--color-text-secondary); font-size: 12px; font-weight: 600; }
-.segOn { background: var(--color-primary); color: #fff; }
-.segOff { background: var(--color-text-secondary); color: #fff; }
+
+.timeInput {
+  width: 116px;
+  padding: 7px 10px;
+}
+
+.dateInput {
+  padding: 7px 10px;
+}
+
+.timeSep,
+.offText,
+.noneText {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.removeBtn {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.removeBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.createBtn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.adjBadge {
+  padding: 1px 7px;
+  border-radius: 99px;
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.daySeg {
+  display: inline-flex;
+  align-self: flex-start;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.segBtn {
+  padding: 6px 14px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.segOn,
+.segOff {
+  color: #fff;
+}
+
+.segOn {
+  background: var(--color-primary);
+}
+
+.segOff {
+  background: var(--color-text-secondary);
+}
 
 @media (max-width: 767px) {
-  .days { overflow-x: auto; padding-bottom: 2px; }
-  .noneText { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .days {
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .noneText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @media (min-width: 768px) {
-  .body { max-width: none; }
-  .row { gap: 8px 16px; padding: 14px 0; }
-  .times { flex-wrap: wrap; }
+  .dateRow {
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+
+  .times {
+    flex-wrap: wrap;
+  }
 }
 
 @media (min-width: 1024px) {
-  .row { padding: 12px 16px; }
-  .times { flex-wrap: nowrap; }
-  .removeBtn { margin-left: auto; }
+  .times {
+    flex-wrap: nowrap;
+  }
+
+  .removeBtn {
+    margin-left: auto;
+  }
 }

@@ -10,13 +10,48 @@
   display: none;
 }
 
+.table :global([data-schedule-row]) {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table :global([data-schedule-row]):last-child {
+  border-bottom: none;
+}
+
+.table :global([data-schedule-employee]),
+.table :global([data-schedule-time]),
+.table :global([data-schedule-empty]) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.table :global([data-schedule-employee]),
+.table :global([data-schedule-time]) {
+  gap: 8px;
+}
+
+.table :global([data-schedule-empty]) {
+  justify-content: space-between;
+  gap: 10px;
+}
+
 @media (min-width: 768px) {
+  :global([data-schedule-body]):has(.table) {
+    max-width: none;
+  }
+
   .table :global([data-schedule-row]) {
     display: grid;
     grid-template-columns: 130px minmax(0, 1fr);
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 16px;
+    row-gap: 8px;
   }
 
   .table :global([data-schedule-row]) > :global([data-schedule-employee]) {

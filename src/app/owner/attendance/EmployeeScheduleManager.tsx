@@ -17,12 +17,6 @@ const TODAY = '2026-06-30'
 
 type DayOverride = { off: boolean; startTime: string; endTime: string }
 
-/**
- * 직원 스케줄 관리 (페이지형).
- * mode='base'  — 반복되는 기본 근무 패턴(요일/시간) 설정
- * mode='adjust' — 특정 날짜만 근무·휴무·시간 조정(기본 스케줄은 유지)
- * 팝업이 아니라 별도 페이지로, 출근 현황 FAB 메뉴에서 각각 진입한다.
- */
 export default function EmployeeScheduleManager({
   mode,
   title,
@@ -138,64 +132,69 @@ export default function EmployeeScheduleManager({
             </p>
             <EmployeeScheduleTable mode="base">
               {activeEmployees.map((emp) => {
-              const sched = schedules[emp.id]
-              return (
-                <div key={emp.id} className={styles.row} data-schedule-row>
-                  <div className={styles.emp} data-schedule-employee>
-                    <span className={styles.avatar}>{emp.name[0]}</span>
-                    <EmployeeName name={emp.name} className={styles.name} />
-                  </div>
-                  {sched === null ? (
-                    <div className={styles.none} data-schedule-empty>
-                      <span className={styles.noneText}>등록된 스케줄이 없습니다</span>
-                      <button
-                        type="button"
-                        className={styles.createBtn}
-                        onClick={() => createSchedule(emp.id)}
-                      >
-                        스케줄 만들기
-                      </button>
+                const sched = schedules[emp.id]
+                return (
+                  <div key={emp.id} role="row" data-schedule-row>
+                    <div role="cell" data-schedule-employee>
+                      <span className={styles.avatar} aria-hidden="true">
+                        {emp.name[0]}
+                      </span>
+                      <EmployeeName name={emp.name} className={styles.name} />
                     </div>
-                  ) : (
-                    <>
-                      <div className={styles.days}>
-                        {WEEKDAY_LABELS.map((d, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            className={`${styles.day} ${sched.days.includes(i) ? styles.dayOn : ''}`}
-                            onClick={() => toggleSchedDay(emp.id, i)}
-                          >
-                            {d}
-                          </button>
-                        ))}
-                      </div>
-                      <div className={styles.times} data-schedule-time>
-                        <input
-                          type="time"
-                          className={styles.timeInput}
-                          value={sched.startTime}
-                          onChange={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
-                        />
-                        <span className={styles.timeSep}>~</span>
-                        <input
-                          type="time"
-                          className={styles.timeInput}
-                          value={sched.endTime}
-                          onChange={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
-                        />
+                    {sched === null ? (
+                      <div role="cell" aria-colspan={3} data-schedule-empty>
+                        <span className={styles.noneText}>등록된 스케줄이 없습니다</span>
                         <button
-                          type="button"
-                          className={styles.removeBtn}
-                          onClick={() => removeSchedule(emp.id, emp.name)}
+                          type="button" aria-label={`${emp.name} 스케줄 만들기`}
+                          className={styles.createBtn}
+                          onClick={() => createSchedule(emp.id)}
                         >
-                          삭제
+                          스케줄 만들기
                         </button>
                       </div>
-                    </>
-                  )}
-                </div>
-              )
+                    ) : (
+                      <>
+                        <div role="cell" className={styles.days}>
+                          {WEEKDAY_LABELS.map((d, i) => (
+                            <button
+                              key={i}
+                              type="button" aria-label={`${emp.name} ${d}요일 근무 설정`}
+                              aria-pressed={sched.days.includes(i)}
+                              className={`${styles.day} ${sched.days.includes(i) ? styles.dayOn : ''}`}
+                              onClick={() => toggleSchedDay(emp.id, i)}
+                            >
+                              {d}
+                            </button>
+                          ))}
+                        </div>
+                        <div role="cell" aria-colspan={2} className={styles.times} data-schedule-time>
+                          <input
+                            type="time"
+                            aria-label={`${emp.name} 시작 시간`}
+                            className={styles.timeInput}
+                            value={sched.startTime}
+                            onChange={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
+                          />
+                          <span className={styles.timeSep} aria-hidden="true">~</span>
+                          <input
+                            type="time"
+                            aria-label={`${emp.name} 종료 시간`}
+                            className={styles.timeInput}
+                            value={sched.endTime}
+                            onChange={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
+                          />
+                          <button
+                            type="button" aria-label={`${emp.name} 스케줄 삭제`}
+                            className={styles.removeBtn}
+                            onClick={() => removeSchedule(emp.id, emp.name)}
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )
               })}
             </EmployeeScheduleTable>
           </>
@@ -204,6 +203,7 @@ export default function EmployeeScheduleManager({
             <div className={styles.dateRow} data-schedule-context>
               <input
                 type="date"
+                aria-label="조정 날짜"
                 className={styles.dateInput}
                 value={schedDate}
                 onChange={(e) => e.target.value && setSchedDate(e.target.value)}
@@ -214,62 +214,68 @@ export default function EmployeeScheduleManager({
             </div>
             <EmployeeScheduleTable mode="adjust">
               {activeEmployees.map((emp) => {
-              const eff = effectiveDay(emp.id, schedDate)
-              return (
-                <div key={emp.id} className={styles.row} data-schedule-row>
-                  <div className={styles.emp} data-schedule-employee>
-                    <span className={styles.avatar}>{emp.name[0]}</span>
-                    <EmployeeName name={emp.name} className={styles.name} />
-                    {eff.adjusted && <span className={styles.adjBadge}>조정됨</span>}
-                  </div>
-                  <div className={styles.daySeg}>
-                    <button
-                      type="button"
-                      className={`${styles.segBtn} ${eff.working ? styles.segOn : ''}`}
-                      onClick={() => setDayOverride(emp.id, { off: false })}
-                    >
-                      근무
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.segBtn} ${!eff.working ? styles.segOff : ''}`}
-                      onClick={() => setDayOverride(emp.id, { off: true })}
-                    >
-                      휴무
-                    </button>
-                  </div>
-                  <div className={styles.times} data-schedule-time>
-                    {eff.working ? (
-                      <>
-                        <input
-                          type="time"
-                          className={styles.timeInput}
-                          value={eff.startTime}
-                          onChange={(e) => setDayOverride(emp.id, { startTime: e.target.value })}
-                        />
-                        <span className={styles.timeSep}>~</span>
-                        <input
-                          type="time"
-                          className={styles.timeInput}
-                          value={eff.endTime}
-                          onChange={(e) => setDayOverride(emp.id, { endTime: e.target.value })}
-                        />
-                      </>
-                    ) : (
-                      <span className={styles.offText}>휴무</span>
-                    )}
-                    {eff.adjusted && (
+                const eff = effectiveDay(emp.id, schedDate)
+                return (
+                  <div key={emp.id} role="row" data-schedule-row>
+                    <div role="cell" data-schedule-employee>
+                      <span className={styles.avatar} aria-hidden="true">
+                        {emp.name[0]}
+                      </span>
+                      <EmployeeName name={emp.name} className={styles.name} />
+                      {eff.adjusted && <span className={styles.adjBadge}>조정됨</span>}
+                    </div>
+                    <div role="cell" className={styles.daySeg}>
                       <button
-                        type="button"
-                        className={styles.removeBtn}
-                        onClick={() => resetDayOverride(emp.id)}
+                        type="button" aria-label={`${emp.name} 근무로 설정`}
+                        aria-pressed={eff.working}
+                        className={`${styles.segBtn} ${eff.working ? styles.segOn : ''}`}
+                        onClick={() => setDayOverride(emp.id, { off: false })}
                       >
-                        기본으로
+                        근무
                       </button>
-                    )}
+                      <button
+                        type="button" aria-label={`${emp.name} 휴무로 설정`}
+                        aria-pressed={!eff.working}
+                        className={`${styles.segBtn} ${!eff.working ? styles.segOff : ''}`}
+                        onClick={() => setDayOverride(emp.id, { off: true })}
+                      >
+                        휴무
+                      </button>
+                    </div>
+                    <div role="cell" aria-colspan={2} className={styles.times} data-schedule-time>
+                      {eff.working ? (
+                        <>
+                          <input
+                            type="time"
+                            aria-label={`${emp.name} 시작 시간`}
+                            className={styles.timeInput}
+                            value={eff.startTime}
+                            onChange={(e) => setDayOverride(emp.id, { startTime: e.target.value })}
+                          />
+                          <span className={styles.timeSep} aria-hidden="true">~</span>
+                          <input
+                            type="time"
+                            aria-label={`${emp.name} 종료 시간`}
+                            className={styles.timeInput}
+                            value={eff.endTime}
+                            onChange={(e) => setDayOverride(emp.id, { endTime: e.target.value })}
+                          />
+                        </>
+                      ) : (
+                        <span className={styles.offText}>휴무</span>
+                      )}
+                      {eff.adjusted && (
+                        <button
+                          type="button" aria-label={`${emp.name} 기본 스케줄로 복원`}
+                          className={styles.removeBtn}
+                          onClick={() => resetDayOverride(emp.id)}
+                        >
+                          기본으로
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
+                )
               })}
             </EmployeeScheduleTable>
           </>

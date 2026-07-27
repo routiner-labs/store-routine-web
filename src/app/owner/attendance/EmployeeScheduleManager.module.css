@@ -288,6 +288,10 @@
 }
 
 @media (min-width: 768px) {
+  .body {
+    max-width: none;
+  }
+
   .row {
     display: grid;
     grid-template-columns: 130px 1fr auto;

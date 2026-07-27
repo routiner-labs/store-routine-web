@@ -46,14 +46,18 @@ test('390px에서 저장 영역의 기존 높이와 우측 하단 배치를 유�
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await open(page, paths.base, 390, 844)
 
-  const footer = await page.locator('[data-schedule-footer]').boundingBox()
+  const footerLocator = page.locator('[data-schedule-footer]')
+  const footer = await footerLocator.boundingBox()
   const save = await page.locator('[data-schedule-footer] button').boundingBox()
+  const paddingRight = await footerLocator.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).paddingRight),
+  )
 
   expect(footer).not.toBeNull()
   expect(save).not.toBeNull()
   expect(footer.height).toBe(63)
   expect(footer.y).toBeGreaterThan(844 / 2)
-  expect(save.x + save.width).toBeGreaterThan(footer.x + footer.width / 2)
+  expect(footer.x + footer.width - (save.x + save.width)).toBe(paddingRight)
 })
 
 test('1440px 기본 스케줄 표는 의미 있는 헤더와 인접한 시간 열을 제공한다', async ({ page }) => {

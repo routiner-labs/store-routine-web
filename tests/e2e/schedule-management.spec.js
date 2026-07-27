@@ -1,22 +1,15 @@
 import { test, expect } from 'playwright/test'
-const paths = {
-  base: '/owner/attendance/schedule',
-  adjust: '/owner/attendance/adjust',
-}
+const paths = { base: '/owner/attendance/schedule', adjust: '/owner/attendance/adjust' }
 const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3005'
 async function open(page, path, width = 1440, height = 900) {
-  await page.setViewportSize({ width, height })
-  await page.goto(`${baseURL}${path}`)
+  await page.setViewportSize({ width, height }); await page.goto(`${baseURL}${path}`)
 }
 async function fillTimeRange(page, start, end) {
-  await page.getByLabel('근무 시간 시작').fill(start)
-  await page.getByLabel('근무 시간 종료').fill(end)
+  await page.getByLabel('근무 시간 시작').fill(start); await page.getByLabel('근무 시간 종료').fill(end)
 }
 async function applyAdvancedSearch(page) { await page.getByRole('button', { name: '세부검색 검색' }).click() }
 async function expectNoPageOverflow(page) {
-  expect(
-    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth),
-  ).toBe(false)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
 }
 for (const [mode, path] of Object.entries(paths)) {
   for (const width of [1024, 768, 390]) {
@@ -29,9 +22,7 @@ for (const [mode, path] of Object.entries(paths)) {
 for (const [mode, path] of Object.entries(paths)) {
   test(`${mode} 헤더에서 직원 이름을 검색 버튼으로 적용한다`, async ({ page }) => {
     await open(page, path)
-    const table = page.getByRole('table', {
-      name: mode === 'base' ? '기본 스케줄 편집표' : '일자별 조정 편집표',
-    })
+    const table = page.getByRole('table', { name: mode === 'base' ? '기본 스케줄 편집표' : '일자별 조정 편집표' })
     const search = page.getByRole('textbox', { name: '헤더 직원 이름 검색' })
     const headerSearch = page.getByRole('button', { name: '헤더 직원 검색' })
     await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
@@ -64,8 +55,11 @@ test('모바일은 세부검색 패널에서 직원 이름을 검색한다', asy
   await expect(page.locator('[data-schedule-row]')).toHaveCount(4)
   const advancedSearch = page.getByRole('button', { name: '세부검색 검색' })
   await expect(advancedSearch).toHaveText('검색')
-  await advancedSearch.click()
+  await search.press('Enter')
   await expect(page.locator('[data-schedule-row]')).toHaveCount(1)
+  await fillTimeRange(page, '18:00', '19:00')
+  await search.press('Enter')
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(0)
 })
 test('기본 스케줄은 겹치는 근무 시간 범위만 표시한다', async ({ page }) => {
   await open(page, paths.base)
@@ -80,6 +74,9 @@ test('기본 스케줄은 겹치는 근무 시간 범위만 표시한다', async
   await expect(rows).toHaveCount(2)
   await expect(page.getByText('김민수', { exact: true })).toBeVisible()
   await expect(page.getByText('박서준', { exact: true })).toBeVisible()
+  await fillTimeRange(page, '', '')
+  await advancedSearch.click()
+  await expect(rows).toHaveCount(4)
 })
 test('이름과 근무 시간은 교집합으로 직원을 필터링한다', async ({ page }) => {
   await open(page, paths.base)
@@ -91,6 +88,13 @@ test('이름과 근무 시간은 교집합으로 직원을 필터링한다', asy
   await expect(page.getByText('박서준', { exact: true })).toBeVisible()
   await expect(page.getByText('김민수', { exact: true })).toHaveCount(0)
   await expect(page.getByText('이서윤', { exact: true })).toHaveCount(0)
+  const headerSearch = page.getByRole('textbox', { name: '헤더 직원 이름 검색' })
+  await headerSearch.fill('이서윤')
+  await headerSearch.press('Enter')
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(0)
+  await headerSearch.fill('')
+  await headerSearch.press('Enter')
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(2)
 })
 test('일치하는 직원이 없으면 빈 결과를 표시한다', async ({ page }) => {
   await open(page, paths.base)
@@ -118,8 +122,7 @@ test('일자별 조정 시간 필터는 선택 날짜와 휴무 조정을 반영
   await expect(page.locator('[data-schedule-row]')).toHaveCount(0)
   await page.getByRole('button', { name: '필터 초기화' }).click()
   await expect(page.locator('[data-schedule-row]')).toHaveCount(4)
-  await expect(page.getByRole('button', { name: '김민수 휴무로 설정' }))
-    .toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('button', { name: '김민수 휴무로 설정' })).toHaveAttribute('aria-pressed', 'true')
 })
 test('일자별 조정 시간 필터는 날짜 변경 시 다시 계산한다', async ({ page }) => {
   await open(page, paths.adjust)
@@ -185,9 +188,8 @@ test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한�
   await expect(monday).toHaveCount(0)
   await search.fill('')
   await search.press('Enter')
-  await expect(page.getByRole('button', { name: '김민수 월요일 근무 설정' })).toHaveAttribute(
-    'aria-pressed', wasPressed === 'true' ? 'false' : 'true',
-  )
+  await expect(page.getByRole('button', { name: '김민수 월요일 근무 설정' }))
+    .toHaveAttribute('aria-pressed', wasPressed === 'true' ? 'false' : 'true')
 })
 test('검색으로 직원을 숨겨도 일자별 조정 상태를 유지한다', async ({ page }) => {
   await open(page, paths.adjust)
@@ -226,9 +228,8 @@ test('390px에서 저장 영역의 기존 높이와 우측 하단 배치를 유�
   const footerLocator = page.locator('[data-schedule-footer]')
   const footer = await footerLocator.boundingBox()
   const save = await page.locator('[data-schedule-footer] button').boundingBox()
-  const paddingRight = await footerLocator.evaluate((element) =>
-    Number.parseFloat(getComputedStyle(element).paddingRight),
-  )
+  const paddingRight = await footerLocator.evaluate(
+    (element) => Number.parseFloat(getComputedStyle(element).paddingRight))
   expect(footer).not.toBeNull()
   expect(save).not.toBeNull()
   expect(footer.height).toBe(63)
@@ -294,7 +295,6 @@ test('일자별 조정의 접근 가능한 날짜·상태·시간 컨트롤이 �
   await expect(start).toHaveValue('10:00')
   const work = page.getByRole('button', { name: '김민수 근무로 설정' })
   const off = page.getByRole('button', { name: '김민수 휴무로 설정' })
-  await expect(work).toBeEnabled()
-  await expect(off).toBeEnabled()
+  await expect(work).toBeEnabled(); await expect(off).toBeEnabled()
   await work.click()
 })

@@ -26,7 +26,7 @@ for (const [mode, path] of Object.entries(paths)) {
   }
 }
 
-for (const width of [1440, 1024, 1023, 768]) {
+for (const [width, expectedHeight] of [[1440, 59], [1024, 59], [1023, 101], [768, 101]]) {
   test(`${width}px에서 저장 영역과 프로필 영역의 상단선이 정렬된다`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await open(page, paths.base, width)
@@ -36,10 +36,25 @@ for (const width of [1440, 1024, 1023, 768]) {
 
     expect(profile).not.toBeNull()
     expect(footer).not.toBeNull()
-    expect(Math.abs(footer.y - profile.y)).toBeLessThanOrEqual(1)
-    expect(Math.abs(footer.height - profile.height)).toBeLessThanOrEqual(1)
+    expect(profile.height).toBe(expectedHeight)
+    expect(footer.height).toBe(expectedHeight)
+    expect(footer.y).toBe(profile.y)
   })
 }
+
+test('390px에서 저장 영역의 기존 높이와 우측 하단 배치를 유지한다', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await open(page, paths.base, 390, 844)
+
+  const footer = await page.locator('[data-schedule-footer]').boundingBox()
+  const save = await page.locator('[data-schedule-footer] button').boundingBox()
+
+  expect(footer).not.toBeNull()
+  expect(save).not.toBeNull()
+  expect(footer.height).toBe(63)
+  expect(footer.y).toBeGreaterThan(844 / 2)
+  expect(save.x + save.width).toBeGreaterThan(footer.x + footer.width / 2)
+})
 
 test('1440px 기본 스케줄 표는 의미 있는 헤더와 인접한 시간 열을 제공한다', async ({ page }) => {
   await open(page, paths.base)

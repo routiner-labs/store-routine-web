@@ -70,7 +70,7 @@ export function useEmployeeScheduleFilters<T extends { name: string }>(
     ? '시작과 종료 시간을 모두 입력하세요.'
     : timeMessageKind === 'error' ? '종료 시간은 시작 시간보다 늦어야 합니다.' : ''
   const canApplyTime = Boolean(draftStart && draftEnd && timeMessageKind === 'none')
-  const hasActiveFilters = Boolean(appliedSearch || appliedStart || appliedEnd)
+  const hasActiveFilters = Boolean(appliedSearch.trim() || appliedStart || appliedEnd)
   const visibleEmployees = useMemo(() => {
     const query = appliedSearch.trim().toLocaleLowerCase('ko-KR')
     return employees.filter((employee) => {

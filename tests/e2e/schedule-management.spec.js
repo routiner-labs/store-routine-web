@@ -3,7 +3,7 @@ const paths = {
   base: '/owner/attendance/schedule',
   adjust: '/owner/attendance/adjust',
 }
-const baseURL = process.env.SCHEDULE_BASE_URL || 'http://127.0.0.1:3005'
+const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3005'
 async function open(page, path, width = 1440, height = 900) {
   await page.setViewportSize({ width, height })
   await page.goto(`${baseURL}${path}`)
@@ -44,6 +44,15 @@ for (const [mode, path] of Object.entries(paths)) {
     await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
   })
 }
+test('공백 검색은 세부검색 버튼을 활성화하지 않는다', async ({ page }) => {
+  await open(page, paths.base)
+  const advanced = page.getByRole('button', { name: '세부 검색' })
+  const initialClass = await advanced.getAttribute('class')
+  await page.getByRole('textbox', { name: '헤더 직원 이름 검색' }).fill('   ')
+  await page.getByRole('button', { name: '헤더 직원 검색' }).click()
+  await expect(advanced).toHaveAttribute('class', initialClass)
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(4)
+})
 test('모바일은 세부검색 패널에서 직원 이름을 검색한다', async ({ page }) => {
   await open(page, paths.base, 390, 844)
   await expect(page.getByRole('textbox', { name: '헤더 직원 이름 검색' })).toBeHidden()
@@ -100,6 +109,18 @@ test('일자별 조정 시간 필터는 선택 날짜와 휴무 조정을 반영
   await expect(page.locator('[data-schedule-row]')).toHaveCount(4)
   await expect(page.getByRole('button', { name: '김민수 휴무로 설정' }))
     .toHaveAttribute('aria-pressed', 'true')
+})
+test('일자별 조정 시간 필터는 날짜 변경 시 다시 계산한다', async ({ page }) => {
+  await open(page, paths.adjust)
+  await page.getByRole('button', { name: '세부 검색' }).click()
+  await applyTimeRange(page, '10:00', '12:00')
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(1)
+  await expect(page.getByText('김민수', { exact: true })).toBeVisible()
+  await page.getByLabel('조정 날짜').fill('2026-07-01')
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(2)
+  await expect(page.getByText('김민수', { exact: true })).toBeVisible()
+  await expect(page.getByText('박서준', { exact: true })).toBeVisible()
+  await expect(page.getByText('이서윤', { exact: true })).toHaveCount(0)
 })
 test('불완전하거나 역전된 시간 범위는 적용할 수 없다', async ({ page }) => {
   await open(page, paths.base)

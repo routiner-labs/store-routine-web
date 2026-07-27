@@ -12,8 +12,12 @@ export default function EmployeeScheduleHeader({
   onBack: () => void
   controls: ScheduleFilterControls
 }) {
-  function submitSearch(event: KeyboardEvent<HTMLInputElement>) {
+  function submitHeaderSearch(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') controls.applySearch()
+  }
+
+  function submitAdvancedSearch(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') controls.applyAdvancedSearch()
   }
 
   return (
@@ -33,11 +37,16 @@ export default function EmployeeScheduleHeader({
               placeholder="직원 이름 검색"
               value={controls.searchText}
               onChange={(event) => controls.setSearchText(event.target.value)}
-              onKeyDown={submitSearch}
+              onKeyDown={submitHeaderSearch}
             />
           </label>
-          <button type="button" className={styles.searchBtn} onClick={controls.applySearch}>
-            헤더 직원 검색
+          <button
+            type="button"
+            className={styles.searchBtn}
+            aria-label="헤더 직원 검색"
+            onClick={controls.applySearch}
+          >
+            검색
           </button>
         </div>
         <button
@@ -70,11 +79,17 @@ export default function EmployeeScheduleHeader({
                 placeholder="직원 이름 검색"
                 value={controls.searchText}
                 onChange={(event) => controls.setSearchText(event.target.value)}
-                onKeyDown={submitSearch}
+                onKeyDown={submitAdvancedSearch}
               />
             </label>
-            <button type="button" className={styles.searchBtn} onClick={controls.applySearch}>
-              세부검색 직원 검색
+            <button
+              type="button"
+              className={styles.searchBtn}
+              aria-label="세부검색 검색"
+              disabled={!controls.canApplyAdvanced}
+              onClick={controls.applyAdvancedSearch}
+            >
+              검색
             </button>
             <button type="button" className={styles.resetBtn} onClick={controls.resetFilters}>
               <LiaTimesSolid aria-hidden="true" /> 필터 초기화
@@ -89,9 +104,6 @@ export default function EmployeeScheduleHeader({
               <span className={styles.timeSep} aria-hidden="true">~</span>
               <input type="time" aria-label="근무 시간 종료" value={controls.draftEnd} onChange={(event) => controls.setDraftEnd(event.target.value)} />
             </div>
-            <button type="button" className={styles.applyBtn} disabled={!controls.canApplyTime} onClick={controls.applyTimeRange}>
-              근무 시간 적용
-            </button>
             <span
               className={`${styles.timeMessage} ${controls.timeMessageKind === 'error' ? styles.timeError : ''}`}
               data-message-kind={controls.timeMessageKind}

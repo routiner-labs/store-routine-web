@@ -91,8 +91,7 @@
   border-color: var(--color-primary);
 }
 
-.searchBtn,
-.applyBtn {
+.searchBtn {
   padding: 7px 14px;
   border-radius: var(--radius-sm);
   background: var(--color-primary);
@@ -103,8 +102,12 @@
   white-space: nowrap;
 }
 
-.searchBtn:hover,
-.applyBtn:hover:not(:disabled) { opacity: 0.88; }
+.searchBtn:hover:not(:disabled) { opacity: 0.88; }
+
+.searchBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
 
 .advBtn {
   gap: 5px;
@@ -211,11 +214,6 @@
 
 .timeSep { display: none; }
 
-.applyBtn:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
 .timeMessage {
   min-height: 16px;
   color: var(--color-text-secondary);
@@ -241,7 +239,6 @@
   .searchBtn,
   .resetBtn { flex: 1; justify-content: center; }
 
-  .applyBtn { width: 100%; }
 }
 
 @media (min-width: 768px) {

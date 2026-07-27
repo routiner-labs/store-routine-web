@@ -27,46 +27,109 @@ for (const [mode, path] of Object.entries(paths)) {
 }
 
 for (const [mode, path] of Object.entries(paths)) {
-  test(`${mode} 스케줄에서 직원 이름 일부로 즉시 검색하고 초기화한다`, async ({ page }) => {
+  test(`${mode} 헤더에서 직원 이름을 검색 버튼으로 적용한다`, async ({ page }) => {
     await open(page, path)
 
     const table = page.getByRole('table', {
       name: mode === 'base' ? '기본 스케줄 편집표' : '일자별 조정 편집표',
     })
-    const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+    const search = page.getByRole('textbox', { name: '헤더 직원 이름 검색' })
 
-    await expect(search).toBeVisible({ timeout: 2000 })
     await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
-
     await search.fill(' 서 ')
+    await page.getByRole('button', { name: '헤더 직원 검색' }).click()
     await expect(table.locator('[data-schedule-row]')).toHaveCount(2)
     await expect(table.getByText('이서윤', { exact: true })).toBeVisible()
     await expect(table.getByText('박서준', { exact: true })).toBeVisible()
-    await expect(table.getByText('김민수', { exact: true })).toHaveCount(0)
 
-    await search.fill('없는직원')
-    await expect(table.locator('[data-schedule-row]')).toHaveCount(0)
-    await expect(table.getByText('검색 결과가 없습니다.', { exact: true })).toBeVisible()
-
-    await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
-    await expect(search).toHaveValue('')
+    await search.fill('')
+    await search.press('Enter')
     await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
   })
 }
 
+test('모바일은 세부검색 패널에서 직원 이름을 검색한다', async ({ page }) => {
+  await open(page, paths.base, 390, 844)
+
+  await expect(page.getByRole('textbox', { name: '헤더 직원 이름 검색' })).toBeHidden()
+  await page.getByRole('button', { name: '세부 검색' }).click()
+  const search = page.getByRole('textbox', { name: '세부검색 직원 이름 검색' })
+  await search.fill('김민수')
+  await page.getByRole('button', { name: '세부검색 직원 검색' }).click()
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(1)
+})
+
+test('기본 스케줄은 겹치는 근무 시간 범위만 표시한다', async ({ page }) => {
+  await open(page, paths.base)
+  await page.getByRole('button', { name: '세부 검색' }).click()
+
+  await page.getByLabel('근무 시간 시작').fill('10:00')
+  await page.getByLabel('근무 시간 종료').fill('12:00')
+  await page.getByRole('button', { name: '근무 시간 적용' }).click()
+
+  const rows = page.getByRole('table', { name: '기본 스케줄 편집표' })
+    .locator('[data-schedule-row]')
+  await expect(rows).toHaveCount(2)
+  await expect(page.getByText('김민수', { exact: true })).toBeVisible()
+  await expect(page.getByText('박서준', { exact: true })).toBeVisible()
+})
+
+test('근무 종료와 검색 시작이 같으면 겹침에서 제외한다', async ({ page }) => {
+  await open(page, paths.base)
+  await page.getByRole('button', { name: '세부 검색' }).click()
+
+  await page.getByLabel('근무 시간 시작').fill('18:00')
+  await page.getByLabel('근무 시간 종료').fill('19:00')
+  await page.getByRole('button', { name: '근무 시간 적용' }).click()
+
+  await expect(page.getByText('김민수', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('이서윤', { exact: true })).toBeVisible()
+  await expect(page.getByText('박서준', { exact: true })).toBeVisible()
+})
+
+test('일자별 조정 시간 필터는 선택 날짜와 휴무 조정을 반영한다', async ({ page }) => {
+  await open(page, paths.adjust)
+  await page.getByRole('button', { name: '세부 검색' }).click()
+  await page.getByLabel('근무 시간 시작').fill('10:00')
+  await page.getByLabel('근무 시간 종료').fill('12:00')
+  await page.getByRole('button', { name: '근무 시간 적용' }).click()
+
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(1)
+  await page.getByRole('button', { name: '김민수 휴무로 설정' }).click()
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(0)
+
+  await page.getByRole('button', { name: '필터 초기화' }).click()
+  await expect(page.locator('[data-schedule-row]')).toHaveCount(4)
+  await expect(page.getByRole('button', { name: '김민수 휴무로 설정' }))
+    .toHaveAttribute('aria-pressed', 'true')
+})
+
+test('불완전하거나 역전된 시간 범위는 적용할 수 없다', async ({ page }) => {
+  await open(page, paths.base)
+  await page.getByRole('button', { name: '세부 검색' }).click()
+
+  const apply = page.getByRole('button', { name: '근무 시간 적용' })
+  await page.getByLabel('근무 시간 시작').fill('18:00')
+  await expect(apply).toBeDisabled()
+  await page.getByLabel('근무 시간 종료').fill('18:00')
+  await expect(apply).toBeDisabled()
+  await expect(page.getByRole('status')).toContainText('종료 시간은 시작 시간보다 늦어야 합니다.')
+})
+
 test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한다', async ({ page }) => {
   await open(page, paths.base)
 
-  const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+  const search = page.getByRole('textbox', { name: '헤더 직원 이름 검색' })
   const monday = page.getByRole('button', { name: '김민수 월요일 근무 설정' })
 
-  await expect(search).toBeVisible({ timeout: 2000 })
   const wasPressed = await monday.getAttribute('aria-pressed')
   await monday.click()
   await expect(monday).toHaveAttribute('aria-pressed', wasPressed === 'true' ? 'false' : 'true')
   await search.fill('이서윤')
+  await search.press('Enter')
   await expect(monday).toHaveCount(0)
-  await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
+  await search.fill('')
+  await search.press('Enter')
   await expect(page.getByRole('button', { name: '김민수 월요일 근무 설정' })).toHaveAttribute(
     'aria-pressed', wasPressed === 'true' ? 'false' : 'true',
   )
@@ -75,16 +138,18 @@ test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한�
 test('검색으로 직원을 숨겨도 일자별 조정 상태를 유지한다', async ({ page }) => {
   await open(page, paths.adjust)
 
-  const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+  const search = page.getByRole('textbox', { name: '헤더 직원 이름 검색' })
   const off = page.getByRole('button', { name: '김민수 휴무로 설정' })
 
   await off.click()
   await expect(off).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByText('조정됨', { exact: true })).toBeVisible()
   await search.fill('이서윤')
+  await search.press('Enter')
   await expect(off).toHaveCount(0)
   await expect(page.getByText('조정됨', { exact: true })).toHaveCount(0)
-  await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
+  await search.fill('')
+  await search.press('Enter')
   await expect(page.getByRole('button', { name: '김민수 휴무로 설정' })).toHaveAttribute(
     'aria-pressed', 'true',
   )

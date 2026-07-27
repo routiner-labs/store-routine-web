@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LiaAngleLeftSolid, LiaCheckSolid } from 'react-icons/lia'
+import { LiaCheckSolid } from 'react-icons/lia'
 import { mockEmployees } from '@/mock/employees'
 import { useToast } from '@/context/ToastContext'
 import { useConfirm } from '@/context/ConfirmContext'
 import { usePageLeave } from '@/lib/usePageLeave'
 import EmployeeName from '@/components/EmployeeName'
 import type { WeeklySchedule } from '@/types'
+import EmployeeScheduleHeader from './EmployeeScheduleHeader'
 import EmployeeScheduleTable from './EmployeeScheduleTable'
+import { useEmployeeScheduleFilters } from './useEmployeeScheduleFilters'
 import styles from './EmployeeScheduleManager.module.css'
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
@@ -30,12 +32,6 @@ export default function EmployeeScheduleManager({
   const { leaving, leave, onAnimationEnd } = usePageLeave()
 
   const activeEmployees = mockEmployees.filter((e) => e.status === 'ACTIVE')
-  const [employeeQuery, setEmployeeQuery] = useState('')
-  const normalizedQuery = employeeQuery.trim().toLocaleLowerCase('ko-KR')
-  const visibleEmployees = normalizedQuery
-    ? activeEmployees.filter((employee) => employee.name.toLocaleLowerCase('ko-KR').includes(normalizedQuery))
-    : activeEmployees
-
   // 스케줄은 사장이 생성해야 존재한다. 생성 전에는 null(스케줄 없음).
   const [schedules, setSchedules] = useState<Record<string, WeeklySchedule | null>>(() =>
     Object.fromEntries(activeEmployees.map((e) => [e.id, e.schedule ?? null])),
@@ -59,6 +55,17 @@ export default function EmployeeScheduleManager({
     }
     return { working: false, startTime: '09:00', endTime: '18:00', adjusted: false }
   }
+
+  const filters = useEmployeeScheduleFilters(activeEmployees, (employee) => {
+    if (mode === 'base') {
+      const schedule = schedules[employee.id]
+      return schedule && schedule.days.length > 0
+        ? { startTime: schedule.startTime, endTime: schedule.endTime }
+        : null
+    }
+    const day = effectiveDay(employee.id, schedDate)
+    return day.working ? { startTime: day.startTime, endTime: day.endTime } : null
+  })
 
   function createSchedule(empId: string) {
     setSchedules((prev) => ({ ...prev, [empId]: { days: [], startTime: '09:00', endTime: '18:00' } }))
@@ -119,15 +126,11 @@ export default function EmployeeScheduleManager({
       className={`${styles.page} ${leaving ? styles.leaving : ''}`}
       onAnimationEnd={onAnimationEnd}
     >
-      <header className={styles.header}>
-        <button
-          className={styles.backBtn}
-          onClick={() => leave(() => router.push('/owner/attendance'))}
-        >
-          <LiaAngleLeftSolid /> 출근 현황
-        </button>
-        <h1 className={styles.heading}>{title}</h1>
-      </header>
+      <EmployeeScheduleHeader
+        title={title}
+        controls={filters.controls}
+        onBack={() => leave(() => router.push('/owner/attendance'))}
+      />
 
       <div className={styles.body} data-schedule-body>
         {mode === 'base' ? (
@@ -135,8 +138,8 @@ export default function EmployeeScheduleManager({
             <p className={styles.guide}>
               스케줄을 생성해야 근무 일정이 만들어집니다. 반복되는 기본 근무 패턴을 설정하세요.
             </p>
-            <EmployeeScheduleTable mode="base" query={employeeQuery} onQueryChange={setEmployeeQuery} empty={!visibleEmployees.length}>
-              {visibleEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="base" empty={!filters.visibleEmployees.length}>
+              {filters.visibleEmployees.map((emp) => {
                 const sched = schedules[emp.id]
                 return (
                   <div key={emp.id} role="row" data-schedule-row>
@@ -217,8 +220,8 @@ export default function EmployeeScheduleManager({
                 선택한 날짜만 근무·휴무·시간을 조정합니다. 기본 스케줄은 바뀌지 않습니다.
               </span>
             </div>
-            <EmployeeScheduleTable mode="adjust" query={employeeQuery} onQueryChange={setEmployeeQuery} empty={!visibleEmployees.length}>
-              {visibleEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="adjust" empty={!filters.visibleEmployees.length}>
+              {filters.visibleEmployees.map((emp) => {
                 const eff = effectiveDay(emp.id, schedDate)
                 return (
                   <div key={emp.id} role="row" data-schedule-row>

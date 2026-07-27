@@ -5,55 +5,11 @@
   background: var(--color-bg);
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: var(--header-height);
-  padding: 0 var(--page-x);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: var(--appbar-height);
-  z-index: 10;
-}
-
-.backBtn,
 .save,
 .days,
 .dateRow {
   display: flex;
   align-items: center;
-}
-
-.backBtn {
-  gap: 4px;
-  padding: 6px 8px 6px 4px;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.backBtn:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-.backBtn svg {
-  font-size: 16px;
-  transition: transform 0.18s ease;
-}
-
-.backBtn:hover svg {
-  transform: translateX(-3px);
-}
-
-.heading {
-  color: var(--color-text);
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .leaving {

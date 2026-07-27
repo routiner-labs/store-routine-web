@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import styles from './EmployeeScheduleDatePicker.module.css'
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
@@ -44,7 +44,6 @@ export default function EmployeeScheduleDatePicker({
   const [open, setOpen] = useState(false)
   const [year, setYear] = useState(() => Number(value.slice(0, 4)))
   const [month, setMonth] = useState(() => Number(value.slice(5, 7)))
-  const pickerRef = useRef<HTMLDivElement>(null)
   const dialogId = useId()
 
   function close() {
@@ -76,20 +75,14 @@ export default function EmployeeScheduleDatePicker({
       if (event.key === 'Escape') close()
     }
 
-    function handlePointerDown(event: PointerEvent) {
-      if (!pickerRef.current?.contains(event.target as Node)) close()
-    }
-
     document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('pointerdown', handlePointerDown)
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('pointerdown', handlePointerDown)
     }
   }, [open])
 
   return (
-    <div className={styles.root} ref={pickerRef}>
+    <div className={styles.root}>
       <button
         type="button"
         className={styles.trigger}
@@ -102,6 +95,7 @@ export default function EmployeeScheduleDatePicker({
         {formatTriggerDate(value)}
         <span className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`} aria-hidden="true">⌄</span>
       </button>
+      {open && <div className={styles.dismissOverlay} aria-hidden="true" onClick={close} />}
       {open && (
         <div id={dialogId} className={styles.dialog} role="dialog" aria-label="조정 날짜 선택">
           <div className={styles.header}>

@@ -179,7 +179,6 @@ export default function EmployeeScheduleManager({
                             className={styles.timeInput}
                             value={sched.startTime}
                             onChange={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
-                            onBlur={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
                           />
                           <span className={styles.timeSep} aria-hidden="true">~</span>
                           <input
@@ -188,7 +187,6 @@ export default function EmployeeScheduleManager({
                             className={styles.timeInput}
                             value={sched.endTime}
                             onChange={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
-                            onBlur={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
                           />
                           <button
                             type="button" aria-label={`${emp.name} 스케줄 삭제`}

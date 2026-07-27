@@ -58,14 +58,18 @@ test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한�
   await open(page, paths.base)
 
   const search = page.getByRole('textbox', { name: '직원 이름 검색' })
-  const start = page.getByLabel('김민수 시작 시간')
+  const monday = page.getByRole('button', { name: '김민수 월요일 근무 설정' })
 
   await expect(search).toBeVisible({ timeout: 2000 })
-  await start.fill('10:00')
+  const wasPressed = await monday.getAttribute('aria-pressed')
+  await monday.click()
+  await expect(monday).toHaveAttribute('aria-pressed', wasPressed === 'true' ? 'false' : 'true')
   await search.fill('이서윤')
-  await expect(start).toHaveCount(0)
+  await expect(monday).toHaveCount(0)
   await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
-  await expect(page.getByLabel('김민수 시작 시간')).toHaveValue('10:00')
+  await expect(page.getByRole('button', { name: '김민수 월요일 근무 설정' })).toHaveAttribute(
+    'aria-pressed', wasPressed === 'true' ? 'false' : 'true',
+  )
 })
 
 for (const [width, expectedHeight] of [[1440, 59], [1024, 59], [1023, 101], [768, 101]]) {

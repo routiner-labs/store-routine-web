@@ -1,0 +1,93 @@
+.table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  contain: inline-size;
+  overflow-x: auto;
+}
+
+.head {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .table :global([data-schedule-row]) {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-employee]) {
+    grid-row: 1 / span 2;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-time]) {
+    grid-column: 2;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-empty]) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .table {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .head,
+  .table :global([data-schedule-row]) {
+    display: grid;
+    align-items: center;
+  }
+
+  .base .head,
+  .base :global([data-schedule-row]) {
+    grid-template-columns: 180px 256px minmax(252px, 1fr) 88px;
+    min-width: 800px;
+  }
+
+  .adjust .head,
+  .adjust :global([data-schedule-row]) {
+    grid-template-columns: 180px minmax(0, 101px) minmax(252px, 1fr) 96px;
+    min-width: 720px;
+  }
+
+  .head {
+    min-height: 42px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .table :global([data-schedule-row]) {
+    min-height: 72px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .table :global([data-schedule-row]):last-child {
+    border-bottom: 0;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-employee]) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-time]) {
+    grid-column: 3 / -1;
+  }
+
+  .table :global([data-schedule-row]) > :global([data-schedule-empty]) {
+    grid-column: 2 / -1;
+    grid-row: auto;
+  }
+}

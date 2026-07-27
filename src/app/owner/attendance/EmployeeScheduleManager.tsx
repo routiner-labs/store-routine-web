@@ -9,6 +9,7 @@ import { useConfirm } from '@/context/ConfirmContext'
 import { usePageLeave } from '@/lib/usePageLeave'
 import EmployeeName from '@/components/EmployeeName'
 import type { WeeklySchedule } from '@/types'
+import EmployeeScheduleTable from './EmployeeScheduleTable'
 import styles from './EmployeeScheduleManager.module.css'
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
@@ -129,22 +130,23 @@ export default function EmployeeScheduleManager({
         <h1 className={styles.heading}>{title}</h1>
       </header>
 
-      <div className={styles.body}>
+      <div className={styles.body} data-schedule-body>
         {mode === 'base' ? (
           <>
             <p className={styles.guide}>
               스케줄을 생성해야 근무 일정이 만들어집니다. 반복되는 기본 근무 패턴을 설정하세요.
             </p>
-            {activeEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="base">
+              {activeEmployees.map((emp) => {
               const sched = schedules[emp.id]
               return (
-                <div key={emp.id} className={styles.row}>
-                  <div className={styles.emp}>
+                <div key={emp.id} className={styles.row} data-schedule-row>
+                  <div className={styles.emp} data-schedule-employee>
                     <span className={styles.avatar}>{emp.name[0]}</span>
                     <EmployeeName name={emp.name} className={styles.name} />
                   </div>
                   {sched === null ? (
-                    <div className={styles.none}>
+                    <div className={styles.none} data-schedule-empty>
                       <span className={styles.noneText}>등록된 스케줄이 없습니다</span>
                       <button
                         type="button"
@@ -168,7 +170,7 @@ export default function EmployeeScheduleManager({
                           </button>
                         ))}
                       </div>
-                      <div className={styles.times}>
+                      <div className={styles.times} data-schedule-time>
                         <input
                           type="time"
                           className={styles.timeInput}
@@ -194,11 +196,12 @@ export default function EmployeeScheduleManager({
                   )}
                 </div>
               )
-            })}
+              })}
+            </EmployeeScheduleTable>
           </>
         ) : (
           <>
-            <div className={styles.dateRow}>
+            <div className={styles.dateRow} data-schedule-context>
               <input
                 type="date"
                 className={styles.dateInput}
@@ -209,11 +212,12 @@ export default function EmployeeScheduleManager({
                 선택한 날짜만 근무·휴무·시간을 조정합니다. 기본 스케줄은 바뀌지 않습니다.
               </span>
             </div>
-            {activeEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="adjust">
+              {activeEmployees.map((emp) => {
               const eff = effectiveDay(emp.id, schedDate)
               return (
-                <div key={emp.id} className={styles.row}>
-                  <div className={styles.emp}>
+                <div key={emp.id} className={styles.row} data-schedule-row>
+                  <div className={styles.emp} data-schedule-employee>
                     <span className={styles.avatar}>{emp.name[0]}</span>
                     <EmployeeName name={emp.name} className={styles.name} />
                     {eff.adjusted && <span className={styles.adjBadge}>조정됨</span>}
@@ -234,7 +238,7 @@ export default function EmployeeScheduleManager({
                       휴무
                     </button>
                   </div>
-                  <div className={styles.times}>
+                  <div className={styles.times} data-schedule-time>
                     {eff.working ? (
                       <>
                         <input
@@ -266,7 +270,8 @@ export default function EmployeeScheduleManager({
                   </div>
                 </div>
               )
-            })}
+              })}
+            </EmployeeScheduleTable>
           </>
         )}
       </div>

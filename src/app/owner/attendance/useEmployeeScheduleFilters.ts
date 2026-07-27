@@ -7,6 +7,8 @@ export type EmployeeShift = {
   endTime: string
 } | null
 
+type TimeMessageKind = 'none' | 'info' | 'error'
+
 export type ScheduleFilterControls = {
   advancedOpen: boolean
   hasActiveFilters: boolean
@@ -15,6 +17,7 @@ export type ScheduleFilterControls = {
   draftEnd: string
   canApplyTime: boolean
   timeMessage: string
+  timeMessageKind: TimeMessageKind
   setSearchText: (value: string) => void
   setDraftStart: (value: string) => void
   setDraftEnd: (value: string) => void
@@ -56,14 +59,17 @@ export function useEmployeeScheduleFilters<T extends { name: string }>(
   const [appliedStart, setAppliedStart] = useState('')
   const [appliedEnd, setAppliedEnd] = useState('')
 
-  const timeMessage = !draftStart && !draftEnd
-    ? ''
+  const timeMessageKind: TimeMessageKind = !draftStart && !draftEnd
+    ? 'none'
     : !draftStart || !draftEnd
-      ? '시작과 종료 시간을 모두 입력하세요.'
+      ? 'info'
       : toMinutes(draftEnd) <= toMinutes(draftStart)
-        ? '종료 시간은 시작 시간보다 늦어야 합니다.'
-        : ''
-  const canApplyTime = Boolean(draftStart && draftEnd && !timeMessage)
+        ? 'error'
+        : 'none'
+  const timeMessage = timeMessageKind === 'info'
+    ? '시작과 종료 시간을 모두 입력하세요.'
+    : timeMessageKind === 'error' ? '종료 시간은 시작 시간보다 늦어야 합니다.' : ''
+  const canApplyTime = Boolean(draftStart && draftEnd && timeMessageKind === 'none')
   const hasActiveFilters = Boolean(appliedSearch || appliedStart || appliedEnd)
   const visibleEmployees = useMemo(() => {
     const query = appliedSearch.trim().toLocaleLowerCase('ko-KR')
@@ -85,6 +91,7 @@ export function useEmployeeScheduleFilters<T extends { name: string }>(
       draftEnd,
       canApplyTime,
       timeMessage,
+      timeMessageKind,
       setSearchText,
       setDraftStart,
       setDraftEnd,

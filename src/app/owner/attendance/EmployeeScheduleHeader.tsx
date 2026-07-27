@@ -92,7 +92,11 @@ export default function EmployeeScheduleHeader({
             <button type="button" className={styles.applyBtn} disabled={!controls.canApplyTime} onClick={controls.applyTimeRange}>
               근무 시간 적용
             </button>
-            <span className={`${styles.timeMessage} ${controls.timeMessage ? styles.timeError : ''}`} role="status">
+            <span
+              className={`${styles.timeMessage} ${controls.timeMessageKind === 'error' ? styles.timeError : ''}`}
+              data-message-kind={controls.timeMessageKind}
+              role="status"
+            >
               {controls.timeMessage}
             </span>
           </div>

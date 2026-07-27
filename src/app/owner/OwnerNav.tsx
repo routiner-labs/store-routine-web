@@ -120,7 +120,7 @@ export default function OwnerNav() {
           </div>
         ))}
 
-        <div className={styles.userSection}>
+        <div className={styles.userSection} data-owner-user-section>
           <UserMenu initial="사" name="사장님" profileHref="/owner/profile">
             <NotificationBell />
           </UserMenu>

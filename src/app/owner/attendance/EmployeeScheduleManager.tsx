@@ -282,7 +282,7 @@ export default function EmployeeScheduleManager({
         )}
       </div>
 
-      <div className={styles.foot}>
+      <div className={styles.foot} data-schedule-footer>
         <button className={styles.save} onClick={save}>
           <LiaCheckSolid /> 저장
         </button>

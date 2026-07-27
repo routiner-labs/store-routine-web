@@ -68,7 +68,21 @@
   }
 }
 
+@media (min-width: 768px) and (max-width: 1023px) {
+  :global([data-schedule-footer]) {
+    align-items: center;
+    height: 101px;
+    padding-block: 0;
+  }
+}
+
 @media (min-width: 1024px) {
+  :global([data-schedule-footer]) {
+    align-items: center;
+    height: 59px;
+    padding-block: 0;
+  }
+
   .table {
     background: var(--color-surface);
     border: 1px solid var(--color-border);

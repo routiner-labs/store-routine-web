@@ -26,6 +26,21 @@ for (const [mode, path] of Object.entries(paths)) {
   }
 }
 
+for (const width of [1440, 1024, 1023, 768]) {
+  test(`${width}px에서 저장 영역과 프로필 영역의 상단선이 정렬된다`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await open(page, paths.base, width)
+
+    const profile = await page.locator('[data-owner-user-section]').boundingBox()
+    const footer = await page.locator('[data-schedule-footer]').boundingBox()
+
+    expect(profile).not.toBeNull()
+    expect(footer).not.toBeNull()
+    expect(Math.abs(footer.y - profile.y)).toBeLessThanOrEqual(1)
+    expect(Math.abs(footer.height - profile.height)).toBeLessThanOrEqual(1)
+  })
+}
+
 test('1440px 기본 스케줄 표는 의미 있는 헤더와 인접한 시간 열을 제공한다', async ({ page }) => {
   await open(page, paths.base)
 

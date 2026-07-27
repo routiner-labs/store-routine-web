@@ -1,6 +1,6 @@
 import { test, expect } from 'playwright/test'
 const paths = { base: '/owner/attendance/schedule', adjust: '/owner/attendance/adjust' }
-const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3006'
+const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3005'
 async function open(page, path, width = 1440, height = 900) {
   await page.setViewportSize({ width, height }); await page.goto(`${baseURL}${path}`)
 }

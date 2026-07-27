@@ -1,6 +1,6 @@
 import { test, expect } from 'playwright/test'
 
-const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3006'
+const baseURL = process.env.SCHEDULE_BASE_URL || 'http://localhost:3005'
 
 async function open(page, width = 1440, height = 900) {
   await page.setViewportSize({ width, height })
@@ -17,12 +17,15 @@ test('일자별 조정 날짜 버튼에서 월간 달력을 열고 날짜를 선
   await open(page)
   const trigger = page.getByRole('button', { name: '조정 날짜' })
   await expect(trigger).toContainText('6월 30일 (화)')
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
   await trigger.click()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByRole('dialog', { name: '조정 날짜 선택' })).toBeVisible()
   await expect(page.getByText('2026년 6월', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: '다음 달' }).click()
   await page.getByRole('button', { name: '2026년 7월 1일 선택' }).click()
   await expect(trigger).toContainText('7월 1일 (수)')
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
   await expect(page.getByRole('dialog', { name: '조정 날짜 선택' })).toBeHidden()
 })
 
@@ -34,6 +37,20 @@ test('월 이동과 취소는 선택한 날짜를 바꾸지 않는다', async ({
   await expect(trigger).toContainText('6월 30일 (화)')
   await clickOutsidePicker(page)
   await expect(page.getByRole('dialog', { name: '조정 날짜 선택' })).toBeHidden()
+  await expect(trigger).toContainText('6월 30일 (화)')
+})
+
+test('12월과 1월 경계 이동은 연도를 바꾸고 선택 날짜는 유지한다', async ({ page }) => {
+  await open(page)
+  const trigger = page.getByRole('button', { name: '조정 날짜' })
+  await trigger.click()
+  const nextMonth = page.getByRole('button', { name: '다음 달' })
+  for (let count = 0; count < 6; count += 1) await nextMonth.click()
+  await expect(page.getByText('2026년 12월', { exact: true })).toBeVisible()
+  await nextMonth.click()
+  await expect(page.getByText('2027년 1월', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: '이전 달' }).click()
+  await expect(page.getByText('2026년 12월', { exact: true })).toBeVisible()
   await expect(trigger).toContainText('6월 30일 (화)')
 })
 

@@ -194,3 +194,115 @@ git add src/app/owner/attendance/EmployeeScheduleTable.tsx src/app/owner/attenda
 git commit -m "feat: 스케줄 관리 화면 편집표로 개선"
 git push
 ```
+
+---
+
+### Task 2: 저장 영역과 사이드바 프로필 영역 높이 정렬
+
+**파일:**
+
+- 수정: `src/app/owner/OwnerNav.tsx`
+- 수정: `src/app/owner/attendance/EmployeeScheduleManager.tsx`
+- 수정: `src/app/owner/attendance/EmployeeScheduleTable.module.css`
+- 수정: `tests/e2e/schedule-management.spec.js`
+- 수정: `.claude/history/2026-07-27.md`
+
+**인터페이스:**
+
+- 사이드바 프로필 영역 식별자: `data-owner-user-section`
+- 스케줄 저장 영역 식별자: `data-schedule-footer`
+- 768px 이상 1024px 미만 저장 영역 높이: `101px`
+- 1024px 이상 저장 영역 높이: `59px`
+
+- [ ] **1단계: 실패하는 경계선 정렬 테스트 작성**
+
+`tests/e2e/schedule-management.spec.js`에 다음 검증을 추가한다.
+
+```javascript
+for (const width of [1440, 1024, 1023, 768]) {
+  test(`${width}px에서 저장 영역과 프로필 영역의 상단선이 정렬된다`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/owner/attendance/schedule')
+
+    const profile = await page.locator('[data-owner-user-section]').boundingBox()
+    const footer = await page.locator('[data-schedule-footer]').boundingBox()
+
+    expect(profile).not.toBeNull()
+    expect(footer).not.toBeNull()
+    expect(Math.abs(footer.y - profile.y)).toBeLessThanOrEqual(1)
+    expect(Math.abs(footer.height - profile.height)).toBeLessThanOrEqual(1)
+  })
+}
+```
+
+- [ ] **2단계: 식별자와 높이 규칙이 없어 실패하는지 확인**
+
+실행:
+
+```bash
+SCHEDULE_BASE_URL=http://localhost:3005 NODE_PATH=/home/cheykim/.nvm/versions/node/v24.12.0/lib/node_modules playwright test tests/e2e/schedule-management.spec.js --grep "저장 영역과 프로필 영역" --reporter=line --workers=1
+```
+
+예상 결과: 두 식별자를 찾을 수 없어 4건 모두 실패한다.
+
+- [ ] **3단계: 정렬 대상 식별자 추가**
+
+- `OwnerNav.tsx`의 `userSection`에 `data-owner-user-section`을 추가한다.
+- `EmployeeScheduleManager.tsx`의 `foot`에 `data-schedule-footer`를 추가한다.
+- 기존 클래스와 동작은 변경하지 않는다.
+
+- [ ] **4단계: 반응형 저장 영역 높이 적용**
+
+`EmployeeScheduleTable.module.css`에 다음 규칙을 추가한다.
+
+```css
+@media (min-width: 768px) and (max-width: 1023px) {
+  :global([data-schedule-footer]) {
+    align-items: center;
+    height: 101px;
+    padding-block: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  :global([data-schedule-footer]) {
+    align-items: center;
+    height: 59px;
+    padding-block: 0;
+  }
+}
+```
+
+- [ ] **5단계: 경계선 정렬과 전체 회귀 테스트 통과 확인**
+
+실행:
+
+```bash
+SCHEDULE_BASE_URL=http://localhost:3005 NODE_PATH=/home/cheykim/.nvm/versions/node/v24.12.0/lib/node_modules playwright test tests/e2e/schedule-management.spec.js --reporter=line --workers=1
+```
+
+예상 결과: 기존 11건과 정렬 4건, 총 15건 통과.
+
+- [ ] **6단계: 시각 및 정적 검증**
+
+- 1440×900, 1024×900, 768×900에서 프로필 영역과 저장 영역의 상단 경계선을 캡처로 확인한다.
+- 390×844에서 모바일 저장 영역이 기존 높이와 배치를 유지하는지 확인한다.
+
+실행:
+
+```bash
+npm run build
+npx eslint src/app/owner/OwnerNav.tsx src/app/owner/attendance/EmployeeScheduleManager.tsx tests/e2e/schedule-management.spec.js
+git diff --check
+wc -l src/app/owner/OwnerNav.tsx src/app/owner/attendance/EmployeeScheduleManager.tsx src/app/owner/attendance/EmployeeScheduleTable.module.css tests/e2e/schedule-management.spec.js
+```
+
+- [ ] **7단계: 이력 기록, 커밋, 푸시**
+
+`.claude/history/2026-07-27.md`에 저장 영역과 프로필 영역 정렬 및 검증 결과를 추가한다.
+
+```bash
+git add src/app/owner/OwnerNav.tsx src/app/owner/attendance/EmployeeScheduleManager.tsx src/app/owner/attendance/EmployeeScheduleTable.module.css tests/e2e/schedule-management.spec.js .claude/history/2026-07-27.md
+git commit -m "feat: 저장 영역과 프로필 높이 정렬"
+git push
+```

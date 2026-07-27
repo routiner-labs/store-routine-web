@@ -26,6 +26,48 @@ for (const [mode, path] of Object.entries(paths)) {
   }
 }
 
+for (const [mode, path] of Object.entries(paths)) {
+  test(`${mode} 스케줄에서 직원 이름 일부로 즉시 검색하고 초기화한다`, async ({ page }) => {
+    await open(page, path)
+
+    const table = page.getByRole('table', {
+      name: mode === 'base' ? '기본 스케줄 편집표' : '일자별 조정 편집표',
+    })
+    const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+
+    await expect(search).toBeVisible({ timeout: 2000 })
+    await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
+
+    await search.fill(' 서 ')
+    await expect(table.locator('[data-schedule-row]')).toHaveCount(2)
+    await expect(table.getByText('이서윤', { exact: true })).toBeVisible()
+    await expect(table.getByText('박서준', { exact: true })).toBeVisible()
+    await expect(table.getByText('김민수', { exact: true })).toHaveCount(0)
+
+    await search.fill('없는직원')
+    await expect(table.locator('[data-schedule-row]')).toHaveCount(0)
+    await expect(table.getByText('검색 결과가 없습니다.', { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
+    await expect(search).toHaveValue('')
+    await expect(table.locator('[data-schedule-row]')).toHaveCount(4)
+  })
+}
+
+test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한다', async ({ page }) => {
+  await open(page, paths.base)
+
+  const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+  const start = page.getByLabel('김민수 시작 시간')
+
+  await expect(search).toBeVisible({ timeout: 2000 })
+  await start.fill('10:00')
+  await search.fill('이서윤')
+  await expect(start).toHaveCount(0)
+  await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
+  await expect(page.getByLabel('김민수 시작 시간')).toHaveValue('10:00')
+})
+
 for (const [width, expectedHeight] of [[1440, 59], [1024, 59], [1023, 101], [768, 101]]) {
   test(`${width}px에서 저장 영역과 프로필 영역의 상단선이 정렬된다`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })

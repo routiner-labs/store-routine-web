@@ -10,6 +10,63 @@
   display: none;
 }
 
+.searchToolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 4px;
+}
+
+.search {
+  position: relative;
+  width: 100%;
+}
+
+.search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 38px 0 34px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.search input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
+}
+
+.searchIcon,
+.search button {
+  position: absolute;
+  top: 50%;
+  color: var(--color-text-secondary);
+  transform: translateY(-50%);
+}
+
+.searchIcon { left: 11px; }
+
+.search button {
+  right: 5px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+}
+
+.search button:hover { background: var(--color-primary-light); }
+
+.emptyRow {
+  display: grid;
+  min-height: 96px;
+  color: var(--color-text-secondary);
+  place-items: center;
+  text-align: center;
+}
+
 .table :global([data-schedule-row]) {
   display: flex;
   flex-direction: column;
@@ -41,6 +98,8 @@
 }
 
 @media (min-width: 768px) {
+  .search { width: 280px; }
+
   :global([data-schedule-body]):has(.table) {
     max-width: none;
   }

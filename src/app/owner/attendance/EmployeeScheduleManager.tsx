@@ -30,6 +30,11 @@ export default function EmployeeScheduleManager({
   const { leaving, leave, onAnimationEnd } = usePageLeave()
 
   const activeEmployees = mockEmployees.filter((e) => e.status === 'ACTIVE')
+  const [employeeQuery, setEmployeeQuery] = useState('')
+  const normalizedQuery = employeeQuery.trim().toLocaleLowerCase('ko-KR')
+  const visibleEmployees = normalizedQuery
+    ? activeEmployees.filter((employee) => employee.name.toLocaleLowerCase('ko-KR').includes(normalizedQuery))
+    : activeEmployees
 
   // 스케줄은 사장이 생성해야 존재한다. 생성 전에는 null(스케줄 없음).
   const [schedules, setSchedules] = useState<Record<string, WeeklySchedule | null>>(() =>
@@ -130,8 +135,8 @@ export default function EmployeeScheduleManager({
             <p className={styles.guide}>
               스케줄을 생성해야 근무 일정이 만들어집니다. 반복되는 기본 근무 패턴을 설정하세요.
             </p>
-            <EmployeeScheduleTable mode="base">
-              {activeEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="base" query={employeeQuery} onQueryChange={setEmployeeQuery} empty={!visibleEmployees.length}>
+              {visibleEmployees.map((emp) => {
                 const sched = schedules[emp.id]
                 return (
                   <div key={emp.id} role="row" data-schedule-row>
@@ -174,6 +179,7 @@ export default function EmployeeScheduleManager({
                             className={styles.timeInput}
                             value={sched.startTime}
                             onChange={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
+                            onBlur={(e) => setSchedTime(emp.id, 'startTime', e.target.value)}
                           />
                           <span className={styles.timeSep} aria-hidden="true">~</span>
                           <input
@@ -182,6 +188,7 @@ export default function EmployeeScheduleManager({
                             className={styles.timeInput}
                             value={sched.endTime}
                             onChange={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
+                            onBlur={(e) => setSchedTime(emp.id, 'endTime', e.target.value)}
                           />
                           <button
                             type="button" aria-label={`${emp.name} 스케줄 삭제`}
@@ -212,8 +219,8 @@ export default function EmployeeScheduleManager({
                 선택한 날짜만 근무·휴무·시간을 조정합니다. 기본 스케줄은 바뀌지 않습니다.
               </span>
             </div>
-            <EmployeeScheduleTable mode="adjust">
-              {activeEmployees.map((emp) => {
+            <EmployeeScheduleTable mode="adjust" query={employeeQuery} onQueryChange={setEmployeeQuery} empty={!visibleEmployees.length}>
+              {visibleEmployees.map((emp) => {
                 const eff = effectiveDay(emp.id, schedDate)
                 return (
                   <div key={emp.id} role="row" data-schedule-row>

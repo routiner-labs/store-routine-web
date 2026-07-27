@@ -28,10 +28,8 @@
 ## 컴포넌트 경계
 
 - `EmployeeScheduleManager.tsx`: 검색어 상태와 필터링된 활성 직원 목록을 소유하고 두 모드의 행 렌더링에 같은 목록을 사용한다.
-- `EmployeeScheduleSearch.tsx`: 검색 입력, 아이콘, 지우기 버튼만 담당한다.
-- `EmployeeScheduleSearch.module.css`: 검색 도구의 반응형 배치와 입력 스타일을 담당한다.
-- `EmployeeScheduleTable.tsx`: 검색 결과가 없을 때 접근 가능한 빈 결과 행을 표시한다.
-- `EmployeeScheduleTable.module.css`: 편집표 안 빈 결과 행의 레이아웃만 담당한다.
+- `EmployeeScheduleTable.tsx`: 공통 검색 입력·아이콘·지우기 버튼과 검색 결과가 없을 때의 접근 가능한 빈 결과 행을 표시한다.
+- `EmployeeScheduleTable.module.css`: 검색 도구의 반응형 배치와 입력 스타일, 편집표 안 빈 결과 행의 레이아웃을 담당한다.
 
 이 분리로 300줄에 가까운 `EmployeeScheduleManager.tsx`에 검색 UI 마크업과 스타일 책임을 추가하지 않는다.
 

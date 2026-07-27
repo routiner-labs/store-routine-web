@@ -72,6 +72,25 @@ test('검색으로 직원을 숨겨도 기본 스케줄 편집값을 유지한�
   )
 })
 
+test('검색으로 직원을 숨겨도 일자별 조정 상태를 유지한다', async ({ page }) => {
+  await open(page, paths.adjust)
+
+  const search = page.getByRole('textbox', { name: '직원 이름 검색' })
+  const off = page.getByRole('button', { name: '김민수 휴무로 설정' })
+
+  await off.click()
+  await expect(off).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByText('조정됨', { exact: true })).toBeVisible()
+  await search.fill('이서윤')
+  await expect(off).toHaveCount(0)
+  await expect(page.getByText('조정됨', { exact: true })).toHaveCount(0)
+  await page.getByRole('button', { name: '직원 검색어 지우기' }).click()
+  await expect(page.getByRole('button', { name: '김민수 휴무로 설정' })).toHaveAttribute(
+    'aria-pressed', 'true',
+  )
+  await expect(page.getByText('조정됨', { exact: true })).toBeVisible()
+})
+
 for (const [width, expectedHeight] of [[1440, 59], [1024, 59], [1023, 101], [768, 101]]) {
   test(`${width}px에서 저장 영역과 프로필 영역의 상단선이 정렬된다`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
